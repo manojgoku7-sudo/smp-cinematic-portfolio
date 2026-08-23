@@ -1,7 +1,7 @@
 /**
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
  */
-import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDownRight,
@@ -82,6 +82,16 @@ const certifications = [
 ];
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
+const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
+  id: index,
+  left: 6 + ((index * 37) % 88),
+  top: 7 + ((index * 61) % 81),
+  size: 1 + ((index * 7) % 3),
+  opacity: 0.28 + ((index * 13) % 52) / 100,
+  delay: -((index * 17) % 43) / 10,
+  speed: 3.8 + ((index * 11) % 31) / 10,
+  tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
+}));
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -139,6 +149,7 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
+  const [starBursts, setStarBursts] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const reduceMotion = useReducedMotion();
@@ -232,6 +243,14 @@ export default function Home() {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
   }
 
+  function createNebulaBurst(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const burst = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
+    setStarBursts((current) => [...current.slice(-2), burst]);
+    window.setTimeout(() => setStarBursts((current) => current.filter((item) => item.id !== burst.id)), 820);
+  }
+
   return (
     <main className={`page-shell ${motionPaused ? "motion-paused" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
@@ -289,11 +308,12 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst}>
             <video ref={heroVideoRef} className="hero-video" autoPlay={!reduceMotion && !motionPaused} loop muted playsInline preload="metadata" poster="/manus-storage/smp-hero-orbit_86f3fd46.jpg" aria-hidden="true">
               <source src="/manus-storage/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" />
             </video>
             <div className="hero-grid" />
+            <div className="nebula-starfield" aria-hidden="true">{nebulaStars.map((star) => <span key={star.id} className={`nebula-star ${star.tone}`} style={{ left: `${star.left}%`, top: `${star.top}%`, "--star-size": `${star.size}px`, "--star-opacity": star.opacity, "--star-delay": `${star.delay}s`, "--star-speed": `${star.speed}s` } as React.CSSProperties} />)}{starBursts.map((burst) => <span key={burst.id} className="nebula-burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }} />)}</div>
             <div className="hero-seal" aria-label="SMP signal mark"><span className="signal-stroke one" /><span className="signal-stroke two" /><span className="signal-stroke three" /></div>
             <span className="hero-seal-caption">SMP / orbit study</span>
             <div className="orbit" aria-hidden="true" />

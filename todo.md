@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Add a live nebula-star field to the opening portfolio experience.
+- [x] Add subtle click-reactive star pulses without interfering with controls or readability.
+- [x] Verify performance and reduced-motion behavior across responsive layouts.
 - [x] Separate the case-signal copy, outcome metric, and category metadata on project cards.
 - [x] Verify the corrected annotation hierarchy at desktop and mobile sizes.
 - [x] Add a subtle dynamic scroll-progress indicator to the left signal rail.
