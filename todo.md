@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Add a small spinning star control in the upper-left portfolio area.
+- [x] Add a tasteful click-triggered spark burst with motion-control support.
+- [x] Verify the star control remains visible and non-obstructive across layouts.
 - [x] Add an elegant four-point star-map proficiency legend near the skills section.
 - [x] Verify the legend remains compact and legible across layouts.
 - [x] Add accessible proficiency-level star-map tooltips to skill chips.
