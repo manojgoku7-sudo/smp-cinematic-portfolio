@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Add restrained animated signal lines and miniature black-hole motifs to selected portfolio sections.
+- [x] Ensure every new decorative motion follows the global pause control and reduced-motion preference.
+- [x] Verify the expanded motion system remains visually balanced across desktop and mobile.
 - [x] Separate the case-signal captions from the category and date metadata on project cards.
 - [x] Add a concise outcome metric to each case-signal annotation and verify the revised composition.
 - [x] Refine the project-note caption overlays to better preserve card imagery and hierarchy.

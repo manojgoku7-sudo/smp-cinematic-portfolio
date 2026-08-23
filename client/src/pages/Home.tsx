@@ -290,6 +290,7 @@ export default function Home() {
       </div>
 
       <section id="about" className="editorial-band container py-28 md:py-40">
+        <div className="mini-singularity about-singularity" aria-hidden="true"><span /></div><span className="signal-thread about-thread" aria-hidden="true" />
         <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer who moves from interface structure to implementation — with enough backend and machine-learning context to make the whole experience connect." /></Reveal>
         <div className="about-proof mt-14 grid gap-5 lg:grid-cols-[1.28fr_.72fr]">
           <Reveal delay={0.06} className="panel relative overflow-hidden p-7 md:p-10">
@@ -341,6 +342,7 @@ export default function Home() {
       </section>
 
       <section className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40">
+        <div className="mini-singularity skill-singularity" aria-hidden="true"><span /></div><span className="signal-thread skill-thread" aria-hidden="true" />
         <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." /></Reveal>
           <div className="capability-grid mt-14 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
             {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className="min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126]"><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => <span className="skill-chip" key={item}>{item}</span>)}</div></div></Reveal>)}
@@ -349,6 +351,7 @@ export default function Home() {
       </section>
 
       <section className="editorial-band container py-28 md:py-40">
+        <div className="mini-singularity credential-singularity" aria-hidden="true"><span /></div><span className="signal-thread credential-thread" aria-hidden="true" />
         <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
         <div className="credential-grid mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">{certifications.map(([issuer, title, meta], index) => <Reveal delay={index * 0.06} key={title}><div className="cert bg-[#0d0b15]"><p className="label text-violet-200">{issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{title}</p><p className="mt-4 text-xs text-[#9d96ac]">{meta}</p></div></Reveal>)}</div>
       </section>
