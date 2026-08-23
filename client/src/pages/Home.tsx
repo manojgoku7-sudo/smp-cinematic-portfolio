@@ -93,6 +93,9 @@ const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
 }));
 type InteractionPoint = { id: number; x: number; y: number };
+const skillProficiency: Record<string, { level: string; stars: number }> = {
+  Java: { level: "Applied", stars: 4 }, JavaScript: { level: "Working", stars: 3 }, Python: { level: "Working", stars: 3 }, SQL: { level: "Working", stars: 3 }, HTML5: { level: "Applied", stars: 4 }, CSS3: { level: "Applied", stars: 4 }, "React (basic)": { level: "Foundation", stars: 2 }, Figma: { level: "Applied", stars: 4 }, Wireframing: { level: "Applied", stars: 4 }, Prototyping: { level: "Applied", stars: 4 }, "Spring Boot": { level: "Working", stars: 3 }, "REST API": { level: "Applied", stars: 4 }, MySQL: { level: "Working", stars: 3 }, Git: { level: "Working", stars: 3 }, GitHub: { level: "Working", stars: 3 }, "VS Code": { level: "Applied", stars: 4 }, Firebase: { level: "Working", stars: 3 }, "Oracle APEX": { level: "Foundation", stars: 2 }, XGBoost: { level: "Applied", stars: 4 }, SVM: { level: "Working", stars: 3 }, "Logistic Regression": { level: "Working", stars: 3 }, Agile: { level: "Working", stars: 3 }, Scrum: { level: "Working", stars: 3 },
+};
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -153,9 +156,12 @@ export default function Home() {
   const [starBursts, setStarBursts] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [projectPulses, setProjectPulses] = useState<InteractionPoint[]>([]);
   const [constellationTrail, setConstellationTrail] = useState<InteractionPoint[]>([]);
+  const [contactPulses, setContactPulses] = useState<InteractionPoint[]>([]);
+  const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
   const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
+  const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const reduceMotion = useReducedMotion();
 
   const year = useMemo(() => new Date().getFullYear(), []);
@@ -165,6 +171,12 @@ export default function Home() {
     const dy = point.y - previous.y;
     return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
   }), [constellationTrail]);
+  const contactConstellationSegments = useMemo(() => contactConstellationTrail.slice(1).map((point, index) => {
+    const previous = contactConstellationTrail[index];
+    const dx = point.x - previous.x;
+    const dy = point.y - previous.y;
+    return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
+  }), [contactConstellationTrail]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -279,6 +291,26 @@ export default function Home() {
     if (now - previous.time < 52 || Math.hypot(x - previous.x, y - previous.y) < 3.4) return;
     lastConstellationPoint.current = { x, y, time: now };
     setConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
+  }
+
+  function createContactPulse(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const pulse = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
+    setContactPulses((current) => [...current.slice(-2), pulse]);
+    window.setTimeout(() => setContactPulses((current) => current.filter((item) => item.id !== pulse.id)), 920);
+  }
+
+  function extendContactConstellation(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+    const now = performance.now();
+    const previous = lastContactConstellationPoint.current;
+    if (now - previous.time < 58 || Math.hypot(x - previous.x, y - previous.y) < 3.7) return;
+    lastContactConstellationPoint.current = { x, y, time: now };
+    setContactConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
   }
 
   return (
@@ -416,7 +448,7 @@ export default function Home() {
         <div className="mini-singularity skill-singularity" aria-hidden="true"><span /></div><span className="signal-thread skill-thread" aria-hidden="true" />
         <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." /></Reveal>
           <div className="capability-grid mt-14 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className="min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126]"><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => <span className="skill-chip" key={item}>{item}</span>)}</div></div></Reveal>)}
+            {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className="min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126]"><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => { const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 }; return <span className="skill-chip" key={item} tabIndex={0} aria-label={`${item}: ${proficiency.level} proficiency`}><span>{item}</span><span className="skill-tooltip" role="tooltip"><span className="skill-star-map" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />)}</span><span className="skill-tooltip-copy">{proficiency.level} proficiency</span></span></span>; })}</div></div></Reveal>)}
           </div>
         </div>
       </section>
@@ -427,8 +459,9 @@ export default function Home() {
         <div className="credential-grid mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">{certifications.map(([issuer, title, meta], index) => <Reveal delay={index * 0.06} key={title}><div className="cert bg-[#0d0b15]"><p className="label text-violet-200">{issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{title}</p><p className="mt-4 text-xs text-[#9d96ac]">{meta}</p></div></Reveal>)}</div>
       </section>
 
-      <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/manus-storage/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div className="contact-atmosphere" aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" /></div>
+      <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" onPointerDown={createContactPulse} onPointerMove={extendContactConstellation} onPointerLeave={() => setContactConstellationTrail([])} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/manus-storage/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="contact-atmosphere" aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" />{contactPulses.map((pulse) => <span key={pulse.id} className="contact-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
+        <div className="contact-constellation" aria-hidden="true">{contactConstellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{contactConstellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
         <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label">07 / Contact</p><h2 className="display mt-5 max-w-[9ch] text-5xl leading-[.9] text-white md:text-7xl">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4"><a href="mailto:manojprabhu0707@gmail.com" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Mail size={16} /></span>manojprabhu0707@gmail.com</a><a href="tel:+919677518268" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Phone size={16} /></span>+91 9677518268</a><a href="https://maps.google.com/?q=Polur,Tamil+Nadu" target="_blank" rel="noreferrer" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><MapPin size={16} /></span>Polur, Tamil Nadu</a></div></div>
           <form className="panel p-6 md:p-9" onSubmit={handleContact}><div className="grid gap-5"><div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4"><span className="label text-[0.57rem]">Correspondence / 01</span><button type="button" className="motion-toggle" onClick={() => setMotionPaused((paused) => !paused)} aria-pressed={motionPaused || Boolean(reduceMotion)} aria-label={reduceMotion ? "Background motion is paused by your device setting" : motionPaused ? "Resume background motion" : "Pause background motion"} disabled={Boolean(reduceMotion)}>{motionPaused || reduceMotion ? <Play size={13} /> : <Pause size={13} />}{motionPaused || reduceMotion ? "Motion paused" : "Motion live"}</button></div><label className="block"><span className="label mb-2 block">Your name</span><input className="form-field" required name="name" placeholder="What should I call you?" /></label><label className="block"><span className="label mb-2 block">Email</span><input className="form-field" type="email" required name="email" placeholder="name@company.com" /></label><label className="block"><span className="label mb-2 block">Message</span><textarea className="form-field min-h-36 resize-y" required name="message" placeholder="A few lines about the work, goal, or opportunity..." /></label><button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
       </section>

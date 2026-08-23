@@ -1,5 +1,9 @@
 # Enhancement Checklist
 
+- [x] Add accessible proficiency-level star-map tooltips to skill chips.
+- [x] Add click-reactive pulses to the contact background.
+- [x] Extend the constellation trail to the contact section with motion-control support.
+- [x] Verify the enhanced interactions remain readable and non-obstructive.
 - [x] Add click-reactive pulses to the project showcase background.
 - [x] Add a smooth constellation trail that follows the pointer within the hero.
 - [x] Verify both effects respect motion controls and remain non-obstructive.
