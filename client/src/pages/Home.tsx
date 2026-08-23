@@ -92,6 +92,7 @@ const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   speed: 3.8 + ((index * 11) % 31) / 10,
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
 }));
+type InteractionPoint = { id: number; x: number; y: number };
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -150,11 +151,20 @@ export default function Home() {
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
   const [starBursts, setStarBursts] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [projectPulses, setProjectPulses] = useState<InteractionPoint[]>([]);
+  const [constellationTrail, setConstellationTrail] = useState<InteractionPoint[]>([]);
   const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const reduceMotion = useReducedMotion();
 
   const year = useMemo(() => new Date().getFullYear(), []);
+  const constellationSegments = useMemo(() => constellationTrail.slice(1).map((point, index) => {
+    const previous = constellationTrail[index];
+    const dx = point.x - previous.x;
+    const dy = point.y - previous.y;
+    return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
+  }), [constellationTrail]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -251,6 +261,26 @@ export default function Home() {
     window.setTimeout(() => setStarBursts((current) => current.filter((item) => item.id !== burst.id)), 820);
   }
 
+  function createProjectPulse(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const pulse = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
+    setProjectPulses((current) => [...current.slice(-2), pulse]);
+    window.setTimeout(() => setProjectPulses((current) => current.filter((item) => item.id !== pulse.id)), 920);
+  }
+
+  function extendConstellation(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+    const now = performance.now();
+    const previous = lastConstellationPoint.current;
+    if (now - previous.time < 52 || Math.hypot(x - previous.x, y - previous.y) < 3.4) return;
+    lastConstellationPoint.current = { x, y, time: now };
+    setConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
+  }
+
   return (
     <main className={`page-shell ${motionPaused ? "motion-paused" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
@@ -308,12 +338,13 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst}>
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
             <video ref={heroVideoRef} className="hero-video" autoPlay={!reduceMotion && !motionPaused} loop muted playsInline preload="metadata" poster="/manus-storage/smp-hero-orbit_86f3fd46.jpg" aria-hidden="true">
               <source src="/manus-storage/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" />
             </video>
             <div className="hero-grid" />
             <div className="nebula-starfield" aria-hidden="true">{nebulaStars.map((star) => <span key={star.id} className={`nebula-star ${star.tone}`} style={{ left: `${star.left}%`, top: `${star.top}%`, "--star-size": `${star.size}px`, "--star-opacity": star.opacity, "--star-delay": `${star.delay}s`, "--star-speed": `${star.speed}s` } as React.CSSProperties} />)}{starBursts.map((burst) => <span key={burst.id} className="nebula-burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }} />)}</div>
+            <div className="constellation-trail" aria-hidden="true">{constellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{constellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
             <div className="hero-seal" aria-label="SMP signal mark"><span className="signal-stroke one" /><span className="signal-stroke two" /><span className="signal-stroke three" /></div>
             <span className="hero-seal-caption">SMP / orbit study</span>
             <div className="orbit" aria-hidden="true" />
@@ -351,8 +382,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40">
-        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" /></div>
+      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse}>
+        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>

@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Add click-reactive pulses to the project showcase background.
+- [x] Add a smooth constellation trail that follows the pointer within the hero.
+- [x] Verify both effects respect motion controls and remain non-obstructive.
 - [x] Add a live nebula-star field to the opening portfolio experience.
 - [x] Add subtle click-reactive star pulses without interfering with controls or readability.
 - [x] Verify performance and reduced-motion behavior across responsive layouts.
