@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Add a matching spinning spark control to the footer.
+- [x] Add a concise hover tooltip and keyboard-focus release label to star controls.
+- [x] Verify the two star controls remain accessible and visually consistent.
 - [x] Add a small spinning star control in the upper-left portfolio area.
 - [x] Add a tasteful click-triggered spark burst with motion-control support.
 - [x] Verify the star control remains visible and non-obstructive across layouts.
