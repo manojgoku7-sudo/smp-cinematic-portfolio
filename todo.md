@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Separate the case-signal copy, outcome metric, and category metadata on project cards.
+- [x] Verify the corrected annotation hierarchy at desktop and mobile sizes.
 - [x] Add a subtle dynamic scroll-progress indicator to the left signal rail.
 - [x] Verify the indicator is responsive and non-distracting across layouts.
 - [x] Add signal-line hover halos to skill chips.
