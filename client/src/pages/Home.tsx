@@ -136,6 +136,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("about");
   const [cursor, setCursor] = useState({ x: -100, y: -100, active: false });
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
@@ -164,12 +165,18 @@ export default function Home() {
   }, [motionPaused, reduceMotion]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const maximum = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0);
+    };
     const onPointer = (event: PointerEvent) => setCursor((current) => ({ ...current, x: event.clientX, y: event.clientY }));
     const onEnter = () => setCursor((current) => ({ ...current, active: true }));
     const onLeave = () => setCursor((current) => ({ ...current, active: false }));
     const interactive = Array.from(document.querySelectorAll<HTMLElement>("a,button,input,textarea"));
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
     window.addEventListener("pointermove", onPointer, { passive: true });
     interactive.forEach((element) => {
       element.addEventListener("pointerenter", onEnter);
@@ -190,6 +197,7 @@ export default function Home() {
     });
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       window.removeEventListener("pointermove", onPointer);
       interactive.forEach((element) => {
         element.removeEventListener("pointerenter", onEnter);
@@ -229,6 +237,7 @@ export default function Home() {
       <AnimatePresence>{introVisible && !reduceMotion ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
+      <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
 
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">

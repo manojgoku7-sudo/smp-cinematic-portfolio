@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a subtle dynamic scroll-progress indicator to the left signal rail.
+- [x] Verify the indicator is responsive and non-distracting across layouts.
 - [x] Add signal-line hover halos to skill chips.
 - [x] Add an animated active-navigation line treatment.
 - [x] Add a concise portfolio loading transition with reduced-motion support.

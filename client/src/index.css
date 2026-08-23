@@ -98,6 +98,12 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .grain { pointer-events: none; position: fixed; inset: 0; z-index: 30; opacity: 0.045; mix-blend-mode: screen; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E"); }
 .cursor { pointer-events: none; position: fixed; z-index: 70; top: 0; left: 0; width: 10px; height: 10px; border-radius: 50%; background: #d5c6ff; mix-blend-mode: screen; box-shadow: 0 0 22px 7px rgb(139 92 246 / 0.76); transform: translate3d(-100px,-100px,0); transition: width 180ms var(--ease-out), height 180ms var(--ease-out), background 180ms var(--ease-out); }
 .cursor.is-active { width: 30px; height: 30px; background: rgb(139 92 246 / 0.25); border: 1px solid rgb(205 187 255 / 0.85); }
+.scroll-progress-rail { pointer-events: none; position: fixed; z-index: 45; left: clamp(0.75rem, 1.6vw, 1.5rem); top: 50%; display: grid; grid-template-columns: auto 1px auto; align-items: center; gap: 0.5rem; height: min(16rem, 32vh); transform: translateY(-50%); }
+.scroll-progress-label { color: rgb(190 172 234 / 0.72); font-size: 0.5rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
+.scroll-progress-track { position: relative; display: block; width: 1px; height: 100%; background: linear-gradient(to bottom, rgb(196 181 253 / 0.08), rgb(196 181 253 / 0.24), rgb(196 181 253 / 0.08)); }
+.scroll-progress-fill { position: absolute; bottom: 0; left: -1px; width: 3px; min-height: 0.3rem; background: linear-gradient(to top, #8b5cf6, #d3c5ff); box-shadow: 0 0 12px rgb(139 92 246 / 0.9); transition: height 90ms linear; }
+.scroll-progress-fill::after { content: ""; position: absolute; top: -0.16rem; left: -0.14rem; width: 0.4rem; height: 0.4rem; border: 1px solid #e0d7ff; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 0 3px rgb(139 92 246 / 0.15), 0 0 12px #8b5cf6; }
+.scroll-progress-value { width: 1.7rem; color: rgb(215 201 255 / 0.7); font-family: "Space Grotesk", sans-serif; font-size: 0.52rem; letter-spacing: 0.08em; }
 
 .top-rule { border-top: 1px solid rgb(222 211 255 / 0.14); }
 .hairline { width: 1px; background: linear-gradient(to bottom, transparent, #8b5cf6 16%, rgb(196 181 253 / 0.22) 84%, transparent); }
@@ -243,3 +249,4 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .entry-loader { display: none !important; } }
 @media (max-width: 767px) { .hero { min-height: auto; padding-top: 6rem; padding-bottom: 3rem; } .hero-visual, .hero-image { min-height: 320px; } .reel-track { animation-duration: 36s; } .mini-singularity { opacity: 0.35; } .about-singularity { top: 3rem; right: -1rem; } .skill-singularity, .credential-singularity { display: none; } .signal-thread { opacity: 0.6; } .about-thread { top: 8rem; right: -10%; width: 76vw; } }
 @media (max-width: 767px) { .project-caption { top: 3.45rem; width: min(82%, 18rem); opacity: 1; transform: none; } }
+@media (max-width: 900px) { .scroll-progress-rail { display: none; } }
