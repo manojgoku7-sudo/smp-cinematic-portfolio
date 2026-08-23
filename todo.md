@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a smooth short-caption reveal to each project card on hover and keyboard focus.
+- [x] Verify the reveal remains readable and respects reduced-motion preferences.
 - [x] Add a subtle CSS-driven project-showcase motion effect using existing visual assets.
 - [x] Integrate the effect with the global pause control and reduced-motion fallback, then verify the layout.
 - [x] Add an accessible visual success indicator after contact-form submission.
