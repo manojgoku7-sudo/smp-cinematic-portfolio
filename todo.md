@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add an accessible visual success indicator after contact-form submission.
+- [x] Verify the confirmation state and its visual contrast, then save the update.
 - [x] Add an accessible motion-control toggle beside the contact form.
 - [x] Verify that the toggle pauses decorative animation and remains keyboard accessible.
 - [x] Add a subtle lighter animated background treatment to the contact section.

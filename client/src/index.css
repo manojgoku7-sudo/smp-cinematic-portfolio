@@ -184,6 +184,8 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .motion-toggle:active:not(:disabled) { transform: scale(0.97); }
 .motion-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
 .motion-paused .orbit, .motion-paused .contact-orbit, .motion-paused .contact-glint, .motion-paused .contact-atmosphere::before, .motion-paused .contact-atmosphere::after { animation-play-state: paused !important; }
+.delivery-status { display: flex; align-items: flex-start; gap: 0.7rem; border: 1px solid rgb(196 181 253 / 0.34); background: linear-gradient(90deg, rgb(139 92 246 / 0.18), rgb(196 181 253 / 0.06)); padding: 0.8rem 0.9rem; color: #ede8ff; box-shadow: inset 3px 0 0 #a78bfa, 0 12px 28px rgb(81 39 167 / 0.14); }
+.delivery-status svg { margin-top: 0.06rem; flex: 0 0 auto; color: #c7b3ff; filter: drop-shadow(0 0 8px rgb(167 139 250 / 0.7)); }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes drift { 0%, 100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(-1rem, -1.5rem, 0) rotate(7deg); } }
