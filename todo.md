@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Separate the case-signal captions from the category and date metadata on project cards.
+- [x] Add a concise outcome metric to each case-signal annotation and verify the revised composition.
 - [x] Refine the project-note caption overlays to better preserve card imagery and hierarchy.
 - [x] Verify the revised caption composition at desktop and mobile sizes.
 - [x] Add a smooth short-caption reveal to each project card on hover and keyboard focus.
