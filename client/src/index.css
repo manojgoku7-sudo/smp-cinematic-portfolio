@@ -179,6 +179,11 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .contact-orbit.two { width: 17rem; height: 17rem; right: 15%; top: 12%; border-right-color: rgb(244 184 232 / 0.32); transform: rotate(18deg); }
 .contact-glint { position: absolute; width: 0.4rem; height: 0.4rem; border-radius: 50%; background: #d9c9ff; box-shadow: 0 0 0 5px rgb(188 154 255 / 0.1), 0 0 24px rgb(188 154 255 / 0.86); }
 .contact-glint.one { left: 24%; top: 31%; }.contact-glint.two { right: 27%; bottom: 27%; background: #f5bded; box-shadow: 0 0 0 5px rgb(244 184 232 / 0.08), 0 0 24px rgb(244 184 232 / 0.78); }
+.motion-toggle { display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgb(222 211 255 / 0.16); background: rgb(5 4 9 / 0.34); padding: 0.55rem 0.7rem; color: #cfc4e8; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; transition: transform 160ms var(--ease-out), border-color 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out); }
+.motion-toggle:hover:not(:disabled) { transform: translateY(-2px); border-color: rgb(196 181 253 / 0.65); background: rgb(139 92 246 / 0.14); color: #fff; }
+.motion-toggle:active:not(:disabled) { transform: scale(0.97); }
+.motion-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
+.motion-paused .orbit, .motion-paused .contact-orbit, .motion-paused .contact-glint, .motion-paused .contact-atmosphere::before, .motion-paused .contact-atmosphere::after { animation-play-state: paused !important; }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes drift { 0%, 100% { transform: translate3d(0,0,0) rotate(0); } 50% { transform: translate3d(-1rem, -1.5rem, 0) rotate(7deg); } }
