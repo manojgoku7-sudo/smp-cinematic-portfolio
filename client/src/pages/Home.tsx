@@ -311,7 +311,8 @@ export default function Home() {
       </section>
 
       <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40">
-        <div className="container"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
+        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" /></div>
+        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article className="project-card panel" onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />

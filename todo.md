@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a subtle CSS-driven project-showcase motion effect using existing visual assets.
+- [x] Integrate the effect with the global pause control and reduced-motion fallback, then verify the layout.
 - [x] Add an accessible visual success indicator after contact-form submission.
 - [x] Verify the confirmation state and its visual contrast, then save the update.
 - [x] Add an accessible motion-control toggle beside the contact form.

@@ -153,6 +153,10 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .project-index { position: absolute; top: 1.5rem; right: 1.5rem; color: #e9e3ff; font-family: "Space Grotesk", sans-serif; font-size: 0.82rem; letter-spacing: 0.12em; }
 .project-signal { position: absolute; z-index: 3; left: 1.5rem; top: 1.55rem; display: flex; align-items: center; gap: 0.5rem; color: #d8ccff; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
 .project-signal::before { content: ""; width: 2.2rem; height: 1px; background: linear-gradient(90deg, #8b5cf6, transparent); box-shadow: 0 0 12px #8b5cf6; }
+.project-atmosphere { pointer-events: none; position: absolute; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(circle at 81% 48%, rgb(141 99 255 / 0.13), transparent 23rem), radial-gradient(circle at 18% 78%, rgb(235 182 245 / 0.06), transparent 18rem); }
+.project-seal-ghost { position: absolute; width: min(37rem, 55vw); right: -10rem; top: 3rem; opacity: 0.075; filter: blur(0.8px) saturate(1.25); transform: rotate(-24deg); mix-blend-mode: screen; }
+.project-signal-wave { position: absolute; width: min(56rem, 82vw); height: 18rem; right: -13rem; bottom: 5%; border: 1px solid rgb(196 181 253 / 0.16); border-left-color: transparent; border-radius: 50%; transform: rotate(-18deg); box-shadow: inset 0 0 65px rgb(139 92 246 / 0.08), 0 0 65px rgb(139 92 246 / 0.06); }
+.project-signal-wave::after { content: ""; position: absolute; inset: 20%; border: 1px solid rgb(244 184 232 / 0.1); border-right-color: transparent; border-radius: 50%; }
 
 .timeline-row { position: relative; display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1.7rem 0 1.7rem 2rem; border-top: 1px solid rgb(222 211 255 / 0.1); }
 .timeline-row::before { content: ""; position: absolute; width: 0.56rem; height: 0.56rem; left: -0.24rem; top: 2rem; border-radius: 50%; background: #9f7aea; box-shadow: 0 0 0 5px rgb(139 92 246 / 0.1), 0 0 18px #8b5cf6; }
@@ -183,7 +187,7 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .motion-toggle:hover:not(:disabled) { transform: translateY(-2px); border-color: rgb(196 181 253 / 0.65); background: rgb(139 92 246 / 0.14); color: #fff; }
 .motion-toggle:active:not(:disabled) { transform: scale(0.97); }
 .motion-toggle:disabled { cursor: not-allowed; opacity: 0.5; }
-.motion-paused .orbit, .motion-paused .contact-orbit, .motion-paused .contact-glint, .motion-paused .contact-atmosphere::before, .motion-paused .contact-atmosphere::after { animation-play-state: paused !important; }
+.motion-paused .orbit, .motion-paused .contact-orbit, .motion-paused .contact-glint, .motion-paused .contact-atmosphere::before, .motion-paused .contact-atmosphere::after, .motion-paused .project-seal-ghost, .motion-paused .project-signal-wave { animation-play-state: paused !important; }
 .delivery-status { display: flex; align-items: flex-start; gap: 0.7rem; border: 1px solid rgb(196 181 253 / 0.34); background: linear-gradient(90deg, rgb(139 92 246 / 0.18), rgb(196 181 253 / 0.06)); padding: 0.8rem 0.9rem; color: #ede8ff; box-shadow: inset 3px 0 0 #a78bfa, 0 12px 28px rgb(81 39 167 / 0.14); }
 .delivery-status svg { margin-top: 0.06rem; flex: 0 0 auto; color: #c7b3ff; filter: drop-shadow(0 0 8px rgb(167 139 250 / 0.7)); }
 
@@ -192,6 +196,8 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @keyframes contact-orbit-drift { 0%, 100% { transform: translate3d(0,0,0) rotate(0deg); } 50% { transform: translate3d(1.4rem,-1rem,0) rotate(9deg); } }
 @keyframes contact-orbit-drift-reverse { 0%, 100% { transform: translate3d(0,0,0) rotate(18deg); } 50% { transform: translate3d(-1rem,1rem,0) rotate(7deg); } }
 @keyframes contact-glint-pulse { 0%, 100% { opacity: .38; transform: scale(.74); } 50% { opacity: 1; transform: scale(1.18); } }
+@keyframes project-seal-drift { 0%, 100% { transform: translate3d(0,0,0) rotate(-24deg) scale(1); } 50% { transform: translate3d(-2.2rem,1.4rem,0) rotate(-17deg) scale(1.06); } }
+@keyframes project-signal-drift { 0%, 100% { transform: translate3d(0,0,0) rotate(-18deg); opacity: .58; } 50% { transform: translate3d(-2rem,-1rem,0) rotate(-12deg); opacity: 1; } }
 @media (min-width: 768px) { .timeline-row { grid-template-columns: 10.5rem 1fr; gap: 2rem; } }
 @media (min-width: 1024px) {
   #about .about-proof { margin-left: clamp(1rem, 8vw, 7.5rem); }
@@ -200,6 +206,6 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
   .capability-grid > div:nth-child(2), .capability-grid > div:nth-child(5) { transform: translateY(1.8rem); }
   .credential-grid > div:nth-child(2), .credential-grid > div:nth-child(4) { transform: translateY(2.3rem); }
 }
-@media (prefers-reduced-motion: no-preference) { .orbit { animation: drift 10s ease-in-out infinite; } .contact-orbit.one { animation: contact-orbit-drift 15s ease-in-out infinite; } .contact-orbit.two { animation: contact-orbit-drift-reverse 18s ease-in-out infinite; } .contact-glint { animation: contact-glint-pulse 4.5s ease-in-out infinite; } .contact-glint.two { animation-delay: -2.1s; } .contact-atmosphere::before { animation: contact-orbit-drift 21s ease-in-out infinite; } .contact-atmosphere::after { animation: contact-orbit-drift-reverse 25s ease-in-out infinite; } }
+@media (prefers-reduced-motion: no-preference) { .orbit { animation: drift 10s ease-in-out infinite; } .project-seal-ghost { animation: project-seal-drift 23s ease-in-out infinite; } .project-signal-wave { animation: project-signal-drift 19s ease-in-out infinite; } .contact-orbit.one { animation: contact-orbit-drift 15s ease-in-out infinite; } .contact-orbit.two { animation: contact-orbit-drift-reverse 18s ease-in-out infinite; } .contact-glint { animation: contact-glint-pulse 4.5s ease-in-out infinite; } .contact-glint.two { animation-delay: -2.1s; } .contact-atmosphere::before { animation: contact-orbit-drift 21s ease-in-out infinite; } .contact-atmosphere::after { animation: contact-orbit-drift-reverse 25s ease-in-out infinite; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } .cursor { display: none; } .hero-video { display: none; } }
 @media (max-width: 767px) { .hero { min-height: auto; padding-top: 6rem; padding-bottom: 3rem; } .hero-visual, .hero-image { min-height: 320px; } .reel-track { animation-duration: 36s; } }
