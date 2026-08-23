@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add an elegant four-point star-map proficiency legend near the skills section.
+- [x] Verify the legend remains compact and legible across layouts.
 - [x] Add accessible proficiency-level star-map tooltips to skill chips.
 - [x] Add click-reactive pulses to the contact background.
 - [x] Extend the constellation trail to the contact section with motion-control support.
