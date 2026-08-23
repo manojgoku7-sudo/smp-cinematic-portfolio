@@ -2,7 +2,7 @@
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
  */
 import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -138,10 +138,20 @@ export default function Home() {
   const [cursor, setCursor] = useState({ x: -100, y: -100, active: false });
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
+  const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const reduceMotion = useReducedMotion();
 
   const year = useMemo(() => new Date().getFullYear(), []);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setIntroVisible(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setIntroVisible(false), 860);
+    return () => window.clearTimeout(timer);
+  }, [reduceMotion]);
 
   useEffect(() => {
     const video = heroVideoRef.current;
@@ -216,6 +226,7 @@ export default function Home() {
 
   return (
     <main className={`page-shell ${motionPaused ? "motion-paused" : ""}`}>
+      <AnimatePresence>{introVisible && !reduceMotion ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
 

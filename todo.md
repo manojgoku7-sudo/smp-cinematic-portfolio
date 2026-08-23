@@ -1,5 +1,9 @@
 # Enhancement Checklist
 
+- [x] Add signal-line hover halos to skill chips.
+- [x] Add an animated active-navigation line treatment.
+- [x] Add a concise portfolio loading transition with reduced-motion support.
+- [x] Verify the interaction system across responsive layouts.
 - [x] Add restrained animated signal lines and miniature black-hole motifs to selected portfolio sections.
 - [x] Ensure every new decorative motion follows the global pause control and reduced-motion preference.
 - [x] Verify the expanded motion system remains visually balanced across desktop and mobile.
