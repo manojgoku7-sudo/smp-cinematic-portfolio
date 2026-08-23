@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Refine the project-note caption overlays to better preserve card imagery and hierarchy.
+- [x] Verify the revised caption composition at desktop and mobile sizes.
 - [x] Add a smooth short-caption reveal to each project card on hover and keyboard focus.
 - [x] Verify the reveal remains readable and respects reduced-motion preferences.
 - [x] Add a subtle CSS-driven project-showcase motion effect using existing visual assets.
