@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add animated radial proof markers for verified project outcomes.
+- [x] Verify the proof markers across desktop, phone, motion-pause, and reduced-motion states.
 - [x] Remove the Low Data action from the mobile dock and rebalance the remaining actions.
 - [x] Verify the simplified mobile dock at phone dimensions.
 - [x] Add a lightweight animated model-evaluation walkthrough to the Prediction of Perpetration Attack case study.
