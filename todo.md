@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Generate a revised MJ monogram with a clearly legible J hook and negative-space channel.
+- [x] Replace the prior monogram and verify both M and J remain distinct at header scale.
 - [x] Generate a transparent MJ monogram logo in the Obsidian Studio visual direction.
 - [x] Replace the current portfolio mark with the MJ monogram and verify its header and footer usage.
 - [x] Add a deeper event-horizon motion layer and an exterior black-hole light field beneath credential cards.
