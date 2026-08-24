@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace duplicate fallback keys in the MJ seal motion layers.
+- [x] Verify the MJ seal renders without duplicate-key console warnings.
 - [x] Preview each project’s MJ echo color from the orbit selector on hover and focus.
 - [x] Verify selector color previews remain restrained, responsive, and motion-safe.
 - [x] Add a restrained MJ orbit project-focus echo when a case signal opens.
