@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a one-time checkpoint pulse to each experience timeline node on viewport entry.
+- [x] Verify the checkpoint pulse remains restrained and motion-safe across desktop and phone layouts.
 - [x] Restyle the desktop project cursor cue as a compact spinning black hole without instructional text.
 - [x] Verify the visual cue remains subtle, desktop-only, and motion-safe.
 - [x] Add a one-time signal-focus reveal that traces from each project index to its outcome marker.

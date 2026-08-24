@@ -238,6 +238,13 @@ function ProjectSignalFocus({ tone, motionPaused }: { tone: "violet" | "cyan"; m
   return <motion.span className={`project-signal-focus is-${tone}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scaleX: 0 }} whileInView={staticMotion ? {} : { opacity: 0.78, scaleX: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.72, delay: 0.18, ease: [0.23, 1, 0.32, 1] }}><i /><i /></motion.span>;
 }
 
+function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [entered, setEntered] = useState(false);
+  const staticPulse = reduceMotion || motionPaused;
+  return <motion.span className={`timeline-checkpoint ${entered && !staticPulse ? "is-active" : ""}`} aria-hidden="true" initial={false} whileInView={{}} viewport={{ once: true, amount: 0.55 }} onViewportEnter={() => setEntered(true)} />;
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -613,8 +620,8 @@ export default function Home() {
       <section id="experience" className="editorial-band container py-28 md:py-40">
         <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." /></Reveal>
         <div className="experience-layout mt-14 grid gap-12 lg:grid-cols-[1.28fr_.72fr] lg:gap-20">
-          <div className="timeline-list"><Reveal><div className="timeline-row"><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
-            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className="timeline-row"><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
+          <div className="timeline-list"><Reveal><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
+            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
           </div>
           <Reveal delay={0.1} className="panel self-start p-7 md:p-8"><div className="flex items-center gap-3"><GraduationCap className="text-violet-300" size={20} /><p className="label">Education</p></div><div className="mt-7"><p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p><p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p><p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p></div><div className="mt-8 space-y-3 border-t border-white/10 pt-6"><div className="flex justify-between text-sm text-[#aaa4b7]"><span>HSC</span><span className="text-white">80%</span></div><div className="flex justify-between text-sm text-[#aaa4b7]"><span>SSLC</span><span className="text-white">79%</span></div></div></Reveal>
         </div>
