@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a restrained lens-aperture reveal to the ML case-study artifact.
+- [x] Verify the lens reveal remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add a restrained Blueprint Crosshair focus animation to the Delivery case-study artifact.
 - [x] Verify the crosshair remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add concise hover and keyboard-focus tooltips to the hero contact icons.

@@ -257,6 +257,13 @@ function BlueprintCrosshair({ motionPaused }: { motionPaused: boolean }) {
   return <motion.span className={`blueprint-crosshair ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.48 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .28, delay: .22, ease: [0.23, 1, 0.32, 1] }}><i className="blueprint-crosshair-h" /><i className="blueprint-crosshair-v" /><b /><em /></motion.span>;
 }
 
+function LensAperture({ motionPaused }: { motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [entered, setEntered] = useState(false);
+  const staticMotion = reduceMotion || motionPaused;
+  return <motion.span className={`ml-lens-aperture ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: .72 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: .48 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .3, delay: .18, ease: [0.23, 1, 0.32, 1] }}><i className="lens-core" /><i className="lens-orbit one" /><i className="lens-orbit two" /><b /></motion.span>;
+}
+
 function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
@@ -640,7 +647,7 @@ export default function Home() {
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article id="attack-study" className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
-              <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 02</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} />
+              <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 02</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><LensAperture motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
               <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><ProjectProofMarker value="85" suffix="%" ringValue={85} label="Best accuracy" detail="XGBoost selected after four-model evaluation" tone="cyan" motionPaused={motionPaused} /><AttackModelWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
