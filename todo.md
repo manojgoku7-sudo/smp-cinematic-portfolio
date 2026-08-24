@@ -1,5 +1,12 @@
 # Enhancement Checklist
 
+- [x] Build compact project navigation for mobile visitors.
+- [x] Add a phone-only sticky contact action and a low-data visual mode.
+- [x] Validate the mobile controls, static-artwork fallback, and phone layout.
+- [x] Add a compact mobile-only navigator for the project cards.
+- [x] Add a sticky bottom contact action for phone visitors.
+- [x] Add a low-data mode toggle that substitutes static artwork for heavy motion.
+- [x] Verify the complete mobile feature set at phone dimensions.
 - [x] Refine mobile layout, spacing, and typography across the portfolio.
 - [x] Improve touch affordances and reduce nonessential mobile motion.
 - [x] Verify the full mobile experience at common phone dimensions.

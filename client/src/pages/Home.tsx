@@ -165,6 +165,7 @@ export default function Home() {
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
   const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
+  const [lowDataMode, setLowDataMode] = useState(false);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -185,29 +186,29 @@ export default function Home() {
   }), [contactConstellationTrail]);
 
   useEffect(() => {
-    if (reduceMotion) {
+    if (reduceMotion || lowDataMode) {
       setIntroVisible(false);
       return;
     }
     const timer = window.setTimeout(() => setIntroVisible(false), 860);
     return () => window.clearTimeout(timer);
-  }, [reduceMotion]);
+  }, [reduceMotion, lowDataMode]);
 
   useEffect(() => {
     const video = heroVideoRef.current;
     if (!video) return;
-    if (motionPaused || reduceMotion) {
+    if (motionPaused || reduceMotion || lowDataMode) {
       video.pause();
       return;
     }
     video.play().catch(() => undefined);
-  }, [motionPaused, reduceMotion]);
+  }, [motionPaused, reduceMotion, lowDataMode]);
 
   useEffect(() => {
-    if (motionPaused || reduceMotion) return;
+    if (motionPaused || reduceMotion || lowDataMode) return;
     const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
     return () => window.clearInterval(cycle);
-  }, [motionPaused, reduceMotion]);
+  }, [motionPaused, reduceMotion, lowDataMode]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -351,8 +352,8 @@ export default function Home() {
   }
 
   return (
-    <main className={`page-shell ${motionPaused ? "motion-paused" : ""}`}>
-      <AnimatePresence>{introVisible && !reduceMotion ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
+    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""}`}>
+      <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
       <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
@@ -414,9 +415,9 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
-            <video ref={heroVideoRef} className="hero-video" autoPlay={!reduceMotion && !motionPaused} loop muted playsInline preload="metadata" poster="/manus-storage/smp-hero-orbit_86f3fd46.jpg" aria-hidden="true">
+            {lowDataMode ? <img className="hero-image" src="/manus-storage/smp-hero-orbit_86f3fd46.jpg" alt="Abstract ultraviolet orbit study" /> : <video ref={heroVideoRef} className="hero-video" autoPlay={!reduceMotion && !motionPaused} loop muted playsInline preload="metadata" poster="/manus-storage/smp-hero-orbit_86f3fd46.jpg" aria-hidden="true">
               <source src="/manus-storage/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" />
-            </video>
+            </video>}
             <div className="hero-grid" />
             <div className="nebula-starfield" aria-hidden="true">{nebulaStars.map((star) => <span key={star.id} className={`nebula-star ${star.tone}`} style={{ left: `${star.left}%`, top: `${star.top}%`, "--star-size": `${star.size}px`, "--star-opacity": star.opacity, "--star-delay": `${star.delay}s`, "--star-speed": `${star.speed}s` } as React.CSSProperties} />)}{starBursts.map((burst) => <span key={burst.id} className="nebula-burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }} />)}</div>
             <div className="constellation-trail" aria-hidden="true">{constellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{constellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
@@ -460,14 +461,15 @@ export default function Home() {
       <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse}>
         <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
+          <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button></nav>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
-            <Reveal delay={0.06}><article className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
+            <Reveal delay={0.06}><article id="attack-study" className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
               <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
               <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
-            <Reveal delay={0.13}><article className="project-card panel" tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
+            <Reveal delay={0.13}><article id="delivery-study" className="project-card panel" tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />
               <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
@@ -511,6 +513,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/manus-storage/smp-logo_526971d2.png" alt="SMP monogram" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>
+      <div className="mobile-contact-dock" aria-label="Mobile quick actions"><button className="mobile-data-toggle" type="button" onClick={() => setLowDataMode((enabled) => !enabled)} aria-pressed={lowDataMode}>{lowDataMode ? "Full visual" : "Low data"}</button><button className="mobile-contact-action" type="button" onClick={() => scrollToSection("contact")}><Mail size={16} />Contact</button></div>
     </main>
   );
 }
