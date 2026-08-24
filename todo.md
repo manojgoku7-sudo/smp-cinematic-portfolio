@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a tiny orbiting spark to the MJ halo on hover and keyboard focus.
+- [x] Verify the MJ spark remains subtle, responsive, and motion-safe.
 - [x] Add a compact black-hole halo with white orbit and ultraviolet light sweep around the MJ monogram.
 - [x] Verify the MJ halo remains legible, responsive, and motion-safe.
 - [x] Add a subtle MJ-aligned divider separating the brand area from navigation.
