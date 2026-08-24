@@ -370,6 +370,7 @@ export default function Home() {
   const reduceMotion = useReducedMotion();
   const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
   const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
+  const dividerScrollRotation = sealOrbitScrollOffset * 0.34;
 
   const year = useMemo(() => new Date().getFullYear(), []);
   const constellationSegments = useMemo(() => constellationTrail.slice(1).map((point, index) => {
@@ -598,7 +599,7 @@ export default function Home() {
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
               <span id="mj-brand-tooltip" className="monogram-brand-tooltip" role="tooltip">MJ / Event horizon</span>
             </button>
-            <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" />
+            <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" style={{ opacity: sealScrollOpacity, transform: `rotate(${dividerScrollRotation}deg)` }} />
           </div>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
             {navItems.map(([label, id]) => (

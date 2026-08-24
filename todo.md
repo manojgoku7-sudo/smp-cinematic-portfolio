@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Synchronize the header divider with the MJ orbit’s scroll-driven visual state.
+- [x] Verify the coordinated header treatment remains refined, responsive, and motion-safe.
 - [x] Add a subtle scroll-driven rotation offset to the MJ orbit.
 - [x] Verify the orbit offset remains refined, responsive, and motion-safe.
 - [x] Add a subtle scroll-linked dimming effect to the MJ header seal.
