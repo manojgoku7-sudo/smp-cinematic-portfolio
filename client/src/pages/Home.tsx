@@ -163,6 +163,7 @@ export default function Home() {
   const [footerBurst, setFooterBurst] = useState(0);
   const [roleIndex, setRoleIndex] = useState(0);
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
+  const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -341,9 +342,12 @@ export default function Home() {
   function createNameRipple(event: ReactPointerEvent<HTMLElement>) {
     if (reduceMotion || motionPaused) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    const ripple = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
+    const interactionId = Date.now();
+    const ripple = { id: interactionId, x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
     setNameRipples((current) => [...current.slice(-1), ripple]);
+    setNameHaptic(interactionId);
     window.setTimeout(() => setNameRipples((current) => current.filter((item) => item.id !== ripple.id)), 900);
+    window.setTimeout(() => setNameHaptic((current) => current === interactionId ? 0 : current), 300);
   }
 
   return (
@@ -386,7 +390,7 @@ export default function Home() {
               <span className="label text-[#d3c5ff]">Available for considered digital work</span>
             </motion.div>
             <motion.p initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08, ease: [0.23, 1, 0.32, 1] }} className="label mb-5">01 / SMP field reel</motion.p>
-            <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 38 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.78, delay: 0.14, ease: [0.23, 1, 0.32, 1] }} className="hero-name display max-w-[10ch] text-[clamp(4.1rem,9vw,8.2rem)] font-semibold leading-[0.81] text-white" tabIndex={0} aria-label="S Manoj Prabhu. Click or press Enter to release a signal ripple." onPointerDown={createNameRipple} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const bounds = event.currentTarget.getBoundingClientRect(); createNameRipple({ ...event, clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 } as unknown as ReactPointerEvent<HTMLElement>); } }}>
+            <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 38 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.78, delay: 0.14, ease: [0.23, 1, 0.32, 1] }} className={`hero-name ${nameHaptic ? "is-haptic" : ""} display max-w-[10ch] text-[clamp(4.1rem,9vw,8.2rem)] font-semibold leading-[0.81] text-white`} tabIndex={0} aria-label="S Manoj Prabhu. Click or press Enter to release a signal ripple." onPointerDown={createNameRipple} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const bounds = event.currentTarget.getBoundingClientRect(); createNameRipple({ ...event, clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 } as unknown as ReactPointerEvent<HTMLElement>); } }}>
               <span className="name-line name-manoj" data-text="S MANOJ">S MANOJ</span><span className="name-line name-prabhu" data-text="PRABHU">PRABHU</span><span className="name-ripple-field" aria-hidden="true">{nameRipples.map((ripple) => <i key={ripple.id} className="name-ripple" style={{ left: `${ripple.x}%`, top: `${ripple.y}%` }} />)}</span><span className="name-spark-field" aria-hidden="true">{[
                 { left: "8%", top: "22%", dx: "34px", dy: "-10px", tilt: "-28deg", delay: "-1.1s" },
                 { left: "56%", top: "14%", dx: "22px", dy: "14px", tilt: "36deg", delay: "-3.2s" },

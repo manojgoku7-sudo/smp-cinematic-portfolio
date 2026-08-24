@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add soundless haptic-style visual feedback to hero-name clicks.
+- [x] Verify the response follows the existing motion and reduced-motion controls.
 - [x] Add a click-triggered ultraviolet signal ripple from the hero name.
 - [x] Verify the ripple remains readable and follows motion preferences.
 - [x] Add a second refined motion layer to the hero name.
