@@ -584,7 +584,7 @@ export default function Home() {
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => scrollToSection("top")} aria-label="Go to the top and reveal the MJ monogram">
-              <span className="seal-wrap"><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+              <span className="seal-wrap"><span className="monogram-halo" aria-hidden="true"><i className="monogram-halo-sweep" /></span><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
             </button>
             <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" />

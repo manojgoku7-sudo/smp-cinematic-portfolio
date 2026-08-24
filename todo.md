@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a compact black-hole halo with white orbit and ultraviolet light sweep around the MJ monogram.
+- [x] Verify the MJ halo remains legible, responsive, and motion-safe.
 - [x] Add a subtle MJ-aligned divider separating the brand area from navigation.
 - [x] Verify the header divider remains balanced across desktop and mobile layouts.
 - [x] Remove the top-left spark control and its dependent decorative behavior.
