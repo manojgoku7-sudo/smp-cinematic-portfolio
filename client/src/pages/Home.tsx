@@ -82,6 +82,7 @@ const certifications = [
 ];
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
+const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
 const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
@@ -160,6 +161,7 @@ export default function Home() {
   const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
   const [cornerBurst, setCornerBurst] = useState(0);
   const [footerBurst, setFooterBurst] = useState(0);
+  const [roleIndex, setRoleIndex] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -197,6 +199,12 @@ export default function Home() {
       return;
     }
     video.play().catch(() => undefined);
+  }, [motionPaused, reduceMotion]);
+
+  useEffect(() => {
+    if (motionPaused || reduceMotion) return;
+    const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
+    return () => window.clearInterval(cycle);
   }, [motionPaused, reduceMotion]);
 
   useEffect(() => {
@@ -373,7 +381,7 @@ export default function Home() {
               <span className="name-line name-manoj" data-text="S MANOJ">S MANOJ</span><span className="name-line name-prabhu" data-text="PRABHU">PRABHU</span>
             </motion.h1>
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.64, delay: 0.28, ease: [0.23, 1, 0.32, 1] }} className="mt-8 max-w-lg">
-              <p className="display text-xl leading-snug text-[#e7e0ff] md:text-2xl">Frontend Developer <span className="text-violet-300">/</span> UI/UX Designer <span className="text-violet-300">/</span> Java Developer</p>
+              <p className="hero-role-cycle" aria-live="polite"><span className="hero-role-label">Now operating as</span><AnimatePresence mode="wait" initial={false}><motion.span key={professionalRoles[roleIndex]} className="hero-role-value" initial={reduceMotion ? false : { opacity: 0, y: 8, filter: "blur(4px)" }} animate={reduceMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }} exit={reduceMotion ? {} : { opacity: 0, y: -7, filter: "blur(3px)" }} transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}>{professionalRoles[roleIndex]}</motion.span></AnimatePresence></p>
               <p className="mt-4 max-w-md text-[0.93rem] leading-7 text-[#aca6ba]">Crafting intuitive interfaces and full-stack experiences — from Figma to production code.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button className="signal-button primary" onClick={() => scrollToSection("work")}>Open selected work <ArrowDownRight size={16} /></button>

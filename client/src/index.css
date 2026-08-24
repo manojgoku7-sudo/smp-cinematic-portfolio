@@ -145,6 +145,9 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .name-line::before { content: ""; position: absolute; z-index: 2; left: -45%; top: 56%; width: 28%; height: 1px; background: linear-gradient(90deg, transparent, #e3d8ff, #b176ff, transparent); box-shadow: 0 0 10px #8b5cf6; opacity: 0; }
 .name-prabhu { color: #bb88ff; }
 .name-prabhu::after { background-image: linear-gradient(110deg, #d3bfff 8%, #a76cf7 26%, #f0afe7 43%, #b578ff 58%, #d2beff 72%, #8d56de 90%); }
+.hero-role-cycle { display: flex; min-height: 2rem; align-items: center; gap: 0.7rem; border-left: 1px solid rgb(196 181 253 / 0.54); padding-left: 0.75rem; }
+.hero-role-label { color: #a79ebc; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+.hero-role-value { color: #eee9ff; font-size: clamp(1.08rem, 1.6vw, 1.42rem); font-weight: 600; letter-spacing: -0.025em; text-shadow: 0 0 18px rgb(139 92 246 / 0.14); }
 .hero-visual { position: relative; min-height: 420px; overflow: hidden; border: 1px solid rgb(225 211 255 / 0.16); background: #0f0b19; box-shadow: 0 40px 130px rgb(43 12 104 / 0.24); }
 .hero-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgb(9 9 15 / 0.76) 0%, transparent 48%, rgb(9 9 15 / 0.2)); pointer-events: none; }
 .hero-image, .hero-video { width: 100%; height: 100%; min-height: 420px; object-fit: cover; object-position: center; filter: saturate(1.06) contrast(1.06); }
@@ -311,5 +314,6 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (max-width: 767px) { .hero { min-height: auto; padding-top: 6rem; padding-bottom: 3rem; } .hero-visual, .hero-image { min-height: 320px; } .reel-track { animation-duration: 36s; } .mini-singularity { opacity: 0.35; } .about-singularity { top: 3rem; right: -1rem; } .skill-singularity, .credential-singularity { display: none; } .signal-thread { opacity: 0.6; } .about-thread { top: 8rem; right: -10%; width: 76vw; } }
 @media (max-width: 767px) { .project-caption { top: 4.9rem; width: min(82%, 18rem); opacity: 1; transform: none; } }
 @media (max-width: 767px) { .skill-legend { gap: 0.5rem 0.8rem; } .skill-legend-title { width: 100%; } }
+@media (max-width: 520px) { .hero-role-cycle { align-items: flex-start; flex-direction: column; gap: 0.18rem; } }
 @media (max-width: 900px) { .scroll-progress-rail { display: none; } }
 @media (max-width: 700px) { .corner-star { display: none; } }
