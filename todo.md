@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a click-triggered ultraviolet signal ripple from the hero name.
+- [x] Verify the ripple remains readable and follows motion preferences.
 - [x] Add a second refined motion layer to the hero name.
 - [x] Verify the enhanced name animation remains legible and respects motion preferences.
 - [x] Add a compact cycling professional-role line beneath the hero name.
