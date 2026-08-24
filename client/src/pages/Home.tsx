@@ -309,6 +309,13 @@ function ExperienceConnectionMap({ activeExperience, motionPaused }: { activeExp
   return <motion.aside className={`experience-connection-map ${staticMotion ? "is-static" : ""}`} aria-label="Skills connected to the active experience role" initial={staticMotion ? false : { opacity: 0, y: 12 }} whileInView={staticMotion ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: .3 }} transition={{ duration: .42, ease: [0.23, 1, 0.32, 1] }}><div className="experience-map-head"><div><p className="label">Skills / role map</p><p>Hover or focus a role to trace its active tools.</p></div><span>{String(activeExperience + 1).padStart(2, "0")} / 03</span></div><div className="experience-map-stage" aria-live="polite"><span className="experience-map-core"><b>{activeConnection.role === "Project Intern" ? "Build" : "Design"}</b><em>{activeConnection.focus}</em></span>{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-link link-${index} ${isActive ? "is-active" : ""}`} aria-hidden="true" />; })}{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-node node-${index} ${isActive ? "is-active" : ""}`}><b>{skill}</b></span>; })}</div><p className="experience-map-reading"><span className="label">Active role</span>{activeConnection.focus}</p></motion.aside>;
 }
 
+function CredentialSignalScan({ motionPaused }: { motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [entered, setEntered] = useState(false);
+  const staticMotion = reduceMotion || motionPaused;
+  return <motion.span className={`credential-signal-scan ${entered && !staticMotion ? "is-active" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0 }} whileInView={staticMotion ? {} : { opacity: 1 }} viewport={{ once: true, amount: .35 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .2 }}><i /><i /><i /></motion.span>;
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -723,7 +730,7 @@ export default function Home() {
       <section className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity credential-singularity" aria-hidden="true"><span /></div><span className="signal-thread credential-thread" aria-hidden="true" />
         <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
-        <div className="credential-grid mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">{certifications.map(([issuer, title, meta], index) => <Reveal delay={index * 0.06} key={title}><div className="cert bg-[#0d0b15]"><p className="label text-violet-200">{issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{title}</p><p className="mt-4 text-xs text-[#9d96ac]">{meta}</p></div></Reveal>)}</div>
+        <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4"><CredentialSignalScan motionPaused={motionPaused} />{certifications.map(([issuer, title, meta], index) => <Reveal delay={index * 0.06} key={title}><div className="cert relative bg-[#0d0b15]"><span className="cert-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><p className="label text-violet-200">{issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{title}</p><p className="mt-4 text-xs text-[#9d96ac]">{meta}</p></div></Reveal>)}</div>
       </section>
 
       <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" onPointerDown={createContactPulse} onPointerMove={extendContactConstellation} onPointerLeave={() => setContactConstellationTrail([])} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/manus-storage/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
