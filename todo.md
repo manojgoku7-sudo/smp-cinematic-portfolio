@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a layered violet-white neon aura behind the MJ logo.
+- [x] Verify the MJ aura remains refined, responsive, and motion-safe.
 - [x] Add a compact focus-only identity tooltip to the MJ seal.
 - [x] Verify the MJ tooltip is keyboard accessible and responsive.
 - [x] Add a click-triggered ripple effect to the MJ logo seal.
