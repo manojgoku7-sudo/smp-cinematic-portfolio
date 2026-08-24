@@ -345,7 +345,6 @@ export default function Home() {
   const [constellationTrail, setConstellationTrail] = useState<InteractionPoint[]>([]);
   const [contactPulses, setContactPulses] = useState<InteractionPoint[]>([]);
   const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
-  const [cornerBurst, setCornerBurst] = useState(0);
   const [footerBurst, setFooterBurst] = useState(0);
   const [roleIndex, setRoleIndex] = useState(0);
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
@@ -557,13 +556,6 @@ export default function Home() {
     setContactConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
   }
 
-  function triggerCornerBurst() {
-    if (reduceMotion || motionPaused) return;
-    const burstId = Date.now();
-    setCornerBurst(burstId);
-    window.setTimeout(() => setCornerBurst((current) => current === burstId ? 0 : current), 780);
-  }
-
   function triggerFooterBurst() {
     if (reduceMotion || motionPaused) return;
     const burstId = Date.now();
@@ -588,8 +580,6 @@ export default function Home() {
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
       <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
-      <button className={`corner-star ${cornerBurst ? "is-bursting" : ""}`} onClick={triggerCornerBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a star spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={17} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{cornerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${cornerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button>
-
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">
           <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => scrollToSection("top")} aria-label="Go to the top and reveal the MJ monogram">
