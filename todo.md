@@ -1,4 +1,8 @@
 # Enhancement Checklist
+- [x] Add accessible interactive credential-preview modals from each certificate card.
+- [x] Verify modal focus handling, responsive layout, and motion-safe preview behavior.
+- [ ] Add accessible official-certificate verification links to each credential card.
+- [ ] Verify credential links are clear, secure, responsive, and keyboard accessible.
 - [x] Add a refined signal-scan animation to the “Signals of momentum” credentials section.
 - [x] Verify the credentials animation remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add a visual skills-to-experience connection map linked to role hover and keyboard focus.

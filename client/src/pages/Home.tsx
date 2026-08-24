@@ -3,6 +3,7 @@
  */
 import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -84,11 +85,11 @@ const experienceConnections = [
 const experienceSkillNodes = ["Java", "Spring Boot", "REST APIs", "MySQL", "Figma", "Usability", "Components", "Mobile flows"] as const;
 
 const certifications = [
-  ["Oracle", "APEX Cloud Developer Professional", "1Z0-771"],
-  ["IBM", "Artificial Intelligence Fundamentals", "SkillsBuild"],
-  ["NPTEL", "Introduction to IoT", "Credential"],
-  ["Infosys", "Springboard Internship 6.0", "Certificate"],
-];
+  { issuer: "Oracle", title: "APEX Cloud Developer Professional", meta: "1Z0-771", theme: "Application development", focus: "Cloud delivery" },
+  { issuer: "IBM", title: "Artificial Intelligence Fundamentals", meta: "SkillsBuild", theme: "Applied intelligence", focus: "AI foundations" },
+  { issuer: "NPTEL", title: "Introduction to IoT", meta: "Credential", theme: "Connected systems", focus: "IoT concepts" },
+  { issuer: "Infosys", title: "Springboard Internship 6.0", meta: "Certificate", theme: "Industry practice", focus: "Product delivery" },
+] as const;
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
 const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
@@ -316,6 +317,13 @@ function CredentialSignalScan({ motionPaused }: { motionPaused: boolean }) {
   return <motion.span className={`credential-signal-scan ${entered && !staticMotion ? "is-active" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0 }} whileInView={staticMotion ? {} : { opacity: 1 }} viewport={{ once: true, amount: .35 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .2 }}><i /><i /><i /></motion.span>;
 }
 
+function CredentialPreviewDialog({ credential, open, onOpenChange, motionPaused }: { credential: typeof certifications[number] | null; open: boolean; onOpenChange: (open: boolean) => void; motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const staticMotion = reduceMotion || motionPaused;
+  if (!credential) return null;
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="credential-preview-dialog max-h-[min(44rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-2xl" showCloseButton={false}><div className="credential-preview-shell"><div className={`credential-preview-reel ${staticMotion ? "is-static" : ""}`} aria-hidden="true"><span className="credential-preview-grid" /><span className="credential-preview-orbit one" /><span className="credential-preview-orbit two" /><span className="credential-preview-core" /><span className="credential-preview-scan" /><span className="credential-preview-stamp">SMP / RECORD</span></div><div className="credential-preview-copy"><div className="flex items-start justify-between gap-4"><p className="label">Credential / preview</p><button type="button" className="credential-preview-close" onClick={() => onOpenChange(false)} aria-label="Close credential preview"><X size={16} /></button></div><DialogTitle className="display mt-5 max-w-[16ch] text-3xl leading-[.94] text-white sm:text-5xl">{credential.title}</DialogTitle><DialogDescription className="mt-4 max-w-md text-sm leading-6 text-[#c8c0d8]">A focused record preview for {credential.issuer}, highlighting the learning signal represented in this portfolio.</DialogDescription><dl className="credential-preview-metadata"><div><dt>Issuer</dt><dd>{credential.issuer}</dd></div><div><dt>Record</dt><dd>{credential.meta}</dd></div><div><dt>Focus</dt><dd>{credential.focus}</dd></div></dl><div className="credential-preview-note"><span className="signal-dot" aria-hidden="true" /><p><b>{credential.theme}</b><br />Official verification can be added here when its credential-specific link is available.</p></div></div></div></DialogContent></Dialog>;
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -345,6 +353,7 @@ export default function Home() {
   const [contactFocused, setContactFocused] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [activeExperience, setActiveExperience] = useState(0);
+  const [activeCredential, setActiveCredential] = useState<number | null>(null);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -730,7 +739,8 @@ export default function Home() {
       <section className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity credential-singularity" aria-hidden="true"><span /></div><span className="signal-thread credential-thread" aria-hidden="true" />
         <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
-        <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4"><CredentialSignalScan motionPaused={motionPaused} />{certifications.map(([issuer, title, meta], index) => <Reveal delay={index * 0.06} key={title}><div className="cert relative bg-[#0d0b15]"><span className="cert-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><p className="label text-violet-200">{issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{title}</p><p className="mt-4 text-xs text-[#9d96ac]">{meta}</p></div></Reveal>)}</div>
+        <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4"><CredentialSignalScan motionPaused={motionPaused} />{certifications.map((credential, index) => <Reveal delay={index * 0.06} key={credential.title}><button type="button" className="cert credential-card relative w-full bg-[#0d0b15] text-left" onClick={() => setActiveCredential(index)} aria-haspopup="dialog" aria-label={`Open preview for ${credential.title}, issued by ${credential.issuer}`}><span className="cert-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><p className="label text-violet-200">{credential.issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{credential.title}</p><p className="mt-4 text-xs text-[#9d96ac]">{credential.meta}</p><span className="credential-open-cue">Open record <ArrowUpRight size={13} /></span></button></Reveal>)}</div>
+        <CredentialPreviewDialog credential={activeCredential === null ? null : certifications[activeCredential]} open={activeCredential !== null} onOpenChange={(open) => { if (!open) setActiveCredential(null); }} motionPaused={motionPaused} />
       </section>
 
       <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" onPointerDown={createContactPulse} onPointerMove={extendContactConstellation} onPointerLeave={() => setContactConstellationTrail([])} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/manus-storage/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
