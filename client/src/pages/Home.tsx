@@ -561,10 +561,10 @@ export default function Home() {
                 <button className="signal-button" onClick={downloadResume}>Retrieve résumé <Download size={15} /></button>
               </div>
               <div className="hero-contact-cluster mt-9 flex flex-wrap gap-2.5">
-                <a className="icon-button hero-contact-link" href="mailto:manojprabhu0707@gmail.com" aria-label="Email Manoj"><Mail size={17} /></a>
-                <a className="icon-button hero-contact-link" href="tel:+919677518268" aria-label="Call Manoj"><Phone size={17} /></a>
-                <a className="icon-button hero-contact-link" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub"><Github size={17} /></a>
-                <a className="icon-button hero-contact-link" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn"><Linkedin size={17} /></a>
+                <a className="icon-button hero-contact-link" href="mailto:manojprabhu0707@gmail.com" aria-label="Email Manoj" data-tooltip="Email Manoj"><Mail size={17} /></a>
+                <a className="icon-button hero-contact-link" href="tel:+919677518268" aria-label="Call Manoj" data-tooltip="Call Manoj"><Phone size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub" data-tooltip="GitHub"><Github size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn" data-tooltip="LinkedIn"><Linkedin size={17} /></a>
               </div>
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
