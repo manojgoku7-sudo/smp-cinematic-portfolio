@@ -183,6 +183,24 @@ function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyI
   );
 }
 
+function DeliveryWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [runId, setRunId] = useState(0);
+  const staticPlayback = reduceMotion || motionPaused || lowDataMode;
+  return (
+    <section className={`delivery-walkthrough ${staticPlayback ? "is-static" : ""}`} aria-label="Food delivery flow walkthrough">
+      <div className="delivery-walkthrough-head"><div><span className="label">Flow walkthrough</span><p>Discover → cart → live order</p></div><button type="button" className="delivery-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay food delivery walkthrough"}><Play size={12} />Replay</button></div>
+      <div key={runId} className="delivery-device" aria-hidden="true">
+        <div className="delivery-screen delivery-discover"><span className="device-status">9:41</span><p>Good evening</p><b>Find your next bite</b><span className="delivery-search">Search dishes</span><div className="delivery-cuisine-row"><i /><i /><i /></div><div className="delivery-restaurant"><span /><b>Local favourites</b><em>28 min · 4.8</em></div></div>
+        <div className="delivery-screen delivery-cart"><span className="device-status">9:42</span><p>Your order</p><b>Comfort bowl</b><div className="delivery-cart-line"><i /><span><strong>Spiced ramen</strong><em>Customise · 1 item</em></span><b>₹240</b></div><div className="delivery-total"><span>Total</span><b>₹269</b></div><button>Continue to payment</button></div>
+        <div className="delivery-screen delivery-track"><span className="device-status">9:48</span><p>Order #SMP-07</p><b>On the way</b><div className="delivery-map"><i /><i /><span /></div><div className="delivery-rider"><span>●</span><div><b>Rider picked up your order</b><em>Arriving in 12 minutes</em></div></div></div>
+        <div className="delivery-progress" aria-hidden="true"><i /><i /><i /></div>
+      </div>
+      <p className="delivery-walkthrough-note">Illustrative flow study based on the project’s onboarding, discovery, cart, and order-tracking screens.</p>
+    </section>
+  );
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -540,7 +558,7 @@ export default function Home() {
               <img className="project-art" src="/manus-storage/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />
               <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><DeliveryWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
             </article></Reveal>
           </div>
         </div>
