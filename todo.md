@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the Low Data action from the mobile dock and rebalance the remaining actions.
+- [x] Verify the simplified mobile dock at phone dimensions.
 - [x] Add a lightweight animated model-evaluation walkthrough to the Prediction of Perpetration Attack case study.
 - [x] Verify its evidence hierarchy, mobile layout, and motion-safe fallback behavior.
 - [x] Add a lightweight animated walkthrough to the Food Delivery case study.

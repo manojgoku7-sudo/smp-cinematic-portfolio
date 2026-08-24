@@ -471,7 +471,7 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (max-width: 767px) {
   .mobile-contact-dock { grid-template-columns: 1fr 1fr; }
   .mobile-resume-action { display: inline-flex; align-items: center; justify-content: center; gap: 0.34rem; border: 1px solid rgb(196 181 253 / 0.22); background: rgb(255 255 255 / 0.06); color: #ded6ee; }
-  .mobile-contact-action { grid-column: 1 / -1; }
+  .mobile-contact-action { grid-column: auto; }
   .recruiter-brief-card { top: auto; right: 0.8rem; bottom: max(5.9rem, calc(env(safe-area-inset-bottom) + 5rem)); left: 0.8rem; width: auto; max-height: min(34rem, calc(100vh - 8rem)); overflow-y: auto; }
 }
 
@@ -485,9 +485,8 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
   .mobile-project-label { grid-column: 1 / -1; color: #cfc1f8; font-size: 0.54rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
   .mobile-project-nav button { min-height: 2.8rem; border: 1px solid rgb(196 181 253 / 0.2); background: rgb(10 8 18 / 0.36); padding: 0.5rem; color: #ded6ee; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; text-align: left; text-transform: uppercase; transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out); }
   .mobile-project-nav button:active, .mobile-project-nav button:focus-visible { border-color: #c4b5fd; background: rgb(139 92 246 / 0.18); color: white; outline: none; }
-  .mobile-contact-dock { position: fixed; z-index: 60; right: 0.8rem; bottom: max(0.8rem, env(safe-area-inset-bottom)); left: 0.8rem; display: grid; grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); gap: 0.55rem; border: 1px solid rgb(196 181 253 / 0.28); background: rgb(9 8 16 / 0.88); padding: 0.48rem; box-shadow: 0 18px 42px rgb(0 0 0 / 0.4); backdrop-filter: blur(16px); }
+  .mobile-contact-dock { position: fixed; z-index: 60; right: 0.8rem; bottom: max(0.8rem, env(safe-area-inset-bottom)); left: 0.8rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.55rem; border: 1px solid rgb(196 181 253 / 0.28); background: rgb(9 8 16 / 0.88); padding: 0.48rem; box-shadow: 0 18px 42px rgb(0 0 0 / 0.4); backdrop-filter: blur(16px); }
   .mobile-contact-dock button { min-height: 3.15rem; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-  .mobile-data-toggle { border: 1px solid rgb(196 181 253 / 0.22); background: rgb(255 255 255 / 0.035); color: #d7cbea; }
   .mobile-contact-action { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid #8b5cf6; background: linear-gradient(120deg, #6d3ee8, #8b5cf6 60%, #b685fb); color: white; box-shadow: 0 10px 24px rgb(109 62 232 / 0.25); }
   .mobile-contact-dock button:active { transform: scale(0.97); }
   body { padding-bottom: 5.6rem; }
