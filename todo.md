@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a restrained MJ orbit project-focus echo when a case signal opens.
+- [x] Verify the project-focus echo remains clear, responsive, and motion-safe.
 - [x] Add a muted orbital glint that activates on active-section navigation changes.
 - [x] Verify the section-change glint remains restrained, responsive, and motion-safe.
 - [x] Synchronize the header divider with the MJ orbit’s scroll-driven visual state.
