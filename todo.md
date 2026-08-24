@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a compact phone-to-tablet-to-desktop device-frame relay to the Delivery case study.
+- [x] Verify the relay remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add a restrained lens-aperture reveal to the ML case-study artifact.
 - [x] Verify the lens reveal remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add a restrained Blueprint Crosshair focus animation to the Delivery case-study artifact.
