@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Restyle the desktop project cursor cue as a compact spinning black hole without instructional text.
+- [x] Verify the visual cue remains subtle, desktop-only, and motion-safe.
 - [x] Add a one-time signal-focus reveal that traces from each project index to its outcome marker.
 - [x] Verify the reveal at desktop and phone widths with paused and reduced-motion states.
 - [x] Separate overlapping project-card metadata, captions, headings, and evidence panels.
