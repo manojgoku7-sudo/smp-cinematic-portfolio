@@ -232,19 +232,6 @@ function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone
   );
 }
 
-function CodeToCanvasBridge({ canvasMode, onToggle, motionPaused }: { canvasMode: boolean; onToggle: () => void; motionPaused: boolean }) {
-  const reduceMotion = useReducedMotion();
-  const staticMotion = reduceMotion || motionPaused;
-  return (
-    <section className={`code-canvas-bridge ${canvasMode ? "is-canvas" : "is-code"}`} aria-label="Code to canvas bridge">
-      <div className="code-canvas-head"><div><span className="label">Code / canvas bridge</span><p>One interface system, two readable states.</p></div><button type="button" className="code-canvas-toggle" onClick={onToggle} aria-pressed={canvasMode}>{canvasMode ? "View logic" : "View canvas"} <ArrowUpRight size={13} /></button></div>
-      <AnimatePresence mode="wait" initial={false}>
-        {canvasMode ? <motion.div key="canvas" className="canvas-frame" initial={staticMotion ? false : { opacity: 0, x: 12 }} animate={staticMotion ? {} : { opacity: 1, x: 0 }} exit={staticMotion ? {} : { opacity: 0, x: -10 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="canvas-topbar"><span>Field order / mobile</span><i /></div><p>Good evening</p><b>Choose the next step.</b><div className="canvas-controls"><span>Discover</span><span>Cart</span><span>Track</span></div><div className="canvas-result"><i /><span><b>Flow stays visible</b><em>States, hierarchy, and feedback</em></span></div></motion.div> : <motion.pre key="code" className="code-frame" initial={staticMotion ? false : { opacity: 0, x: -12 }} animate={staticMotion ? {} : { opacity: 1, x: 0 }} exit={staticMotion ? {} : { opacity: 0, x: 10 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><code><span className="code-key">const</span> <span className="code-name">flow</span> = [<span className="code-string">&quot;discover&quot;</span>, <span className="code-string">&quot;cart&quot;</span>, <span className="code-string">&quot;track&quot;</span>];{"\n\n"}<span className="code-key">return</span> <span className="code-tag">&lt;MobileFlow</span>{"\n  "}<span className="code-prop">steps</span>={'{flow}'}{"\n  "}<span className="code-prop">feedback</span>=<span className="code-string">&quot;visible&quot;</span>{"\n"}<span className="code-tag">/&gt;</span></code></motion.pre>}
-      </AnimatePresence>
-    </section>
-  );
-}
-
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -270,7 +257,6 @@ export default function Home() {
   const [activeOrbitProject, setActiveOrbitProject] = useState<CaseStudyId>("attack-study");
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
   const [contactFocused, setContactFocused] = useState(false);
-  const [canvasMode, setCanvasMode] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -586,7 +572,6 @@ export default function Home() {
             </div>
           </Reveal>
         </div>
-        <Reveal delay={0.18} className="mt-5 lg:ml-[clamp(1rem,8vw,7.5rem)]"><CodeToCanvasBridge canvasMode={canvasMode} onToggle={() => setCanvasMode((current) => !current)} motionPaused={motionPaused} /></Reveal>
       </section>
 
       <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={() => setProjectFinder((current) => ({ ...current, active: false }))}>

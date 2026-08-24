@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the Code-to-Canvas Bridge from the About section.
+- [x] Verify the revised About section spacing across desktop and phone layouts.
 - [x] Add an interactive code-to-canvas bridge to the About section.
 - [x] Add an accessible project comparison view for the two featured case studies.
 - [x] Add a desktop-only cursor-led orbital finder around the project section.
