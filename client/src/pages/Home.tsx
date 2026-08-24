@@ -582,10 +582,13 @@ export default function Home() {
       <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">
-          <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => scrollToSection("top")} aria-label="Go to the top and reveal the MJ monogram">
-            <span className="seal-wrap"><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
-            <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
-          </button>
+          <div className="flex items-center gap-5">
+            <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => scrollToSection("top")} aria-label="Go to the top and reveal the MJ monogram">
+              <span className="seal-wrap"><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+              <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
+            </button>
+            <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" />
+          </div>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
             {navItems.map(([label, id]) => (
               <button key={id} className={`nav-link ${active === id ? "is-active" : ""}`} onClick={() => scrollToSection(id)}>{label}</button>

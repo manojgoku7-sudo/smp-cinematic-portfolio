@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle MJ-aligned divider separating the brand area from navigation.
+- [x] Verify the header divider remains balanced across desktop and mobile layouts.
 - [x] Remove the top-left spark control and its dependent decorative behavior.
 - [x] Verify the cleaned header remains balanced and responsive.
 - [x] Add a hover and keyboard-focus tilt that reveals the MJ monogram’s J hook.
