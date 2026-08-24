@@ -89,6 +89,12 @@ const orbitProjects = [
   { id: "attack-study", index: "01", title: "Attack model", discipline: "ML / security", signal: "85% accuracy" },
   { id: "delivery-study", index: "02", title: "Delivery flow", discipline: "UX / mobile", signal: "15+ screens" },
 ] as const;
+const recruiterReviewSteps = [
+  { id: "top", index: "01", label: "Availability", note: "Open to internships and collaborative product work." },
+  { id: "about", index: "02", label: "Core proof", note: "React components, Figma screens, and 85% ML accuracy." },
+  { id: "work", index: "03", label: "Selected work", note: "Machine-learning evaluation and mobile product design." },
+  { id: "contact", index: "04", label: "Contact", note: "Reply within 1–2 days." },
+] as const;
 const caseSignals = {
   "attack-study": {
     challenge: "Separate high-signal attack patterns from a noisy cybersecurity dataset.",
@@ -266,6 +272,8 @@ export default function Home() {
   const [introVisible, setIntroVisible] = useState(true);
   const [lowDataMode, setLowDataMode] = useState(false);
   const [recruiterOpen, setRecruiterOpen] = useState(false);
+  const [recruiterReviewOpen, setRecruiterReviewOpen] = useState(false);
+  const [recruiterReviewStep, setRecruiterReviewStep] = useState(0);
   const [lightPreset, setLightPreset] = useState(() => typeof window !== "undefined" && window.localStorage.getItem("smp-contrast-preset") === "light");
   const [activeOrbitProject, setActiveOrbitProject] = useState<CaseStudyId>("attack-study");
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
@@ -393,6 +401,20 @@ export default function Home() {
     scrollToSection(id);
   }
 
+  function startRecruiterReview() {
+    setRecruiterOpen(false);
+    setMobileOpen(false);
+    setRecruiterReviewStep(0);
+    setRecruiterReviewOpen(true);
+    scrollToSection(recruiterReviewSteps[0].id);
+  }
+
+  function goToRecruiterReviewStep(nextStep: number) {
+    const boundedStep = Math.min(Math.max(nextStep, 0), recruiterReviewSteps.length - 1);
+    setRecruiterReviewStep(boundedStep);
+    scrollToSection(recruiterReviewSteps[boundedStep].id);
+  }
+
   function handleContactBlur(event: FocusEvent<HTMLFormElement>) {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setContactFocused(false);
   }
@@ -477,7 +499,7 @@ export default function Home() {
   }
 
   return (
-    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${lightPreset ? "contrast-light" : ""}`}>
+    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${lightPreset ? "contrast-light" : ""} ${recruiterReviewOpen ? "recruiter-review-active" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
@@ -495,14 +517,14 @@ export default function Home() {
               <button key={id} className={`nav-link ${active === id ? "is-active" : ""}`} onClick={() => scrollToSection(id)}>{label}</button>
             ))}
           </nav>
-          <div className="hidden items-center gap-2 md:flex"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark" : "Light"}</button><button className="recruiter-trigger" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter brief</button><a href="mailto:manojprabhu0707@gmail.com" className="signal-button min-h-0 px-4 py-2.5">Open correspondence <ArrowUpRight size={14} /></a></div>
+          <div className="hidden items-center gap-2 md:flex"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark" : "Light"}</button><button className="recruiter-trigger" type="button" onClick={startRecruiterReview}>Recruiter path</button><a href="mailto:manojprabhu0707@gmail.com" className="signal-button min-h-0 px-4 py-2.5">Open correspondence <ArrowUpRight size={14} /></a></div>
           <button className="icon-button md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>{mobileOpen ? <X size={18} /> : <Menu size={18} />}</button>
         </div>
         {mobileOpen ? (
           <div className="border-t border-violet-200/10 bg-[#0b0a12]/95 px-5 py-6 backdrop-blur-xl md:hidden">
             <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
               {navItems.map(([label, id]) => <button key={id} className="display text-left text-2xl text-white" onClick={() => { setMobileOpen(false); scrollToSection(id); }}>{label}</button>)}
-              <div className="flex gap-3 pt-1"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark preset" : "Light preset"}</button><button className="recruiter-trigger" type="button" onClick={() => { setMobileOpen(false); setRecruiterOpen(true); }}>Recruiter brief</button></div>
+              <div className="flex gap-3 pt-1"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark preset" : "Light preset"}</button><button className="recruiter-trigger" type="button" onClick={startRecruiterReview}>Recruiter path</button></div>
               <a href="mailto:manojprabhu0707@gmail.com" className="label mt-2 inline-flex items-center gap-2 text-violet-200">Send an email <ArrowUpRight size={15} /></a>
             </nav>
           </div>
@@ -564,6 +586,8 @@ export default function Home() {
       </div>
 
       <AnimatePresence>{recruiterOpen ? <motion.aside className="recruiter-brief-card" role="dialog" aria-modal="true" aria-label="Recruiter quick-view" initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.97 }} transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-brief-head"><div><p className="label">Recruiter quick-view</p><p className="mt-1 text-sm font-semibold text-white">S Manoj Prabhu</p></div><button className="recruiter-close" type="button" onClick={() => setRecruiterOpen(false)} aria-label="Close recruiter quick-view"><X size={17} /></button></div><div className="recruiter-availability"><span className="signal-dot" /><span>Open to internships and collaborative product work</span></div><div className="recruiter-detail-grid"><div><p className="label">Based in</p><p>Polur, Tamil Nadu</p></div><div><p className="label">Core stack</p><p>React · Figma · Java</p></div><div><p className="label">Proof</p><p>85% ML accuracy</p></div><div><p className="label">Contact</p><p>Reply within 1–2 days</p></div></div><div className="recruiter-brief-actions"><button className="signal-button primary" type="button" onClick={downloadResume}>Get résumé <Download size={14} /></button><a className="signal-button" href="mailto:manojprabhu0707@gmail.com">Email Manoj <Mail size={14} /></a></div></motion.aside> : null}</AnimatePresence>
+
+      <AnimatePresence>{recruiterReviewOpen ? <motion.aside className="recruiter-review-panel" role="region" aria-label="Recruiter review path" initial={reduceMotion ? false : { opacity: 0, y: 16, scale: .98 }} animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: .98 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-review-head"><div><p className="label">Recruiter review path</p><p>Four signals. One concise review.</p></div><button type="button" className="recruiter-close" onClick={() => setRecruiterReviewOpen(false)} aria-label="Close recruiter review path"><X size={17} /></button></div><div className="recruiter-review-progress" aria-label={`Checkpoint ${recruiterReviewStep + 1} of ${recruiterReviewSteps.length}`}>{recruiterReviewSteps.map((step, index) => <button key={step.id} type="button" className={index === recruiterReviewStep ? "is-active" : index < recruiterReviewStep ? "is-complete" : ""} onClick={() => goToRecruiterReviewStep(index)} aria-current={index === recruiterReviewStep ? "step" : undefined}><span>{step.index}</span><em>{step.label}</em></button>)}</div><div className="recruiter-review-copy" aria-live="polite"><span className="label">{recruiterReviewSteps[recruiterReviewStep].index} / {recruiterReviewSteps[recruiterReviewStep].label}</span><p>{recruiterReviewSteps[recruiterReviewStep].note}</p></div><div className="recruiter-review-actions"><button type="button" onClick={() => goToRecruiterReviewStep(recruiterReviewStep - 1)} disabled={recruiterReviewStep === 0}>Previous</button><button type="button" className="signal-button primary" onClick={() => recruiterReviewStep === recruiterReviewSteps.length - 1 ? setRecruiterReviewOpen(false) : goToRecruiterReviewStep(recruiterReviewStep + 1)}>{recruiterReviewStep === recruiterReviewSteps.length - 1 ? "Complete review" : "Next signal"} <ArrowDownRight size={14} /></button></div></motion.aside> : null}</AnimatePresence>
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity about-singularity" aria-hidden="true"><span /></div><span className="signal-thread about-thread" aria-hidden="true" />

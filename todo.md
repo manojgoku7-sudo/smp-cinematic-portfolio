@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a concise recruiter review path with availability, proof, work, and contact checkpoints.
+- [x] Verify recruiter-path navigation and responsive behavior across desktop and phone layouts.
 - [x] Add a one-time checkpoint pulse to each experience timeline node on viewport entry.
 - [x] Verify the checkpoint pulse remains restrained and motion-safe across desktop and phone layouts.
 - [x] Restyle the desktop project cursor cue as a compact spinning black hole without instructional text.
