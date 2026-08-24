@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle scroll-driven rotation offset to the MJ orbit.
+- [x] Verify the orbit offset remains refined, responsive, and motion-safe.
 - [x] Add a subtle scroll-linked dimming effect to the MJ header seal.
 - [x] Verify seal dimming remains clear across layouts, hover, focus, and motion-safe states.
 - [x] Add a continuous, subtle resting pulse to the MJ white orbit.
