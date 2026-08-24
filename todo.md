@@ -1,5 +1,8 @@
 # Enhancement Checklist
 
+- [x] Refine mobile layout, spacing, and typography across the portfolio.
+- [x] Improve touch affordances and reduce nonessential mobile motion.
+- [x] Verify the full mobile experience at common phone dimensions.
 - [x] Add soundless haptic-style visual feedback to hero-name clicks.
 - [x] Verify the response follows the existing motion and reduced-motion controls.
 - [x] Add a click-triggered ultraviolet signal ripple from the hero name.

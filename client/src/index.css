@@ -328,5 +328,52 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (max-width: 767px) { .project-caption { top: 4.9rem; width: min(82%, 18rem); opacity: 1; transform: none; } }
 @media (max-width: 767px) { .skill-legend { gap: 0.5rem 0.8rem; } .skill-legend-title { width: 100%; } }
 @media (max-width: 520px) { .hero-role-cycle { align-items: flex-start; flex-direction: column; gap: 0.18rem; } }
+@media (max-width: 767px) {
+  .container { padding-inline: 1rem; }
+  .nav-shell .container { height: 4.6rem !important; }
+  .nav-shell .seal-wrap { width: 2.55rem; height: 2.55rem; }
+  .nav-shell .display { font-size: 0.75rem; }
+  .hero { padding-top: 5.35rem; padding-bottom: 2.4rem; }
+  .hero > .grid { gap: 2.35rem; }
+  .hero-name { max-width: none !important; font-size: clamp(3.45rem, 17vw, 4.65rem) !important; line-height: 0.83 !important; }
+  .hero-role-cycle { margin-top: 0.15rem; min-height: 2.15rem; }
+  .hero-role-label { font-size: 0.52rem; }
+  .hero-role-value { font-size: 1.1rem; }
+  .hero .signal-button { flex: 1 1 100%; min-height: 3.45rem; }
+  .hero .icon-button { width: 2.85rem; height: 2.85rem; }
+  .hero-visual, .hero-image, .hero-video { min-height: 280px; }
+  .hero-seal { right: 1rem; top: 4.2rem; width: 6.5rem; height: 6.5rem; }
+  .hero-seal-caption { right: 0.85rem; top: 0.85rem; font-size: 0.48rem; }
+  .orbit { width: 10rem; height: 10rem; right: -2rem; bottom: -3.5rem; }
+  .nebula-starfield::before { width: 10rem; height: 10rem; }
+  .editorial-band:not(.hero) { padding-top: 4.6rem !important; padding-bottom: 4.6rem !important; }
+  .section-heading { font-size: clamp(2.45rem, 12vw, 3.25rem); max-width: 11ch; }
+  .editorial-band::before { left: 0.65rem; opacity: 0.68; }
+  .editorial-band::after { left: 0.45rem; top: 3.1rem; transform: scale(0.82); }
+  .project-card { min-height: 430px; }
+  .project-card:hover { box-shadow: none; }
+  .project-art { opacity: 0.59; }
+  .project-card:hover .project-art { transform: none; opacity: 0.59; }
+  .project-caption { left: 1rem; top: 4.6rem; width: min(84%, 18rem); }
+  .project-meta { top: 3.12rem; left: 1rem; right: 1rem; font-size: 0.56rem; }
+  .project-signal { left: 1rem; top: 1.3rem; }
+  .project-index { top: 1.3rem; right: 1rem; }
+  .skill-chip { padding: 0.62rem 0.72rem; font-size: 0.75rem; }
+  .skill-tooltip { display: none; }
+  .cert { min-height: 0; padding: 1.15rem; }
+  .timeline-row { padding-left: 1.65rem; }
+  .motion-toggle { min-height: 2.7rem; }
+  .form-field { min-height: 3.25rem; padding: 0.95rem; font-size: 1rem; }
+  textarea.form-field { min-height: 9rem; }
+  .contact-orbit.one { width: 16rem; height: 16rem; left: -3rem; }
+  .contact-orbit.two { width: 12rem; height: 12rem; right: -3rem; }
+  .reel-track { gap: 1.25rem; padding-block: 0.82rem; animation-duration: 42s; }
+  .reel-item { gap: 0.68rem; font-size: 0.62rem; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .hero-name { cursor: default; }
+  .project-card { transform: none !important; }
+  .skill-chip:hover { transform: none; }
+}
 @media (max-width: 900px) { .scroll-progress-rail { display: none; } }
 @media (max-width: 700px) { .corner-star { display: none; } }
