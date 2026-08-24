@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Preview each project’s MJ echo color from the orbit selector on hover and focus.
+- [x] Verify selector color previews remain restrained, responsive, and motion-safe.
 - [x] Add a restrained MJ orbit project-focus echo when a case signal opens.
 - [x] Verify the project-focus echo remains clear, responsive, and motion-safe.
 - [x] Add a muted orbital glint that activates on active-section navigation changes.

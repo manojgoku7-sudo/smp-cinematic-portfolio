@@ -359,6 +359,7 @@ export default function Home() {
   const [recruiterReviewStep, setRecruiterReviewStep] = useState(0);
   const [lightPreset, setLightPreset] = useState(() => typeof window !== "undefined" && window.localStorage.getItem("smp-contrast-preset") === "light");
   const [activeOrbitProject, setActiveOrbitProject] = useState<CaseStudyId>("attack-study");
+  const [orbitSelectorPreview, setOrbitSelectorPreview] = useState<CaseStudyId | null>(null);
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
   const [contactFocused, setContactFocused] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
@@ -374,6 +375,7 @@ export default function Home() {
   const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
   const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
   const dividerScrollRotation = sealOrbitScrollOffset * 0.34;
+  const activeOrbitPreview = motionPaused || reduceMotion || lowDataMode ? null : orbitSelectorPreview;
 
   const year = useMemo(() => new Date().getFullYear(), []);
   const constellationSegments = useMemo(() => constellationTrail.slice(1).map((point, index) => {
@@ -616,7 +618,7 @@ export default function Home() {
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram" aria-describedby="mj-brand-tooltip">
-              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: sealScrollOpacity }}><span className="monogram-halo" aria-hidden="true" style={{ transform: `rotate(${sealOrbitScrollOffset}deg)` }}><i className="monogram-halo-sweep" /><i key={monogramSectionGlint || "idle"} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><i key={monogramProjectEcho || "idle"} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" ? "is-cyan" : "is-violet"}` : ""}`} /><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: sealScrollOpacity }}><span className="monogram-halo" aria-hidden="true" style={{ transform: `rotate(${sealOrbitScrollOffset}deg)` }}><i className="monogram-halo-sweep" /><i key={monogramSectionGlint || "idle"} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><i key={monogramProjectEcho || "idle"} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" ? "is-cyan" : "is-violet"}` : ""}`} /><i className={`monogram-selector-preview ${activeOrbitPreview ? `is-active ${activeOrbitPreview === "attack-study" ? "is-cyan" : "is-violet"}` : ""}`} /><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
               <span id="mj-brand-tooltip" className="monogram-brand-tooltip" role="tooltip">MJ / Event horizon</span>
             </button>
@@ -730,7 +732,7 @@ export default function Home() {
             <div className="project-orbit-stage">
               <span className="project-orbit-ring outer" aria-hidden="true" /><span className="project-orbit-ring inner" aria-hidden="true" /><span className="project-orbit-axis" aria-hidden="true" />
               <span className="project-orbit-core" aria-hidden="true"><i /><b>Work<br />orbit</b></span>
-              {orbitProjects.map((project, index) => <button key={project.id} className={`orbit-project-node node-${index + 1} ${activeOrbitProject === project.id ? "is-active" : ""}`} type="button" aria-pressed={activeOrbitProject === project.id} onFocus={() => setActiveOrbitProject(project.id)} onClick={() => selectOrbitProject(project.id)}><span className="orbit-project-index">{project.index}</span><span><b>{project.title}</b><em>{project.discipline}</em></span></button>)}
+              {orbitProjects.map((project, index) => <button key={project.id} className={`orbit-project-node node-${index + 1} ${project.id === "attack-study" ? "project-tone-cyan" : "project-tone-violet"} ${activeOrbitProject === project.id ? "is-active" : ""}`} type="button" aria-pressed={activeOrbitProject === project.id} onMouseEnter={() => setOrbitSelectorPreview(project.id)} onMouseLeave={() => setOrbitSelectorPreview(null)} onFocus={() => { setActiveOrbitProject(project.id); setOrbitSelectorPreview(project.id); }} onBlur={() => setOrbitSelectorPreview(null)} onClick={() => selectOrbitProject(project.id)}><span className="orbit-project-index">{project.index}</span><span><b>{project.title}</b><em>{project.discipline}</em></span></button>)}
             </div>
           </div>
           <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare signals</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
