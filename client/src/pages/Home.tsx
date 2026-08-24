@@ -346,6 +346,7 @@ export default function Home() {
   const [contactPulses, setContactPulses] = useState<InteractionPoint[]>([]);
   const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
   const [footerBurst, setFooterBurst] = useState(0);
+  const [monogramRipple, setMonogramRipple] = useState(0);
   const [roleIndex, setRoleIndex] = useState(0);
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
   const [nameHaptic, setNameHaptic] = useState(0);
@@ -563,6 +564,13 @@ export default function Home() {
     window.setTimeout(() => setFooterBurst((current) => current === burstId ? 0 : current), 780);
   }
 
+  function triggerMonogramRipple() {
+    if (reduceMotion || motionPaused || lowDataMode) return;
+    const rippleId = Date.now();
+    setMonogramRipple(rippleId);
+    window.setTimeout(() => setMonogramRipple((current) => current === rippleId ? 0 : current), 760);
+  }
+
   function createNameRipple(event: ReactPointerEvent<HTMLElement>) {
     if (reduceMotion || motionPaused) return;
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -583,8 +591,8 @@ export default function Home() {
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
-            <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => scrollToSection("top")} aria-label="Go to the top and reveal the MJ monogram">
-              <span className="seal-wrap"><span className="monogram-halo" aria-hidden="true"><i className="monogram-halo-sweep" /><b className="monogram-orbit-spark" /></span><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+            <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram">
+              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`}><span className="monogram-halo" aria-hidden="true"><i className="monogram-halo-sweep" /><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
             </button>
             <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" />

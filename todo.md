@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a click-triggered ripple effect to the MJ logo seal.
+- [x] Verify the seal ripple provides clear feedback and respects motion settings.
 - [x] Add a tiny orbiting spark to the MJ halo on hover and keyboard focus.
 - [x] Verify the MJ spark remains subtle, responsive, and motion-safe.
 - [x] Add a compact black-hole halo with white orbit and ultraviolet light sweep around the MJ monogram.
