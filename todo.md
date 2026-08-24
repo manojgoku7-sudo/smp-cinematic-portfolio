@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a deeper event-horizon motion layer and an exterior black-hole light field beneath credential cards.
+- [x] Verify the expanded credential gravity treatment remains clear, responsive, and motion-safe.
 - [x] Add restrained orbital sparks and particle motion to the credential event-horizon reel.
 - [x] Verify the spark treatment remains clear, responsive, and motion-safe.
 - [x] Add brighter white radius lines and deeper black-hole detail to the credential preview reel.
