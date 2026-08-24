@@ -378,7 +378,12 @@ export default function Home() {
             </motion.div>
             <motion.p initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08, ease: [0.23, 1, 0.32, 1] }} className="label mb-5">01 / SMP field reel</motion.p>
             <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 38 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.78, delay: 0.14, ease: [0.23, 1, 0.32, 1] }} className="hero-name display max-w-[10ch] text-[clamp(4.1rem,9vw,8.2rem)] font-semibold leading-[0.81] text-white">
-              <span className="name-line name-manoj" data-text="S MANOJ">S MANOJ</span><span className="name-line name-prabhu" data-text="PRABHU">PRABHU</span>
+              <span className="name-line name-manoj" data-text="S MANOJ">S MANOJ</span><span className="name-line name-prabhu" data-text="PRABHU">PRABHU</span><span className="name-spark-field" aria-hidden="true">{[
+                { left: "8%", top: "22%", dx: "34px", dy: "-10px", tilt: "-28deg", delay: "-1.1s" },
+                { left: "56%", top: "14%", dx: "22px", dy: "14px", tilt: "36deg", delay: "-3.2s" },
+                { left: "82%", top: "63%", dx: "-28px", dy: "-12px", tilt: "-48deg", delay: "-4.7s" },
+                { left: "27%", top: "76%", dx: "42px", dy: "-8px", tilt: "12deg", delay: "-5.8s" },
+              ].map((spark, index) => <i key={index} className="name-spark" style={{ "--spark-left": spark.left, "--spark-top": spark.top, "--spark-dx": spark.dx, "--spark-dy": spark.dy, "--spark-tilt": spark.tilt, "--spark-delay": spark.delay } as React.CSSProperties} />)}</span>
             </motion.h1>
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.64, delay: 0.28, ease: [0.23, 1, 0.32, 1] }} className="mt-8 max-w-lg">
               <p className="hero-role-cycle" aria-live="polite"><span className="hero-role-label">Now operating as</span><AnimatePresence mode="wait" initial={false}><motion.span key={professionalRoles[roleIndex]} className="hero-role-value" initial={reduceMotion ? false : { opacity: 0, y: 8, filter: "blur(4px)" }} animate={reduceMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }} exit={reduceMotion ? {} : { opacity: 0, y: -7, filter: "blur(3px)" }} transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}>{professionalRoles[roleIndex]}</motion.span></AnimatePresence></p>

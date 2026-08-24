@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a second refined motion layer to the hero name.
+- [x] Verify the enhanced name animation remains legible and respects motion preferences.
 - [x] Add a compact cycling professional-role line beneath the hero name.
 - [x] Verify the role transition honors the global motion and reduced-motion preferences.
 - [x] Add a refined internal light-and-signal animation to the hero name.
