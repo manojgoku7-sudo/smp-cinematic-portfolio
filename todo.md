@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a one-time signal-focus reveal that traces from each project index to its outcome marker.
+- [x] Verify the reveal at desktop and phone widths with paused and reduced-motion states.
 - [x] Separate overlapping project-card metadata, captions, headings, and evidence panels.
 - [x] Verify the corrected hierarchy at desktop and phone widths.
 - [x] Remove the Code-to-Canvas Bridge from the About section.
