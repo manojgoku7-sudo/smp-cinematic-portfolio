@@ -1,5 +1,7 @@
 # Enhancement Checklist
 
+- [x] Add a refined internal light-and-signal animation to the hero name.
+- [x] Verify name readability and reduced-motion behavior across layouts.
 - [x] Add a matching spinning spark control to the footer.
 - [x] Add a concise hover tooltip and keyboard-focus release label to star controls.
 - [x] Verify the two star controls remain accessible and visually consistent.
