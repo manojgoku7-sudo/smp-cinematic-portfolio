@@ -158,7 +158,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
 function GravityHeading({ title, motionPaused }: { title: string; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticType = reduceMotion || motionPaused;
-  return <h2 className="display section-heading gravity-heading" aria-label={title}>{title.split(" ").map((word, wordIndex) => <span className="gravity-word" key={`${word}-${wordIndex}`}>{word.split("").map((character, characterIndex) => { const index = wordIndex * 8 + characterIndex; return <motion.span key={`${character}-${characterIndex}`} className="gravity-letter" aria-hidden="true" initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: .6 }} whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }} viewport={{ once: true, amount: .55 }} transition={{ duration: .54, delay: .08 + (index % 8) * .035, ease: [0.23, 1, 0.32, 1] }}>{character}</motion.span>; })}{wordIndex < title.split(" ").length - 1 ? " " : null}</span>)}</h2>;
+  return <h2 className="display section-heading gravity-heading" aria-label={title}>{title.split(" ").map((word, wordIndex) => <span className="gravity-word-shell" key={`${word}-${wordIndex}`}><span className="gravity-word">{word.split("").map((character, characterIndex) => { const index = wordIndex * 8 + characterIndex; return <motion.span key={`${character}-${characterIndex}`} className="gravity-letter" aria-hidden="true" initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: .6 }} whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }} viewport={{ once: true, amount: .55 }} transition={{ duration: .54, delay: .08 + (index % 8) * .035, ease: [0.23, 1, 0.32, 1] }}>{character}</motion.span>; })}</span>{wordIndex < title.split(" ").length - 1 ? <span className="gravity-space" aria-hidden="true" /> : null}</span>)}</h2>;
 }
 
 function SectionIntro({ index, eyebrow, title, detail, motionPaused = false }: { index: string; eyebrow: string; title: string; detail?: string; motionPaused?: boolean }) {
@@ -248,6 +248,13 @@ function ProjectSignalFocus({ tone, motionPaused }: { tone: "violet" | "cyan"; m
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
   return <motion.span className={`project-signal-focus is-${tone}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scaleX: 0 }} whileInView={staticMotion ? {} : { opacity: 0.78, scaleX: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.72, delay: 0.18, ease: [0.23, 1, 0.32, 1] }}><i /><i /></motion.span>;
+}
+
+function BlueprintCrosshair({ motionPaused }: { motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [entered, setEntered] = useState(false);
+  const staticMotion = reduceMotion || motionPaused;
+  return <motion.span className={`blueprint-crosshair ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.48 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .28, delay: .22, ease: [0.23, 1, 0.32, 1] }}><i className="blueprint-crosshair-h" /><i className="blueprint-crosshair-v" /><b /><em /></motion.span>;
 }
 
 function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
@@ -639,7 +646,7 @@ export default function Home() {
             </article></Reveal>
             <Reveal delay={0.13}><article id="delivery-study" className="project-card panel" tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />
-              <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 02</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} />
+              <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 02</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><BlueprintCrosshair motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
               <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><ProjectProofMarker value="15+" ringValue={100} label="Screens mapped" detail="Two usability review cycles across the mobile flow" motionPaused={motionPaused} /><DeliveryWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
             </article></Reveal>

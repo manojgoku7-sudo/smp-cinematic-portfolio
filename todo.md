@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a restrained Blueprint Crosshair focus animation to the Delivery case-study artifact.
+- [x] Verify the crosshair remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add concise hover and keyboard-focus tooltips to the hero contact icons.
 - [x] Verify tooltip placement and mobile suppression across responsive layouts.
 - [x] Add refined hover, focus, and touch feedback to the hero contact icons and recruiter quick-view control.
