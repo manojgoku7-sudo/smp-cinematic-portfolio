@@ -1,4 +1,8 @@
 # Enhancement Checklist
+- [x] Add an interactive code-to-canvas bridge to the About section.
+- [x] Add an accessible project comparison view for the two featured case studies.
+- [x] Add a desktop-only cursor-led orbital finder around the project section.
+- [x] Verify the interaction set across desktop, phone, motion-pause, and reduced-motion states.
 - [x] Add animated radial proof markers for verified project outcomes.
 - [x] Verify the proof markers across desktop, phone, motion-pause, and reduced-motion states.
 - [x] Remove the Low Data action from the mobile dock and rebalance the remaining actions.

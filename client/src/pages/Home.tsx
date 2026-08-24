@@ -232,6 +232,19 @@ function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone
   );
 }
 
+function CodeToCanvasBridge({ canvasMode, onToggle, motionPaused }: { canvasMode: boolean; onToggle: () => void; motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const staticMotion = reduceMotion || motionPaused;
+  return (
+    <section className={`code-canvas-bridge ${canvasMode ? "is-canvas" : "is-code"}`} aria-label="Code to canvas bridge">
+      <div className="code-canvas-head"><div><span className="label">Code / canvas bridge</span><p>One interface system, two readable states.</p></div><button type="button" className="code-canvas-toggle" onClick={onToggle} aria-pressed={canvasMode}>{canvasMode ? "View logic" : "View canvas"} <ArrowUpRight size={13} /></button></div>
+      <AnimatePresence mode="wait" initial={false}>
+        {canvasMode ? <motion.div key="canvas" className="canvas-frame" initial={staticMotion ? false : { opacity: 0, x: 12 }} animate={staticMotion ? {} : { opacity: 1, x: 0 }} exit={staticMotion ? {} : { opacity: 0, x: -10 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="canvas-topbar"><span>Field order / mobile</span><i /></div><p>Good evening</p><b>Choose the next step.</b><div className="canvas-controls"><span>Discover</span><span>Cart</span><span>Track</span></div><div className="canvas-result"><i /><span><b>Flow stays visible</b><em>States, hierarchy, and feedback</em></span></div></motion.div> : <motion.pre key="code" className="code-frame" initial={staticMotion ? false : { opacity: 0, x: -12 }} animate={staticMotion ? {} : { opacity: 1, x: 0 }} exit={staticMotion ? {} : { opacity: 0, x: 10 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><code><span className="code-key">const</span> <span className="code-name">flow</span> = [<span className="code-string">&quot;discover&quot;</span>, <span className="code-string">&quot;cart&quot;</span>, <span className="code-string">&quot;track&quot;</span>];{"\n\n"}<span className="code-key">return</span> <span className="code-tag">&lt;MobileFlow</span>{"\n  "}<span className="code-prop">steps</span>={'{flow}'}{"\n  "}<span className="code-prop">feedback</span>=<span className="code-string">&quot;visible&quot;</span>{"\n"}<span className="code-tag">/&gt;</span></code></motion.pre>}
+      </AnimatePresence>
+    </section>
+  );
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -257,6 +270,9 @@ export default function Home() {
   const [activeOrbitProject, setActiveOrbitProject] = useState<CaseStudyId>("attack-study");
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
   const [contactFocused, setContactFocused] = useState(false);
+  const [canvasMode, setCanvasMode] = useState(false);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -396,6 +412,12 @@ export default function Home() {
     const pulse = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
     setProjectPulses((current) => [...current.slice(-2), pulse]);
     window.setTimeout(() => setProjectPulses((current) => current.filter((item) => item.id !== pulse.id)), 920);
+  }
+
+  function followProjectFinder(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    setProjectFinder({ x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100, active: true });
   }
 
   function extendConstellation(event: ReactPointerEvent<HTMLElement>) {
@@ -564,10 +586,11 @@ export default function Home() {
             </div>
           </Reveal>
         </div>
+        <Reveal delay={0.18} className="mt-5 lg:ml-[clamp(1rem,8vw,7.5rem)]"><CodeToCanvasBridge canvasMode={canvasMode} onToggle={() => setCanvasMode((current) => !current)} motionPaused={motionPaused} /></Reveal>
       </section>
 
-      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse}>
-        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
+      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={() => setProjectFinder((current) => ({ ...current, active: false }))}>
+        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span className={`project-orbital-finder ${projectFinder.active ? "is-active" : ""}`} style={{ left: `${projectFinder.x}%`, top: `${projectFinder.y}%` }}><i /><i /><em>Explore evidence</em></span></div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button></nav>
           <div className="project-orbit-selector" aria-label="Featured project selector">
@@ -578,6 +601,7 @@ export default function Home() {
               {orbitProjects.map((project, index) => <button key={project.id} className={`orbit-project-node node-${index + 1} ${activeOrbitProject === project.id ? "is-active" : ""}`} type="button" aria-pressed={activeOrbitProject === project.id} onFocus={() => setActiveOrbitProject(project.id)} onClick={() => selectOrbitProject(project.id)}><span className="orbit-project-index">{project.index}</span><span><b>{project.title}</b><em>{project.discipline}</em></span></button>)}
             </div>
           </div>
+          <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare signals</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article id="attack-study" className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
