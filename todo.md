@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Separate overlapping project-card metadata, captions, headings, and evidence panels.
+- [x] Verify the corrected hierarchy at desktop and phone widths.
 - [x] Remove the Code-to-Canvas Bridge from the About section.
 - [x] Verify the revised About section spacing across desktop and phone layouts.
 - [x] Add an interactive code-to-canvas bridge to the About section.
