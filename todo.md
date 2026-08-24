@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a continuous, subtle resting pulse to the MJ white orbit.
+- [x] Verify the orbit pulse is elegant, responsive, and disabled by motion safeguards.
 - [x] Refine the MJ white orbit to a thinner, more elegant stroke.
 - [x] Verify the thinner orbit remains clear across desktop and mobile layouts.
 - [x] Remove the recently added violet-white neon aura from the MJ logo.
