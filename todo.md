@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add restrained orbital sparks and particle motion to the credential event-horizon reel.
+- [x] Verify the spark treatment remains clear, responsive, and motion-safe.
 - [x] Add brighter white radius lines and deeper black-hole detail to the credential preview reel.
 - [x] Verify the refined black-hole reel remains legible, responsive, and motion-safe.
 - [x] Add a project-driven Skill gravity alignment interaction in the capabilities section.
