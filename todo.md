@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle scroll-linked dimming effect to the MJ header seal.
+- [x] Verify seal dimming remains clear across layouts, hover, focus, and motion-safe states.
 - [x] Add a continuous, subtle resting pulse to the MJ white orbit.
 - [x] Verify the orbit pulse is elegant, responsive, and disabled by motion safeguards.
 - [x] Refine the MJ white orbit to a thinner, more elegant stroke.
