@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add refined hover, focus, and touch feedback to the hero contact icons and recruiter quick-view control.
+- [x] Verify the interaction treatment remains clear and motion-safe across desktop and phone layouts.
 - [x] Add restrained gravity-drift motion to key editorial section headings.
 - [x] Verify heading legibility and motion-safe fallbacks across desktop and phone layouts.
 - [x] Add a concise recruiter review path with availability, proof, work, and contact checkpoints.

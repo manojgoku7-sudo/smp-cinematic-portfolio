@@ -560,13 +560,13 @@ export default function Home() {
                 <button className="signal-button primary" onClick={() => scrollToSection("work")}>Open selected work <ArrowDownRight size={16} /></button>
                 <button className="signal-button" onClick={downloadResume}>Retrieve résumé <Download size={15} /></button>
               </div>
-              <div className="mt-9 flex flex-wrap gap-2.5">
-                <a className="icon-button" href="mailto:manojprabhu0707@gmail.com" aria-label="Email Manoj"><Mail size={17} /></a>
-                <a className="icon-button" href="tel:+919677518268" aria-label="Call Manoj"><Phone size={17} /></a>
-                <a className="icon-button" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub"><Github size={17} /></a>
-                <a className="icon-button" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn"><Linkedin size={17} /></a>
+              <div className="hero-contact-cluster mt-9 flex flex-wrap gap-2.5">
+                <a className="icon-button hero-contact-link" href="mailto:manojprabhu0707@gmail.com" aria-label="Email Manoj"><Mail size={17} /></a>
+                <a className="icon-button hero-contact-link" href="tel:+919677518268" aria-label="Call Manoj"><Phone size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub"><Github size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn"><Linkedin size={17} /></a>
               </div>
-              <button className="recruiter-hero-trigger" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
+              <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
