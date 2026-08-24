@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add restrained gravity-drift motion to key editorial section headings.
+- [x] Verify heading legibility and motion-safe fallbacks across desktop and phone layouts.
 - [x] Add a concise recruiter review path with availability, proof, work, and contact checkpoints.
 - [x] Verify recruiter-path navigation and responsive behavior across desktop and phone layouts.
 - [x] Add a one-time checkpoint pulse to each experience timeline node on viewport entry.

@@ -155,7 +155,13 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function SectionIntro({ index, eyebrow, title, detail }: { index: string; eyebrow: string; title: string; detail?: string }) {
+function GravityHeading({ title, motionPaused }: { title: string; motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const staticType = reduceMotion || motionPaused;
+  return <h2 className="display section-heading gravity-heading" aria-label={title}>{title.split(" ").map((word, wordIndex) => <span className="gravity-word" key={`${word}-${wordIndex}`}>{word.split("").map((character, characterIndex) => { const index = wordIndex * 8 + characterIndex; return <motion.span key={`${character}-${characterIndex}`} className="gravity-letter" aria-hidden="true" initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: .6 }} whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }} viewport={{ once: true, amount: .55 }} transition={{ duration: .54, delay: .08 + (index % 8) * .035, ease: [0.23, 1, 0.32, 1] }}>{character}</motion.span>; })}{wordIndex < title.split(" ").length - 1 ? " " : null}</span>)}</h2>;
+}
+
+function SectionIntro({ index, eyebrow, title, detail, motionPaused = false }: { index: string; eyebrow: string; title: string; detail?: string; motionPaused?: boolean }) {
   return (
     <div className="grid gap-6 md:grid-cols-[9rem_1fr] md:gap-10">
       <div className="flex items-center gap-3 md:block">
@@ -164,7 +170,7 @@ function SectionIntro({ index, eyebrow, title, detail }: { index: string; eyebro
       </div>
       <div>
         <p className="label mb-4">{eyebrow}</p>
-        <h2 className="display section-heading">{title}</h2>
+        <GravityHeading title={title} motionPaused={motionPaused} />
         {detail ? <p className="mt-6 max-w-xl text-[0.94rem] leading-7 text-[#b0aabc]">{detail}</p> : null}
       </div>
     </div>
@@ -591,7 +597,7 @@ export default function Home() {
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity about-singularity" aria-hidden="true"><span /></div><span className="signal-thread about-thread" aria-hidden="true" />
-        <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer who moves from interface structure to implementation — with enough backend and machine-learning context to make the whole experience connect." /></Reveal>
+        <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer who moves from interface structure to implementation — with enough backend and machine-learning context to make the whole experience connect." motionPaused={motionPaused} /></Reveal>
         <div className="about-proof mt-14 grid gap-5 lg:grid-cols-[1.28fr_.72fr]">
           <Reveal delay={0.06} className="panel relative overflow-hidden p-7 md:p-10">
             <div className="absolute right-0 top-0 h-32 w-32 bg-violet-500/15 blur-3xl" />
@@ -613,7 +619,7 @@ export default function Home() {
 
       <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={() => setProjectFinder((current) => ({ ...current, active: false }))}>
         <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span className={`project-orbital-finder ${projectFinder.active ? "is-active" : ""}`} style={{ left: `${projectFinder.x}%`, top: `${projectFinder.y}%` }}><i /><i /></span></div>
-        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
+        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." motionPaused={motionPaused} /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button></nav>
           <div className="project-orbit-selector" aria-label="Featured project selector">
             <div className="project-orbit-intro"><p className="label">Project orbit / choose a signal</p><p>Rotate between the two studies, then follow the selected signal into the work.</p><span className="project-orbit-current">{orbitProjects.find((project) => project.id === activeOrbitProject)?.signal}</span></div>
@@ -642,7 +648,7 @@ export default function Home() {
       </section>
 
       <section id="experience" className="editorial-band container py-28 md:py-40">
-        <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." /></Reveal>
+        <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." motionPaused={motionPaused} /></Reveal>
         <div className="experience-layout mt-14 grid gap-12 lg:grid-cols-[1.28fr_.72fr] lg:gap-20">
           <div className="timeline-list"><Reveal><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
             {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
@@ -653,7 +659,7 @@ export default function Home() {
 
       <section className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40">
         <div className="mini-singularity skill-singularity" aria-hidden="true"><span /></div><span className="signal-thread skill-thread" aria-hidden="true" />
-        <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." /></Reveal>
+        <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." motionPaused={motionPaused} /></Reveal>
           <Reveal delay={0.08}><div className="skill-legend" aria-label="Four-point star-map proficiency scale"><span className="skill-legend-title">Star map / four-point scale</span>{[[1, "Exploring"], [2, "Foundation"], [3, "Working"], [4, "Applied"]].map(([stars, label]) => <span className="skill-legend-item" key={label as string}><span className="skill-legend-stars" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <b key={star} className={star < Number(stars) ? "is-lit" : ""} />)}</span>{label}</span>)}</div></Reveal>
           <div className="capability-grid mt-10 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
             {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className="min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126]"><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => { const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 }; return <span className="skill-chip" key={item} tabIndex={0} aria-label={`${item}: ${proficiency.level} proficiency`}><span>{item}</span><span className="skill-tooltip" role="tooltip"><span className="skill-star-map" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />)}</span><span className="skill-tooltip-copy">{proficiency.level} proficiency</span></span></span>; })}</div></div></Reveal>)}

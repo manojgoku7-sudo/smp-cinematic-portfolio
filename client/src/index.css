@@ -124,6 +124,7 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .panel:hover { border-color: rgb(181 145 255 / 0.34); }
 .violet-text { background: linear-gradient(110deg, #fff 6%, #d7c8ff 38%, #a779ff 72%, #f4b1ef 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .section-heading { max-width: 13ch; font-size: clamp(2.4rem, 6vw, 5.9rem); line-height: 0.93; font-weight: 600; }
+.gravity-heading { text-wrap: balance; }.gravity-letter { display: inline-block; transform-origin: 50% 72%; will-change: transform, opacity; }
 
 .nav-shell { position: fixed; top: 0; left: 0; right: 0; z-index: 50; transition: background 220ms var(--ease-out), border-color 220ms var(--ease-out), transform 220ms var(--ease-out); }
 .nav-shell.is-scrolled { border-bottom: 1px solid rgb(222 211 255 / 0.12); background: rgb(9 9 15 / 0.78); backdrop-filter: blur(18px); }
