@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a hover and keyboard-focus tilt that reveals the MJ monogram’s J hook.
+- [x] Verify the monogram tilt remains responsive and motion-safe.
 - [x] Generate a revised MJ monogram with a clearly legible J hook and negative-space channel.
 - [x] Replace the prior monogram and verify both M and J remain distinct at header scale.
 - [x] Generate a transparent MJ monogram logo in the Obsidian Studio visual direction.
