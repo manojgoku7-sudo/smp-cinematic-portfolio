@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Refine the MJ white orbit to a thinner, more elegant stroke.
+- [x] Verify the thinner orbit remains clear across desktop and mobile layouts.
 - [x] Remove the recently added violet-white neon aura from the MJ logo.
 - [x] Verify the restored MJ black-hole halo remains clear and responsive.
 - [x] Add a layered violet-white neon aura behind the MJ logo.
