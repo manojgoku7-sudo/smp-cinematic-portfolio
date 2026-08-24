@@ -347,6 +347,7 @@ export default function Home() {
   const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
   const [footerBurst, setFooterBurst] = useState(0);
   const [monogramRipple, setMonogramRipple] = useState(0);
+  const [monogramSectionGlint, setMonogramSectionGlint] = useState(0);
   const [roleIndex, setRoleIndex] = useState(0);
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
   const [nameHaptic, setNameHaptic] = useState(0);
@@ -367,6 +368,7 @@ export default function Home() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
+  const lastActiveSection = useRef(active);
   const reduceMotion = useReducedMotion();
   const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
   const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
@@ -389,6 +391,16 @@ export default function Home() {
   useEffect(() => {
     window.localStorage.setItem("smp-contrast-preset", lightPreset ? "light" : "dark");
   }, [lightPreset]);
+
+  useEffect(() => {
+    if (active === lastActiveSection.current) return;
+    lastActiveSection.current = active;
+    if (motionPaused || reduceMotion || lowDataMode) return;
+    const glintId = Date.now();
+    setMonogramSectionGlint(glintId);
+    const timer = window.setTimeout(() => setMonogramSectionGlint((current) => current === glintId ? 0 : current), 1040);
+    return () => window.clearTimeout(timer);
+  }, [active, lowDataMode, motionPaused, reduceMotion]);
 
   useEffect(() => {
     if (reduceMotion || lowDataMode) {
@@ -595,7 +607,7 @@ export default function Home() {
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram" aria-describedby="mj-brand-tooltip">
-              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: sealScrollOpacity }}><span className="monogram-halo" aria-hidden="true" style={{ transform: `rotate(${sealOrbitScrollOffset}deg)` }}><i className="monogram-halo-sweep" /><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: sealScrollOpacity }}><span className="monogram-halo" aria-hidden="true" style={{ transform: `rotate(${sealOrbitScrollOffset}deg)` }}><i className="monogram-halo-sweep" /><i key={monogramSectionGlint || "idle"} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
               <span id="mj-brand-tooltip" className="monogram-brand-tooltip" role="tooltip">MJ / Event horizon</span>
             </button>

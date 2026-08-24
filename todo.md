@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a muted orbital glint that activates on active-section navigation changes.
+- [x] Verify the section-change glint remains restrained, responsive, and motion-safe.
 - [x] Synchronize the header divider with the MJ orbit’s scroll-driven visual state.
 - [x] Verify the coordinated header treatment remains refined, responsive, and motion-safe.
 - [x] Add a subtle scroll-driven rotation offset to the MJ orbit.
