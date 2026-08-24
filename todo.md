@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Generate a transparent MJ monogram logo in the Obsidian Studio visual direction.
+- [x] Replace the current portfolio mark with the MJ monogram and verify its header and footer usage.
 - [x] Add a deeper event-horizon motion layer and an exterior black-hole light field beneath credential cards.
 - [x] Verify the expanded credential gravity treatment remains clear, responsive, and motion-safe.
 - [x] Add restrained orbital sparks and particle motion to the credential event-horizon reel.
