@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the recently added violet-white neon aura from the MJ logo.
+- [x] Verify the restored MJ black-hole halo remains clear and responsive.
 - [x] Add a layered violet-white neon aura behind the MJ logo.
 - [x] Verify the MJ aura remains refined, responsive, and motion-safe.
 - [x] Add a compact focus-only identity tooltip to the MJ seal.
