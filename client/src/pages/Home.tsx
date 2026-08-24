@@ -201,6 +201,24 @@ function DeliveryWalkthrough({ motionPaused, lowDataMode }: { motionPaused: bool
   );
 }
 
+function AttackModelWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [runId, setRunId] = useState(0);
+  const staticPlayback = reduceMotion || motionPaused || lowDataMode;
+  return (
+    <section className={`attack-walkthrough ${staticPlayback ? "is-static" : ""}`} aria-label="Attack model evaluation walkthrough">
+      <div className="attack-walkthrough-head"><div><span className="label">Evaluation walkthrough</span><p>Feature set → model comparison → best result</p></div><button type="button" className="attack-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay attack model walkthrough"}><Play size={12} />Replay</button></div>
+      <div key={runId} className="attack-console" aria-hidden="true">
+        <div className="attack-stage attack-input"><span className="attack-terminal-label">01 / INPUT MATRIX</span><b>Cybersecurity dataset</b><div className="attack-feature-stack"><i><span />Signal patterns</i><i><span />Traffic markers</i><i><span />Event fields</i></div><p>Structured for model evaluation</p></div>
+        <div className="attack-stage attack-compare"><span className="attack-terminal-label">02 / MODEL REVIEW</span><b>Four-model comparison</b><div className="attack-model-grid"><i>XGBoost</i><i>SVM</i><i>Logistic<br />Regression</i><i>Gradient<br />Boosting</i></div><p>Consistent evaluation pass</p></div>
+        <div className="attack-stage attack-result"><span className="attack-terminal-label">03 / BEST RESULT</span><div className="attack-result-seal"><span>85</span><em>%</em></div><b>XGBoost selected</b><p>Best observed classification accuracy</p><i className="attack-result-line" /></div>
+        <div className="attack-progress" aria-hidden="true"><i /><i /><i /></div>
+      </div>
+      <p className="attack-walkthrough-note">Illustrative evaluation flow based on the reported four-model comparison and final 85% classification accuracy.</p>
+    </section>
+  );
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -552,7 +570,7 @@ export default function Home() {
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
               <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><AttackModelWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
             <Reveal delay={0.13}><article id="delivery-study" className="project-card panel" tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />

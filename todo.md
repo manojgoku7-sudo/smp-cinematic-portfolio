@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a lightweight animated model-evaluation walkthrough to the Prediction of Perpetration Attack case study.
+- [x] Verify its evidence hierarchy, mobile layout, and motion-safe fallback behavior.
 - [x] Add a lightweight animated walkthrough to the Food Delivery case study.
 - [x] Verify its visual hierarchy, mobile layout, and reduced-motion/low-data behavior.
 - [x] Build an accessible orbiting selector for the featured projects.
