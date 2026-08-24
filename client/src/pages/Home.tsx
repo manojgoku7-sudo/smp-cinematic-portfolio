@@ -1,7 +1,7 @@
 /**
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
  */
-import { FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDownRight,
@@ -85,6 +85,23 @@ const certifications = [
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
 const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
+const orbitProjects = [
+  { id: "attack-study", index: "01", title: "Attack model", discipline: "ML / security", signal: "85% accuracy" },
+  { id: "delivery-study", index: "02", title: "Delivery flow", discipline: "UX / mobile", signal: "15+ screens" },
+] as const;
+const caseSignals = {
+  "attack-study": {
+    challenge: "Separate high-signal attack patterns from a noisy cybersecurity dataset.",
+    approach: "Compared four supervised learning models with a consistent evaluation flow.",
+    outcome: "XGBoost delivered the strongest result at 85% classification accuracy.",
+  },
+  "delivery-study": {
+    challenge: "Make a multi-step ordering journey feel direct on a small mobile screen.",
+    approach: "Mapped discovery, cart, and tracking across a cohesive Figma flow.",
+    outcome: "Refined 15+ screens through two usability review cycles.",
+  },
+} as const;
+type CaseStudyId = keyof typeof caseSignals;
 const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
@@ -148,6 +165,24 @@ function SectionIntro({ index, eyebrow, title, detail }: { index: string; eyebro
   );
 }
 
+function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyId; open: boolean; onToggle: () => void; motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const signal = caseSignals[id];
+  const staticMotion = reduceMotion || motionPaused;
+  return (
+    <div className="case-signal-control">
+      <button className={`case-signal-button ${open ? "is-open" : ""}`} type="button" onClick={onToggle} aria-expanded={open} aria-controls={`${id}-signal-detail`}>
+        <span>Case signal</span><span>{open ? "Close" : "Open"} <ArrowUpRight size={13} /></span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open ? <motion.div id={`${id}-signal-detail`} className="case-signal-detail" initial={staticMotion ? false : { opacity: 0, y: 8, scale: 0.985 }} animate={staticMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={staticMotion ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}>
+          <div><span>Challenge</span><p>{signal.challenge}</p></div><div><span>Approach</span><p>{signal.approach}</p></div><div><span>Outcome</span><p>{signal.outcome}</p></div>
+        </motion.div> : null}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -170,6 +205,9 @@ export default function Home() {
   const [lowDataMode, setLowDataMode] = useState(false);
   const [recruiterOpen, setRecruiterOpen] = useState(false);
   const [lightPreset, setLightPreset] = useState(() => typeof window !== "undefined" && window.localStorage.getItem("smp-contrast-preset") === "light");
+  const [activeOrbitProject, setActiveOrbitProject] = useState<CaseStudyId>("attack-study");
+  const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
+  const [contactFocused, setContactFocused] = useState(false);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -284,6 +322,15 @@ export default function Home() {
 
   function resetProjectTilt(event: MouseEvent<HTMLElement>) {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
+  }
+
+  function selectOrbitProject(id: CaseStudyId) {
+    setActiveOrbitProject(id);
+    scrollToSection(id);
+  }
+
+  function handleContactBlur(event: FocusEvent<HTMLFormElement>) {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setContactFocused(false);
   }
 
   function createNebulaBurst(event: ReactPointerEvent<HTMLElement>) {
@@ -474,18 +521,26 @@ export default function Home() {
         <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-logo_526971d2.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Two focused case studies across applied machine learning and mobile product design — distinct problems, one bias toward clear decisions." /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button></nav>
+          <div className="project-orbit-selector" aria-label="Featured project selector">
+            <div className="project-orbit-intro"><p className="label">Project orbit / choose a signal</p><p>Rotate between the two studies, then follow the selected signal into the work.</p><span className="project-orbit-current">{orbitProjects.find((project) => project.id === activeOrbitProject)?.signal}</span></div>
+            <div className="project-orbit-stage">
+              <span className="project-orbit-ring outer" aria-hidden="true" /><span className="project-orbit-ring inner" aria-hidden="true" /><span className="project-orbit-axis" aria-hidden="true" />
+              <span className="project-orbit-core" aria-hidden="true"><i /><b>Work<br />orbit</b></span>
+              {orbitProjects.map((project, index) => <button key={project.id} className={`orbit-project-node node-${index + 1} ${activeOrbitProject === project.id ? "is-active" : ""}`} type="button" aria-pressed={activeOrbitProject === project.id} onFocus={() => setActiveOrbitProject(project.id)} onClick={() => selectOrbitProject(project.id)}><span className="orbit-project-index">{project.index}</span><span><b>{project.title}</b><em>{project.discipline}</em></span></button>)}
+            </div>
+          </div>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article id="attack-study" className="project-card panel" tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
               <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
             <Reveal delay={0.13}><article id="delivery-study" className="project-card panel" tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus to reveal the project note." onMouseMove={handleProjectTilt} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/manus-storage/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />
               <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 02</span>
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
             </article></Reveal>
           </div>
         </div>
@@ -518,10 +573,10 @@ export default function Home() {
       </section>
 
       <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" onPointerDown={createContactPulse} onPointerMove={extendContactConstellation} onPointerLeave={() => setContactConstellationTrail([])} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/manus-storage/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div className="contact-atmosphere" aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" />{contactPulses.map((pulse) => <span key={pulse.id} className="contact-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
+        <div className={`contact-atmosphere ${contactFocused ? "is-engaged" : ""}`} aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" /><span className="contact-beacon"><i /><i /><i /></span>{contactPulses.map((pulse) => <span key={pulse.id} className="contact-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
         <div className="contact-constellation" aria-hidden="true">{contactConstellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{contactConstellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
         <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label">07 / Contact</p><h2 className="display mt-5 max-w-[9ch] text-5xl leading-[.9] text-white md:text-7xl">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4"><a href="mailto:manojprabhu0707@gmail.com" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Mail size={16} /></span>manojprabhu0707@gmail.com</a><a href="tel:+919677518268" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Phone size={16} /></span>+91 9677518268</a><a href="https://maps.google.com/?q=Polur,Tamil+Nadu" target="_blank" rel="noreferrer" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><MapPin size={16} /></span>Polur, Tamil Nadu</a></div></div>
-          <form className="panel p-6 md:p-9" onSubmit={handleContact}><div className="grid gap-5"><div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4"><span className="label text-[0.57rem]">Correspondence / 01</span><button type="button" className="motion-toggle" onClick={() => setMotionPaused((paused) => !paused)} aria-pressed={motionPaused || Boolean(reduceMotion)} aria-label={reduceMotion ? "Background motion is paused by your device setting" : motionPaused ? "Resume background motion" : "Pause background motion"} disabled={Boolean(reduceMotion)}>{motionPaused || reduceMotion ? <Play size={13} /> : <Pause size={13} />}{motionPaused || reduceMotion ? "Motion paused" : "Motion live"}</button></div><label className="block"><span className="label mb-2 block">Your name</span><input className="form-field" required name="name" placeholder="What should I call you?" /></label><label className="block"><span className="label mb-2 block">Email</span><input className="form-field" type="email" required name="email" placeholder="name@company.com" /></label><label className="block"><span className="label mb-2 block">Message</span><textarea className="form-field min-h-36 resize-y" required name="message" placeholder="A few lines about the work, goal, or opportunity..." /></label><button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
+          <form className="panel p-6 md:p-9" onSubmit={handleContact} onFocusCapture={() => setContactFocused(true)} onBlurCapture={handleContactBlur}><div className="grid gap-5"><div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4"><span className="label text-[0.57rem]">Correspondence / 01</span><button type="button" className="motion-toggle" onClick={() => setMotionPaused((paused) => !paused)} aria-pressed={motionPaused || Boolean(reduceMotion)} aria-label={reduceMotion ? "Background motion is paused by your device setting" : motionPaused ? "Resume background motion" : "Pause background motion"} disabled={Boolean(reduceMotion)}>{motionPaused || reduceMotion ? <Play size={13} /> : <Pause size={13} />}{motionPaused || reduceMotion ? "Motion paused" : "Motion live"}</button></div><label className="block"><span className="label mb-2 block">Your name</span><input className="form-field" required name="name" placeholder="What should I call you?" /></label><label className="block"><span className="label mb-2 block">Email</span><input className="form-field" type="email" required name="email" placeholder="name@company.com" /></label><label className="block"><span className="label mb-2 block">Message</span><textarea className="form-field min-h-36 resize-y" required name="message" placeholder="A few lines about the work, goal, or opportunity..." /></label><button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
       </section>
 
       <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/manus-storage/smp-logo_526971d2.png" alt="SMP monogram" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>

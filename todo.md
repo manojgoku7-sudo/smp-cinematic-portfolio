@@ -1,4 +1,8 @@
 # Enhancement Checklist
+- [x] Build an accessible orbiting selector for the featured projects.
+- [x] Add concise challenge-to-outcome signal reveals to the project cards.
+- [x] Add a focus-reactive contact transmission beacon with motion-safe fallbacks.
+- [x] Verify the new interaction set across desktop, phone, motion-pause, and reduced-motion states.
 - [x] Add a compact recruiter quick-view card with availability, skills, and contact actions.
 - [x] Add a mobile résumé action to the sticky phone dock.
 - [x] Add a persistent light/dark contrast preset with accessible controls.
