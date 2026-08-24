@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a visual skills-to-experience connection map linked to role hover and keyboard focus.
+- [x] Verify the role-skill highlights remain accessible, responsive, and motion-safe.
 - [x] Add restrained visual progression and evidence signals to the “Learning in the work” timeline.
 - [x] Verify the enhanced timeline remains clear, responsive, and motion-safe across desktop and phone layouts.
 - [x] Add a lightweight ordering interaction-detail loop to the Delivery case study.

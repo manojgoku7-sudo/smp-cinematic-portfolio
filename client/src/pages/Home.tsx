@@ -76,6 +76,12 @@ const experience = [
   },
 ];
 const experienceSignals = ["8+ APIs shipped", "3 review cycles", "20+ components"] as const;
+const experienceConnections = [
+  { role: "Project Intern", focus: "Java service delivery", skills: ["Java", "Spring Boot", "REST APIs", "MySQL"] },
+  { role: "UI/UX Design Intern", focus: "Research-led interface design", skills: ["Figma", "Usability", "Wireframes", "Prototypes"] },
+  { role: "UI/UX Design Intern", focus: "Reusable mobile systems", skills: ["Figma", "Components", "Material Design", "Mobile flows"] },
+] as const;
+const experienceSkillNodes = ["Java", "Spring Boot", "REST APIs", "MySQL", "Figma", "Usability", "Components", "Mobile flows"] as const;
 
 const certifications = [
   ["Oracle", "APEX Cloud Developer Professional", "1Z0-771"],
@@ -296,6 +302,13 @@ function ExperienceEvidenceSignal({ label, motionPaused }: { label: string; moti
   return <motion.span className="experience-evidence-signal" initial={staticMotion ? false : { opacity: 0, x: -8 }} whileInView={staticMotion ? {} : { opacity: 1, x: 0 }} viewport={{ once: true, amount: .56 }} transition={{ duration: .32, delay: .12, ease: [0.23, 1, 0.32, 1] }}><motion.i aria-hidden="true" initial={staticMotion ? false : { scaleX: 0 }} whileInView={staticMotion ? {} : { scaleX: 1 }} viewport={{ once: true, amount: .56 }} transition={{ duration: .46, delay: .16, ease: [0.23, 1, 0.32, 1] }} /><b>{label}</b><em>evidence signal</em></motion.span>;
 }
 
+function ExperienceConnectionMap({ activeExperience, motionPaused }: { activeExperience: number; motionPaused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const activeConnection = experienceConnections[activeExperience];
+  const staticMotion = reduceMotion || motionPaused;
+  return <motion.aside className={`experience-connection-map ${staticMotion ? "is-static" : ""}`} aria-label="Skills connected to the active experience role" initial={staticMotion ? false : { opacity: 0, y: 12 }} whileInView={staticMotion ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: .3 }} transition={{ duration: .42, ease: [0.23, 1, 0.32, 1] }}><div className="experience-map-head"><div><p className="label">Skills / role map</p><p>Hover or focus a role to trace its active tools.</p></div><span>{String(activeExperience + 1).padStart(2, "0")} / 03</span></div><div className="experience-map-stage" aria-live="polite"><span className="experience-map-core"><b>{activeConnection.role === "Project Intern" ? "Build" : "Design"}</b><em>{activeConnection.focus}</em></span>{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-link link-${index} ${isActive ? "is-active" : ""}`} aria-hidden="true" />; })}{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-node node-${index} ${isActive ? "is-active" : ""}`}><b>{skill}</b></span>; })}</div><p className="experience-map-reading"><span className="label">Active role</span>{activeConnection.focus}</p></motion.aside>;
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -324,6 +337,7 @@ export default function Home() {
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
   const [contactFocused, setContactFocused] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [activeExperience, setActiveExperience] = useState(0);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -689,10 +703,10 @@ export default function Home() {
       <section id="experience" className="editorial-band container py-28 md:py-40">
         <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." motionPaused={motionPaused} /></Reveal>
         <div className="experience-layout mt-14 grid gap-12 lg:grid-cols-[1.28fr_.72fr] lg:gap-20">
-          <div className="timeline-list"><Reveal><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
-            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className="timeline-row"><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
+          <div className="timeline-list"><Reveal><div className={`timeline-row ${activeExperience === 0 ? "is-map-active" : ""}`} tabIndex={0} aria-label="Project Intern. Focus to highlight related skills." onMouseEnter={() => setActiveExperience(0)} onFocus={() => setActiveExperience(0)}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
+            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className={`timeline-row ${activeExperience === index + 1 ? "is-map-active" : ""}`} tabIndex={0} aria-label={`${item.role}. Focus to highlight related skills.`} onMouseEnter={() => setActiveExperience(index + 1)} onFocus={() => setActiveExperience(index + 1)}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
           </div>
-          <Reveal delay={0.1} className="panel self-start p-7 md:p-8"><div className="flex items-center gap-3"><GraduationCap className="text-violet-300" size={20} /><p className="label">Education</p></div><div className="mt-7"><p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p><p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p><p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p></div><div className="mt-8 space-y-3 border-t border-white/10 pt-6"><div className="flex justify-between text-sm text-[#aaa4b7]"><span>HSC</span><span className="text-white">80%</span></div><div className="flex justify-between text-sm text-[#aaa4b7]"><span>SSLC</span><span className="text-white">79%</span></div></div></Reveal>
+          <Reveal delay={0.1} className="experience-aside-stack self-start"><ExperienceConnectionMap activeExperience={activeExperience} motionPaused={motionPaused} /><div className="panel p-7 md:p-8"><div className="flex items-center gap-3"><GraduationCap className="text-violet-300" size={20} /><p className="label">Education</p></div><div className="mt-7"><p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p><p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p><p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p></div><div className="mt-8 space-y-3 border-t border-white/10 pt-6"><div className="flex justify-between text-sm text-[#aaa4b7]"><span>HSC</span><span className="text-white">80%</span></div><div className="flex justify-between text-sm text-[#aaa4b7]"><span>SSLC</span><span className="text-white">79%</span></div></div></div></Reveal>
         </div>
       </section>
 
