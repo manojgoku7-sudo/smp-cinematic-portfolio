@@ -22,6 +22,8 @@ import {
   Play,
   Send,
   Sparkles,
+  Sun,
+  Moon,
   X,
 } from "lucide-react";
 
@@ -166,6 +168,8 @@ export default function Home() {
   const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
   const [lowDataMode, setLowDataMode] = useState(false);
+  const [recruiterOpen, setRecruiterOpen] = useState(false);
+  const [lightPreset, setLightPreset] = useState(() => typeof window !== "undefined" && window.localStorage.getItem("smp-contrast-preset") === "light");
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -184,6 +188,10 @@ export default function Home() {
     const dy = point.y - previous.y;
     return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
   }), [contactConstellationTrail]);
+
+  useEffect(() => {
+    window.localStorage.setItem("smp-contrast-preset", lightPreset ? "light" : "dark");
+  }, [lightPreset]);
 
   useEffect(() => {
     if (reduceMotion || lowDataMode) {
@@ -352,7 +360,7 @@ export default function Home() {
   }
 
   return (
-    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""}`}>
+    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${lightPreset ? "contrast-light" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-logo_526971d2.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
       <div className="grain" aria-hidden="true" />
@@ -370,13 +378,14 @@ export default function Home() {
               <button key={id} className={`nav-link ${active === id ? "is-active" : ""}`} onClick={() => scrollToSection(id)}>{label}</button>
             ))}
           </nav>
-          <a href="mailto:manojprabhu0707@gmail.com" className="signal-button hidden min-h-0 px-4 py-2.5 md:inline-flex">Open correspondence <ArrowUpRight size={14} /></a>
+          <div className="hidden items-center gap-2 md:flex"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark" : "Light"}</button><button className="recruiter-trigger" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter brief</button><a href="mailto:manojprabhu0707@gmail.com" className="signal-button min-h-0 px-4 py-2.5">Open correspondence <ArrowUpRight size={14} /></a></div>
           <button className="icon-button md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>{mobileOpen ? <X size={18} /> : <Menu size={18} />}</button>
         </div>
         {mobileOpen ? (
           <div className="border-t border-violet-200/10 bg-[#0b0a12]/95 px-5 py-6 backdrop-blur-xl md:hidden">
             <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
               {navItems.map(([label, id]) => <button key={id} className="display text-left text-2xl text-white" onClick={() => { setMobileOpen(false); scrollToSection(id); }}>{label}</button>)}
+              <div className="flex gap-3 pt-1"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark preset" : "Light preset"}</button><button className="recruiter-trigger" type="button" onClick={() => { setMobileOpen(false); setRecruiterOpen(true); }}>Recruiter brief</button></div>
               <a href="mailto:manojprabhu0707@gmail.com" className="label mt-2 inline-flex items-center gap-2 text-violet-200">Send an email <ArrowUpRight size={15} /></a>
             </nav>
           </div>
@@ -412,6 +421,7 @@ export default function Home() {
                 <a className="icon-button" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub"><Github size={17} /></a>
                 <a className="icon-button" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn"><Linkedin size={17} /></a>
               </div>
+              <button className="recruiter-hero-trigger" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
@@ -435,6 +445,8 @@ export default function Home() {
           {[...reelItems, ...reelItems, ...reelItems].map((item, index) => <div className="reel-item" key={`${item}-${index}`}><span className="signal-dot scale-[0.62]" />{item}</div>)}
         </div>
       </div>
+
+      <AnimatePresence>{recruiterOpen ? <motion.aside className="recruiter-brief-card" role="dialog" aria-modal="true" aria-label="Recruiter quick-view" initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.97 }} transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-brief-head"><div><p className="label">Recruiter quick-view</p><p className="mt-1 text-sm font-semibold text-white">S Manoj Prabhu</p></div><button className="recruiter-close" type="button" onClick={() => setRecruiterOpen(false)} aria-label="Close recruiter quick-view"><X size={17} /></button></div><div className="recruiter-availability"><span className="signal-dot" /><span>Open to internships and collaborative product work</span></div><div className="recruiter-detail-grid"><div><p className="label">Based in</p><p>Polur, Tamil Nadu</p></div><div><p className="label">Core stack</p><p>React · Figma · Java</p></div><div><p className="label">Proof</p><p>85% ML accuracy</p></div><div><p className="label">Contact</p><p>Reply within 1–2 days</p></div></div><div className="recruiter-brief-actions"><button className="signal-button primary" type="button" onClick={downloadResume}>Get résumé <Download size={14} /></button><a className="signal-button" href="mailto:manojprabhu0707@gmail.com">Email Manoj <Mail size={14} /></a></div></motion.aside> : null}</AnimatePresence>
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity about-singularity" aria-hidden="true"><span /></div><span className="signal-thread about-thread" aria-hidden="true" />
@@ -513,7 +525,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/manus-storage/smp-logo_526971d2.png" alt="SMP monogram" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>
-      <div className="mobile-contact-dock" aria-label="Mobile quick actions"><button className="mobile-data-toggle" type="button" onClick={() => setLowDataMode((enabled) => !enabled)} aria-pressed={lowDataMode}>{lowDataMode ? "Full visual" : "Low data"}</button><button className="mobile-contact-action" type="button" onClick={() => scrollToSection("contact")}><Mail size={16} />Contact</button></div>
+      <div className="mobile-contact-dock" aria-label="Mobile quick actions"><button className="mobile-data-toggle" type="button" onClick={() => setLowDataMode((enabled) => !enabled)} aria-pressed={lowDataMode}>{lowDataMode ? "Full visual" : "Low data"}</button><button className="mobile-resume-action" type="button" onClick={downloadResume}><Download size={15} />Résumé</button><button className="mobile-contact-action" type="button" onClick={() => scrollToSection("contact")}><Mail size={16} />Contact</button></div>
     </main>
   );
 }
