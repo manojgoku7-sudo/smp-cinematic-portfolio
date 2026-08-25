@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Rebuild only the four-card Project Collection presentation as a layered physical playing-card fan.
+- [x] Add a hover-forward treatment while preserving every project’s existing content, dialogs, and allowed links.
+- [x] Validate distinct card rotations, significant overlap, visible faces, responsive access, and unchanged project content.
 - [x] Correct the Project Collection fan so all four cards remain visibly exposed and selectable.
 - [x] Validate desktop and mobile card access after reducing the fan overlap.
 - [x] Replace the stepped collection curve with a true shared-pivot playing-card fan.
