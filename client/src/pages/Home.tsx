@@ -775,11 +775,11 @@ export default function Home() {
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         <div className="mini-singularity about-singularity" aria-hidden="true"><span /></div><span className="signal-thread about-thread" aria-hidden="true" />
-        <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer who moves from interface structure to implementation — with enough backend and machine-learning context to make the whole experience connect." motionPaused={motionPaused} /></Reveal>
+        <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer with experience in Java, Spring Boot, and applied machine learning." motionPaused={motionPaused} /></Reveal>
         <div className="about-proof mt-14 grid gap-5 lg:grid-cols-[1.28fr_.72fr]">
           <Reveal delay={0.06} className="panel relative overflow-hidden p-7 md:p-10">
             <div className="absolute right-0 top-0 h-32 w-32 bg-violet-500/15 blur-3xl" />
-            <p className="display max-w-[20ch] text-2xl leading-tight text-[#eeeaff] md:text-[2rem]">I turn <span className="text-violet-300">complex product intent</span> into interface systems that are intuitive to use and practical to ship.</p>
+            <p className="display max-w-[20ch] text-2xl leading-tight text-[#eeeaff] md:text-[2rem]">I create <span className="text-violet-300">clear, responsive interfaces</span> and practical user flows—from Figma design to implementation.</p>
             <div className="mt-12 grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-3">
               <div><p className="display text-3xl text-white">20<span className="text-violet-300">+</span></p><p className="label mt-2 text-[0.57rem]">Reusable React components</p></div>
               <div><p className="display text-3xl text-white">10<span className="text-violet-300">+</span></p><p className="label mt-2 text-[0.57rem]">High-fidelity Figma screens</p></div>
