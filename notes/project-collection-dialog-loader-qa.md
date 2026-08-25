@@ -25,3 +25,17 @@ The live browser exposes Network Information signals for adaptive prefetching: `
 Initial constrained-profile testing confirmed that low-velocity 3G movement and a save-data-enabled gesture issued no speculative artwork requests. The qualified 3G request path is being retested against an unprefetched adjacent artwork to isolate it from any already-warmed image cache.
 
 The isolated 3G retest confirmed that a qualified, clearly fast swipe still issued exactly one low-priority request for the unprefetched MyJob AI Radar artwork. Together with the save-data suppression result, this verifies the intended adaptive behavior: no speculative load for data-saving or insufficient intent, with a stricter but available path on cautious connections.
+
+The new collection light sweep is pointer-gated on desktop. A programmatic focus check confirmed the card remains keyboard-focusable, while the CSS pseudo-class did not activate in that non-keyboard focus state; an actual hover check is being used to validate the visual sweep.
+
+The desktop hover check kept the approved four-card fan, labels, and interaction rail stable while the active card was brought forward. The light-sweep pseudo-element is being read directly from its computed animation state to complete the validation.
+
+The first pointer position fell just outside Card 02’s current bounds, so it did not activate the hover-only sweep. Card bounds were measured and the pointer validation is being retargeted to the visible Card 02 centre.
+
+The retargeted Card 02 hover activated the new `collection-card-light-sweep` animation at its intended 0.56-second duration. The card also retained its established physical pull-forward behavior; all four collection cards remain available.
+
+The global motion-pause control check confirmed the new sweep rule is present. The current click did not enter the paused state, so the existing control wiring is being inspected before the safeguard result is recorded.
+
+The established motion control was then invoked directly and entered the expected `.page-shell.motion-paused` state with `aria-pressed="true"` and the visible “Motion paused” label. The sweep’s pause selector sits inside this same established motion-paused scope; the control is being restored to its prior live state after verification.
+
+The control was restored successfully to its prior live state (`aria-pressed="false"`, “Motion live”). No browser-console warnings were recorded through the light-sweep and motion-control checks.

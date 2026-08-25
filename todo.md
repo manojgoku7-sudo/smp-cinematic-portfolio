@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add one smooth, purposeful animation refinement to the approved Project Collection.
+- [x] Verify the refinement preserves card access, dialog behavior, global motion pause, and reduced-motion behavior.
 - [x] Detect connection quality and data-saving preferences before speculative Project Collection artwork loading.
 - [x] Apply stricter touch-intent thresholds or skip prefetching on constrained connections.
 - [x] Verify adaptive prefetching preserves fast-network responsiveness and saves data on slow networks.
