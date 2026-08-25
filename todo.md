@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace the stepped collection curve with a true shared-pivot playing-card fan.
+- [x] Verify the cards spread radially from a tight lower overlap while remaining accessible.
 - [x] Replace the subtle collection fan with a clearly visible deep playing-card hand arc.
 - [x] Verify the raised centre, lower outer cards, and responsive access are visually obvious.
 - [x] Redesign Project Collection into a balanced curved hand of four cards on desktop.
