@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Reposition the AI Content Studio card to remove the empty left-column work-section gap.
+- [x] Verify the work cards form a continuous staggered sequence across layouts.
 - [x] Integrate the AI Content Studio into the same staggered side-by-side project sequence as the first two cards.
 - [x] Verify the three-card sequence remains aligned across desktop and mobile layouts.
 - [x] Add layered staged motion to the AI Content Studio automation walkthrough.

@@ -482,8 +482,10 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (min-width: 768px) { .timeline-row { grid-template-columns: 10.5rem 1fr; gap: 2rem; } }
 @media (min-width: 1024px) {
   #about .about-proof { margin-left: clamp(1rem, 8vw, 7.5rem); }
-  #work .project-grid > div:nth-child(2) { margin-top: 4rem; }
-  #work .project-grid > .project-sequence-third { margin-top: 2.5rem; }
+  #work .project-grid { grid-template-areas: "attack delivery" "studio delivery"; grid-template-rows: auto auto; align-items: start; }
+  #work .project-grid > div:nth-child(1) { grid-area: attack; }
+  #work .project-grid > div:nth-child(2) { grid-area: delivery; align-self: start; margin-top: 4rem; }
+  #work .project-grid > .project-sequence-third { grid-area: studio; margin-top: 1.25rem; }
   #experience .experience-layout { margin-left: clamp(1rem, 5vw, 4.5rem); }
   .capability-grid > div:nth-child(2), .capability-grid > div:nth-child(5) { transform: translateY(1.8rem); }
   .credential-grid > div:nth-child(2), .credential-grid > div:nth-child(4) { transform: translateY(2.3rem); }
