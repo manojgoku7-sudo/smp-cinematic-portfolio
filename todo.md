@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Enhance the “More signals in the field” collection with clearer fan guidance, visibility, and interaction feedback.
+- [x] Verify desktop and mobile collection usability while preserving card content and actions.
 - [x] Smooth the approved Project Collection card pull-out and settle interactions.
 - [x] Verify the refined hover/focus motion preserves card access and fan geometry.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
