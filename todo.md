@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace the current collection positioning with the attached real shared-origin overlapping fan implementation.
+- [x] Verify all four existing cards remain visible, angled, interactive, and content-identical after the correction.
 - [x] Rebuild only the four-card Project Collection presentation as a layered physical playing-card fan.
 - [x] Add a hover-forward treatment while preserving every project’s existing content, dialogs, and allowed links.
 - [x] Validate distinct card rotations, significant overlap, visible faces, responsive access, and unchanged project content.
