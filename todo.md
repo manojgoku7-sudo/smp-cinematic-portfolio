@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Correct the Project Collection fan so all four cards remain visibly exposed and selectable.
+- [x] Validate desktop and mobile card access after reducing the fan overlap.
 - [x] Replace the stepped collection curve with a true shared-pivot playing-card fan.
 - [x] Verify the cards spread radially from a tight lower overlap while remaining accessible.
 - [x] Replace the subtle collection fan with a clearly visible deep playing-card hand arc.
