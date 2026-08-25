@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a brief, accessible spinner state inside Project Collection detail dialogs.
+- [x] Verify dialog loading feedback, complete project content, and motion safeguards.
 - [x] Restore reliable third Project Collection card targeting above overlapping cards.
 - [x] Slow the active response slightly and verify rapid switching with motion safeguards.
 - [x] Remove the Project Collection card-switch delay while retaining smooth feedback.
