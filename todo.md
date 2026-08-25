@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Detect the mobile collection swipe direction when a card snaps to centre.
+- [x] Use the detected touch direction to prefetch the likely next Project Collection artwork.
+- [x] Verify directional prefetching preserves swipe behavior, dialog readiness, and collection content/actions.
 - [x] Prefetch the next likely Project Collection dialog artwork after a card becomes active.
 - [x] Verify prefetched artwork reaches the next dialog without altering collection content, actions, or motion safeguards.
 - [x] Prioritize Project Collection dialog artwork delivery during the brief loading handoff.
