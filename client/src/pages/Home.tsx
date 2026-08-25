@@ -541,6 +541,7 @@ export default function Home() {
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastActiveSection = useRef(active);
+  const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const reduceMotion = useReducedMotion();
   const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
   const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
@@ -600,6 +601,24 @@ export default function Home() {
     const timer = window.setTimeout(() => setCollectionDialogLoading(false), 260);
     return () => window.clearTimeout(timer);
   }, [activeCollectionProject, reduceMotion]);
+
+  useEffect(() => {
+    const activeIndex = activeCollectionProject
+      ? projectCollection.findIndex((project) => project.id === activeCollectionProject.id)
+      : collectionFocus;
+    if (lowDataMode || activeIndex === null || activeIndex < 0) return;
+    const nextProject = projectCollection[(activeIndex + 1) % projectCollection.length];
+    if (collectionPrefetches.current.has(nextProject.image)) return;
+    const prefetchTimer = window.setTimeout(() => {
+      const image = new Image();
+      image.decoding = "async";
+      image.fetchPriority = "low";
+      image.src = nextProject.image;
+      collectionPrefetches.current.set(nextProject.image, image);
+      image.decode?.().catch(() => undefined);
+    }, 90);
+    return () => window.clearTimeout(prefetchTimer);
+  }, [activeCollectionProject, collectionFocus, lowDataMode]);
 
   useEffect(() => {
     const video = heroVideoRef.current;

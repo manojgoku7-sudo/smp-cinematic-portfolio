@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Prefetch the next likely Project Collection dialog artwork after a card becomes active.
+- [x] Verify prefetched artwork reaches the next dialog without altering collection content, actions, or motion safeguards.
 - [x] Prioritize Project Collection dialog artwork delivery during the brief loading handoff.
 - [x] Verify image decoding, fade-in behavior, and dialog responsiveness across desktop and mobile.
 - [x] Add a brief, accessible spinner state inside Project Collection detail dialogs.
