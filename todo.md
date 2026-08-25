@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace the subtle collection fan with a clearly visible deep playing-card hand arc.
+- [x] Verify the raised centre, lower outer cards, and responsive access are visually obvious.
 - [x] Redesign Project Collection into a balanced curved hand of four cards on desktop.
 - [x] Verify all cards remain visible, interactive, and responsive after the curved-layout update.
 - [x] Add a separate Project Collection after the featured projects with exactly four supplied secondary projects.
