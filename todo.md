@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
+- [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
 - [x] Verify the entrance returns to the approved fan geometry and preserves card interactions.
 - [x] Restore the development server and confirm the portfolio preview responds.
