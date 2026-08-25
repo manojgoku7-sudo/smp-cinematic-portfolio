@@ -734,3 +734,6 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .collection-card:hover, .collection-card:focus-visible, .collection-card:hover::after, .collection-card:focus-visible::after { animation: none !important; } }
 /* Project Collection response correction: stack ownership changes instantly so an overlapping card never blocks the next target. */
 @media (min-width: 1024px) { .collection-reveal, .collection-reveal:hover, .collection-reveal:focus-within { transition: z-index 0s !important; } }
+/* Project Collection targeting fix: transparent wrapper space must never cover a visible lower card. */
+@media (min-width: 1024px) { .collection-reveal { pointer-events: none !important; }.collection-card { pointer-events: auto !important; }.collection-reveal:has(.collection-card:hover) { z-index: 50 !important; animation-play-state: paused; }.collection-reveal:has(.collection-card:hover) .collection-card-index { animation-play-state: paused; opacity: 1; text-shadow: 0 0 .9rem rgb(196 181 253 / .76); } }
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) { .collection-card:hover, .collection-card:focus-visible, .collection-card:hover::after, .collection-card:focus-visible::after { animation-duration: 1.95s; } }

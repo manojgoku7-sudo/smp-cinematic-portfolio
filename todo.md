@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Restore reliable third Project Collection card targeting above overlapping cards.
+- [x] Slow the active response slightly and verify rapid switching with motion safeguards.
 - [x] Remove the Project Collection card-switch delay while retaining smooth feedback.
 - [x] Verify rapid card switching, card dialogs, and motion safeguards.
 - [x] Refine the active Project Collection glow pulse for smoother easing and more polished feedback.
