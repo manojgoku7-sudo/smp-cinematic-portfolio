@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a second replayable AI automation video panel to fill the extended lower card area.
+- [x] Verify the AI Content Studio card has no unused lower space across desktop and mobile layouts.
 - [x] Replace the About Me copy with the approved shorter professional version.
 - [x] Complete a read-only content-quality review of the portfolio.
 - [x] Complete a read-only test of basic portfolio functionality.
