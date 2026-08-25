@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a smooth fade transition between selector project echo colors.
+- [x] Verify the color handoff remains refined and motion-safe.
 - [x] Replace duplicate fallback keys in the MJ seal motion layers.
 - [x] Verify the MJ seal renders without duplicate-key console warnings.
 - [x] Preview each project’s MJ echo color from the orbit selector on hover and focus.
