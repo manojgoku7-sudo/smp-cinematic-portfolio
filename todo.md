@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the Project Collection card-switch delay while retaining smooth feedback.
+- [x] Verify rapid card switching, card dialogs, and motion safeguards.
 - [x] Refine the active Project Collection glow pulse for smoother easing and more polished feedback.
 - [x] Verify the smoother pulse preserves card actions, readability, and motion safeguards.
 - [x] Make the active Project Collection violet halo pulse slightly faster and more noticeable.
