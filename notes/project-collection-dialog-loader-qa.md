@@ -39,3 +39,7 @@ The global motion-pause control check confirmed the new sweep rule is present. T
 The established motion control was then invoked directly and entered the expected `.page-shell.motion-paused` state with `aria-pressed="true"` and the visible “Motion paused” label. The sweep’s pause selector sits inside this same established motion-paused scope; the control is being restored to its prior live state after verification.
 
 The control was restored successfully to its prior live state (`aria-pressed="false"`, “Motion live”). No browser-console warnings were recorded through the light-sweep and motion-control checks.
+
+The Project Collection loader now renders the dialog aperture successfully: it exposes three rings, runs `collection-dialog-aperture-open` for 0.42 seconds, retains the existing loader, and keeps the close control visible throughout the handoff.
+
+With the existing Motion control paused, the aperture receives its `is-static` state and its ring animation resolves to `none`, while the close control remains visible. The control was restored to its prior live state afterwards. The reduced-motion CSS fallback also removes the aperture entirely.

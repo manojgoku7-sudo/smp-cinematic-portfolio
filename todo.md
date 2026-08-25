@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle cinematic aperture transition to Project Collection dialog opening.
+- [x] Verify the aperture preserves loader visibility, close controls, dialog content, global motion pause, and reduced-motion behavior.
 - [x] Add one smooth, purposeful animation refinement to the approved Project Collection.
 - [x] Verify the refinement preserves card access, dialog behavior, global motion pause, and reduced-motion behavior.
 - [x] Detect connection quality and data-saving preferences before speculative Project Collection artwork loading.
