@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a compact replayable automation walkthrough to the AI Content Studio card.
+- [x] Verify the walkthrough remains responsive and motion-safe.
 - [x] Rebuild the AI Content Studio showcase in the same portrait-card proportion as the first two projects.
 - [x] Verify its card scale and internal hierarchy align across desktop and mobile layouts.
 - [x] Redesign the AI Content Studio card to match the full cinematic project-card reference.
