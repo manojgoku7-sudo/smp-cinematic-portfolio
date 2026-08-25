@@ -279,10 +279,9 @@ function PolurCharmWalkthrough({ motionPaused, lowDataMode }: { motionPaused: bo
 }
 
 function PolurTripPlannerMicroFlow({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
-  const reduceMotion = useReducedMotion();
-  const staticMotion = reduceMotion || motionPaused || lowDataMode;
-  const [routeSaved, setRouteSaved] = useState(false);
-  return <section className={`polur-trip-flow ${routeSaved ? "is-route-saved" : ""} ${staticMotion ? "is-static" : ""}`} aria-label="Interactive Polur Charm trip planner preview"><div className="polur-trip-flow-head"><div><span className="label">Trip micro-flow</span><p>Choose route → save plan</p></div><span className="polur-trip-status">{routeSaved ? "Route saved" : "Interactive"}</span></div><div className="polur-trip-stage"><div className="polur-trip-route"><span className="polur-trip-icon">⌁</span><span><b>Sunrise temple trail</b><em>Parvathamalai · 05:15 start</em></span><strong>₹72</strong><button type="button" onClick={() => setRouteSaved((saved) => !saved)} aria-pressed={routeSaved}>{routeSaved ? "Saved" : "Add plan"}</button></div><span className="polur-trip-cursor" aria-hidden="true" /><span className="polur-trip-pulse" aria-hidden="true" /><div className="polur-trip-confirm"><i>{routeSaved ? "✓" : "01"}</i><span>{routeSaved ? "Added to your trip" : "Ready to add route"}</span><b>{routeSaved ? "View plan" : "Tap add plan"}</b></div></div><p className="polur-trip-flow-note">Try the route action to preview a compact planning confirmation; motion pauses with the portfolio’s existing safeguards.</p></section>;
+  void motionPaused;
+  void lowDataMode;
+  return null;
 }
 
 function DeliveryDeviceRelay({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {

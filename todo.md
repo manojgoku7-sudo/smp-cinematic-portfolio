@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Remove the Polur Charm Trip micro-flow and validate the streamlined card layout.
 - [x] Add a replayable video-style Polur Charm discovery walkthrough.
 - [x] Add a compact interactive trip-planning micro-flow with motion-safe fallbacks.
 - [x] Verify playback, replay, and responsive presentation across desktop and phone layouts.
