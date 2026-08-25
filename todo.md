@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Smooth the approved Project Collection card pull-out and settle interactions.
+- [x] Verify the refined hover/focus motion preserves card access and fan geometry.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
