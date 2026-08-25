@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Increase the Project Collection card ambient-motion speed slightly.
+- [x] Verify the faster card drift preserves interaction pauses and motion safeguards.
 - [x] Add gentle continuous card-surface motion and smoother returns to the approved Project Collection fan.
 - [x] Verify the smooth fan motion preserves card access and motion safeguards.
 - [x] Add a subtle mobile visual indicator when a Project Collection card snaps to centre.
