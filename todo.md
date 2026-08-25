@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add gentle continuous card-surface motion and smoother returns to the approved Project Collection fan.
+- [x] Verify the smooth fan motion preserves card access and motion safeguards.
 - [x] Add a subtle mobile visual indicator when a Project Collection card snaps to centre.
 - [x] Verify the snap feedback preserves swipe, card click, and motion-safe behavior.
 - [x] Add restrained click-response motion to the approved Project Collection cards.
