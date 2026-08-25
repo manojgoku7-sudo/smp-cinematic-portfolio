@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Polish the approved Project Collection fan without changing its geometry, artwork, content, dialogs, or external actions.
+- [x] Verify title and category visibility, card depth, aligned borders, hover pull-out behavior, and mobile access.
 - [x] Replace the current collection positioning with the attached real shared-origin overlapping fan implementation.
 - [x] Verify all four existing cards remain visible, angled, interactive, and content-identical after the correction.
 - [x] Rebuild only the four-card Project Collection presentation as a layered physical playing-card fan.
