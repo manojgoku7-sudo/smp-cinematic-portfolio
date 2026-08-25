@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add the supplied AI Content Studio as a showcase-only project to this portfolio.
+- [x] Preserve existing projects and omit repository, View Code, and Live Demo links.
 - [x] Add a smooth fade transition between selector project echo colors.
 - [x] Verify the color handoff remains refined and motion-safe.
 - [x] Replace duplicate fallback keys in the MJ seal motion layers.
