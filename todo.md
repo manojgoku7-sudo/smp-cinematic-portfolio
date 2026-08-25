@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Increase the active Project Collection card violet hover and focus glow slightly.
+- [x] Verify the calibrated glow preserves label contrast and card interactions.
 - [x] Add a subtle violet hover and focus glow to the approved Project Collection cards.
 - [x] Verify the glow preserves text contrast, card actions, and reduced-motion behavior.
 - [x] Increase the Project Collection card ambient-motion speed slightly.
