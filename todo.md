@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Add Polur Charm as a fourth integrated portfolio project card.
+- [x] Include its live site, repository, navigation, project detail, and responsive staggered-layout treatment.
+- [x] Verify the four-project sequence, links, and motion-safe interactions across desktop and phone layouts.
 - [x] Reposition the AI Content Studio card to remove the empty left-column work-section gap.
 - [x] Verify the work cards form a continuous staggered sequence across layouts.
 - [x] Integrate the AI Content Studio into the same staggered side-by-side project sequence as the first two cards.
