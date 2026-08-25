@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Prioritize Project Collection dialog artwork delivery during the brief loading handoff.
+- [x] Verify image decoding, fade-in behavior, and dialog responsiveness across desktop and mobile.
 - [x] Add a brief, accessible spinner state inside Project Collection detail dialogs.
 - [x] Verify dialog loading feedback, complete project content, and motion safeguards.
 - [x] Restore reliable third Project Collection card targeting above overlapping cards.
