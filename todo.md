@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Restore full readability of the Project Collection explanatory note beneath the card fan.
+- [x] Verify the note remains unobstructed without changing the approved fan interactions.
 - [x] Enhance the “More signals in the field” collection with clearer fan guidance, visibility, and interaction feedback.
 - [x] Verify desktop and mobile collection usability while preserving card content and actions.
 - [x] Smooth the approved Project Collection card pull-out and settle interactions.
