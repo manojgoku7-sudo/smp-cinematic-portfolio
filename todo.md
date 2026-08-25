@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Redesign the AI Content Studio card to match the full cinematic project-card reference.
+- [x] Verify the full reference-aligned layout across desktop and mobile sizes.
 - [x] Redesign the AI Content Studio card into a compact reference-inspired composition.
 - [x] Verify the redesigned card remains readable across desktop and mobile layouts.
 - [x] Add the supplied AI Content Studio as a showcase-only project to this portfolio.
