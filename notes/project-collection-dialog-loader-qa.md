@@ -43,3 +43,7 @@ The control was restored successfully to its prior live state (`aria-pressed="fa
 The Project Collection loader now renders the dialog aperture successfully: it exposes three rings, runs `collection-dialog-aperture-open` for 0.42 seconds, retains the existing loader, and keeps the close control visible throughout the handoff.
 
 With the existing Motion control paused, the aperture receives its `is-static` state and its ring animation resolves to `none`, while the close control remains visible. The control was restored to its prior live state afterwards. The reduced-motion CSS fallback also removes the aperture entirely.
+
+Per-project accents were verified directly: Card 01 uses rose, Card 02 uses blue, Card 03 uses teal, and Card 04 uses amber, each retaining a readable 0.92-opacity label. The MyJob opening dialog inherits the matching teal accent while preserving the loader, visible close control, and no-source-link policy.
+
+After the handoff, MyJob retains its teal dialog accent and accessible visual tag, its supplied Live Demo remains present, and no source link is introduced. The portfolio was captured at 390 × 844 after the accent refinement; the responsive collection remains intact, with no browser-console warnings recorded.

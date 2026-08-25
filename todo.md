@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Define restrained, accessible accent hues for the four Project Collection projects.
+- [x] Apply project-specific color cues to cards and dialogs without changing artwork, content, or action policy.
+- [x] Verify accent contrast, responsive presentation, dialog behavior, and motion safeguards.
 - [x] Add a subtle cinematic aperture transition to Project Collection dialog opening.
 - [x] Verify the aperture preserves loader visibility, close controls, dialog content, global motion pause, and reduced-motion behavior.
 - [x] Add one smooth, purposeful animation refinement to the approved Project Collection.
