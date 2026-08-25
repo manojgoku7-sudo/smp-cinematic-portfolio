@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Add a separate Project Collection after the featured projects with exactly four supplied secondary projects.
+- [x] Create original card visuals, accessible detail dialogs, and the supplied MyJob AI Radar live-demo action only.
+- [x] Verify the desktop fanned composition, mobile accessible card layout, and unchanged featured portfolio behavior.
 - [x] Add a second replayable AI automation video panel to fill the extended lower card area.
 - [x] Verify the AI Content Studio card has no unused lower space across desktop and mobile layouts.
 - [x] Replace the About Me copy with the approved shorter professional version.

@@ -166,6 +166,74 @@ const polurCharm = {
   ],
   tags: ["React 19", "TypeScript", "TanStack Start", "TanStack Router", "Tailwind CSS", "Radix UI", "i18n Localization", "SEO", "Schema.org", "Travel Tech", "Civic Tech"],
 } as const;
+const projectCollection = [
+  {
+    id: "anime-pinterest-automation",
+    title: "Anime Pinterest Automation Bot",
+    label: "Backend automation",
+    tagline: "Automated scraping, image processing, and affiliate monetization pipeline for Pinterest.",
+    category: "Backend Development & Automation",
+    status: "Completed",
+    description: "A Python automation service that processes art content from Telegram channels, prepares Pinterest-friendly images, generates contextual affiliate links, and publishes pins through the Pinterest API with rate limiting and daily quotas.",
+    problem: "Streamlines repeated content extraction, preparation, affiliate linking, and scheduled publishing into one controlled workflow.",
+    features: ["Automated content extraction and processing", "1000×1500 resizing, cropping, and watermarking", "Affiliate-link and hashtag generation", "Background posting queue with daily limits", "Pinterest media publishing and board selection"],
+    technologies: ["Python", "BeautifulSoup4", "Pillow", "Pinterest API v5", "Flask", "Requests", "Render"],
+    tags: ["Python", "Automation", "Web Scraping", "REST APIs", "Image Processing", "Social Media Bot"],
+    image: "/manus-storage/project-collection-pinterest-automation_0e75a634.jpg",
+    alt: "Original cinematic image automation visual with abstract creative image tiles and content-processing signals",
+  },
+  {
+    id: "social-reaction-publisher",
+    title: "Automated Social Media Reaction & Content Publishing Bot",
+    label: "AI media processing",
+    tagline: "End-to-end automated video reaction rendering, AI metadata generation, and multi-platform publishing pipeline.",
+    category: "Backend & Automation Engineering / AI Media Processing",
+    status: "Complete / Production-Ready",
+    role: "Sole Developer / Architect",
+    description: "An automated Python application for continuous cloud execution that processes short-form video, renders vertical split-screen reactions with FFmpeg, generates AI-assisted SEO metadata, and supports YouTube Shorts and Instagram Reels publishing workflows.",
+    problem: "Reduces manual video processing, metadata preparation, approval, and multi-platform publishing work.",
+    features: ["Multi-tier fallback content ingestion", "9:16 split-screen reaction rendering", "Adaptive audio normalization", "AI-generated titles, descriptions, and hashtags", "Telegram approvals, scheduling, and upload limits"],
+    technologies: ["Python", "FFmpeg", "TeleBot", "Groq API", "YouTube Data API v3", "Meta Graph API", "Instagrapi", "SQLite", "Render"],
+    tags: ["Python", "AI", "Automation", "FFmpeg", "Media Processing", "Groq LLM", "YouTube API", "Instagram API"],
+    image: "/manus-storage/project-collection-social-publishing_227bb808.jpg",
+    alt: "Original cinematic AI media publishing visual with abstract vertical video frames and automation signals",
+  },
+  {
+    id: "myjob-ai-radar",
+    title: "MyJob AI Radar",
+    label: "AI career intelligence",
+    tagline: "Autonomous AI-powered job radar and application assistant with multi-source job monitoring and Telegram-based management.",
+    category: "AI Automation / Career Intelligence",
+    status: "Production-Ready",
+    description: "An AI-powered career intelligence platform that aggregates entry-level technology opportunities, analyzes job postings, prepares tailored application materials, and helps track opportunities through Telegram management and a companion Mini-App.",
+    problem: "Reduces time spent searching fragmented job sources, preparing repetitive application materials, and tracking applications.",
+    features: ["Multi-source job monitoring and aggregation", "AI job analysis and compatibility scoring", "Tailored résumé and cover-letter generation", "Telegram Bot management and Mini-App filtering", "Application tracking, monitoring, and error recovery"],
+    technologies: ["Python", "Flask", "Telegram Bot API", "Playwright", "Google Gemini API", "Groq API", "FPDF", "Notion API", "Docker", "GitHub Actions"],
+    tags: ["Python", "Telegram Bot", "Playwright", "Generative AI", "Google Gemini", "Groq", "Web Automation", "Flask", "Docker", "CI/CD"],
+    liveUrl: "https://nm969989-cmd.github.io/myjob-ai-bot/",
+    image: "/manus-storage/project-collection-myjob-radar_8cc39039.jpg",
+    alt: "Original cinematic AI career radar with abstract opportunity cards and scanning signals",
+  },
+  {
+    id: "smart-aroma-diffuser",
+    title: "Smart Aroma Diffuser",
+    label: "IoT & fuzzy logic",
+    tagline: "Fuzzy Logic Control versus Time-Based Algorithms for efficient and adaptive aroma diffusion.",
+    category: "IoT / Smart Systems / Research & Automation",
+    status: "Completed",
+    context: "College academic project / research prototype",
+    description: "A smart aroma diffuser prototype comparing Fuzzy Logic Control with a traditional Time-Based Algorithm for adaptive aroma diffusion under changing temperature and humidity conditions.",
+    problem: "Fixed-interval diffusers cannot dynamically adapt to changing environmental conditions.",
+    features: ["Temperature and humidity sensing", "Fuzzy Logic Control for adaptive aroma output", "Time-Based Algorithm comparison", "Power-consumption and efficiency analysis", "Experimental prototype testing with SPSS comparison"],
+    technologies: ["Fuzzy Logic Control", "Time-Based Control", "Environmental Sensors", "IoT Concepts", "SPSS", "Data Analysis", "Prototype Development"],
+    results: ["92.5% FLC mean accuracy", "85.2% FLC mean efficiency", "18–20% reported FLC battery consumption", "FLC outperformed the Time-Based Algorithm across reported performance measures"],
+    tags: ["Fuzzy Logic", "IoT", "Sensors", "Smart Automation", "SPSS", "Data Analysis", "Research Prototype"],
+    image: "/manus-storage/project-collection-aroma-diffuser_04698510.jpg",
+    alt: "Original cinematic smart aroma diffuser research visual with sensor halos and fuzzy-logic light curves",
+  },
+] as const;
+type CollectionProject = (typeof projectCollection)[number];
+
 const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
@@ -409,6 +477,11 @@ function PolurCharmDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}><div className="ai-studio-dialog polur-charm-dialog"><div className="ai-studio-dialog-visual" aria-hidden="true"><img src="/manus-storage/polur-charm-portfolio-art_ee154405.jpg" alt="" /><span>Polur / 04</span></div><div className="p-6 sm:p-9"><div className="flex items-start justify-between gap-5"><div><p className="label text-cyan-100">Project / Active</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{polurCharm.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close Polur Charm project details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#c8c0d8]">{polurCharm.description}</DialogDescription><dl className="ai-studio-summary polur-charm-summary"><div><dt>Category</dt><dd>{polurCharm.category}</dd></div><div><dt>Status</dt><dd>{polurCharm.status}</dd></div><div><dt>Role</dt><dd>{polurCharm.role}</dd></div></dl><section className="ai-studio-detail-section"><p className="label">Problem solved</p><p>{polurCharm.problem}</p></section><section className="ai-studio-detail-section"><p className="label">Main features</p><ul className="ai-studio-feature-list">{polurCharm.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technical highlights</p><ul className="ai-studio-feature-list">{polurCharm.highlights.map((highlight) => <li key={highlight}><span className="ai-studio-bullet" aria-hidden="true" /><span>{highlight}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technology stack</p><div className="ai-studio-stack-grid">{polurCharm.stack.map((group) => <div key={group.label}><b>{group.label}</b><p>{group.values.join(" · ")}</p></div>)}</div></section><section className="ai-studio-detail-section"><p className="label">Tags</p><div className="ai-studio-tags">{polurCharm.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section><div className="polur-charm-dialog-actions"><a href="https://polurcharm.com" target="_blank" rel="noreferrer">Visit live site <ArrowUpRight size={15} /></a><a href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noreferrer">Open repository <Github size={15} /></a></div></div></div></DialogContent></Dialog>;
 }
 
+function ProjectCollectionDialog({ project, onOpenChange }: { project: CollectionProject | null; onOpenChange: (open: boolean) => void }) {
+  if (!project) return null;
+  return <Dialog open={Boolean(project)} onOpenChange={onOpenChange}><DialogContent className="collection-dialog max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}><div className="collection-dialog-shell"><div className="collection-dialog-visual" aria-hidden="true"><img src={project.image} alt="" /><span>Collection / {String(projectCollection.findIndex((entry) => entry.id === project.id) + 1).padStart(2, "0")}</span></div><div className="collection-dialog-copy"><div className="flex items-start justify-between gap-5"><div><p className="label text-violet-200">Project collection</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{project.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project collection details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#d3cbdf]">{project.tagline}</DialogDescription><p className="mt-5 text-sm leading-6 text-[#bcb4ca]">{project.description}</p><dl className="collection-dialog-summary"><div><dt>Category</dt><dd>{project.category}</dd></div><div><dt>Status</dt><dd>{project.status}</dd></div><div><dt>{"role" in project ? "Role" : "Context"}</dt><dd>{"role" in project ? project.role : "context" in project ? project.context : "Project collection"}</dd></div></dl><section className="collection-detail-section"><p className="label">Problem solved</p><p>{project.problem}</p></section><section className="collection-detail-section"><p className="label">Main features</p><ul>{project.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="collection-detail-section"><p className="label">Technologies & skills</p><div className="collection-tech-list">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></section>{"results" in project ? <section className="collection-detail-section"><p className="label">Important results</p><ul>{project.results.map((result) => <li key={result}><span className="ai-studio-bullet" aria-hidden="true" /><span>{result}</span></li>)}</ul></section> : null}<section className="collection-detail-section"><p className="label">Tags</p><div className="collection-tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>{"liveUrl" in project ? <a className="collection-live-demo" href={project.liveUrl} target="_blank" rel="noreferrer">Live demo <ArrowUpRight size={15} /></a> : null}<p className="collection-security-note"><span className="signal-dot" aria-hidden="true" />This collection entry does not expose source code or repository links.</p></div></div></DialogContent></Dialog>;
+}
+
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -444,6 +517,7 @@ export default function Home() {
   const [activeCredential, setActiveCredential] = useState<number | null>(null);
   const [aiContentStudioOpen, setAiContentStudioOpen] = useState(false);
   const [polurCharmOpen, setPolurCharmOpen] = useState(false);
+  const [activeCollectionProject, setActiveCollectionProject] = useState<CollectionProject | null>(null);
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -835,6 +909,10 @@ export default function Home() {
       </section>
       <AIContentStudioDialog open={aiContentStudioOpen} onOpenChange={setAiContentStudioOpen} />
       <PolurCharmDialog open={polurCharmOpen} onOpenChange={setPolurCharmOpen} />
+      <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911] py-28 md:py-40">
+        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="project-collection-stage mt-14" aria-label="Project Collection. Select a project card to view its details.">{projectCollection.map((project, index) => <Reveal key={project.id} delay={index * .07} className={`collection-reveal collection-reveal-${index + 1}`}><button type="button" className={`collection-card collection-card-${index + 1}`} onClick={() => setActiveCollectionProject(project)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></Reveal>)}</div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
+      </section>
+      <ProjectCollectionDialog project={activeCollectionProject} onOpenChange={(open) => { if (!open) setActiveCollectionProject(null); }} />
 
       <section id="experience" className="editorial-band container py-28 md:py-40">
         <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." motionPaused={motionPaused} /></Reveal>
