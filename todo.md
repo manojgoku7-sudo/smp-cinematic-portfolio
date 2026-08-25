@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle violet hover and focus glow to the approved Project Collection cards.
+- [x] Verify the glow preserves text contrast, card actions, and reduced-motion behavior.
 - [x] Increase the Project Collection card ambient-motion speed slightly.
 - [x] Verify the faster card drift preserves interaction pauses and motion safeguards.
 - [x] Add gentle continuous card-surface motion and smoother returns to the approved Project Collection fan.
