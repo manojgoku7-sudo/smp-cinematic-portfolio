@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Integrate the AI Content Studio into the same staggered side-by-side project sequence as the first two cards.
+- [x] Verify the three-card sequence remains aligned across desktop and mobile layouts.
 - [x] Add layered staged motion to the AI Content Studio automation walkthrough.
 - [x] Verify the added motion remains restrained and motion-safe.
 - [x] Add a short completion pulse to the AI Content Studio publish stage.
