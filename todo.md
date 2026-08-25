@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Redesign Project Collection into a balanced curved hand of four cards on desktop.
+- [x] Verify all cards remain visible, interactive, and responsive after the curved-layout update.
 - [x] Add a separate Project Collection after the featured projects with exactly four supplied secondary projects.
 - [x] Create original card visuals, accessible detail dialogs, and the supplied MyJob AI Radar live-demo action only.
 - [x] Verify the desktop fanned composition, mobile accessible card layout, and unchanged featured portfolio behavior.
