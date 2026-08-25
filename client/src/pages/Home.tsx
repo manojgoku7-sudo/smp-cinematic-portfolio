@@ -234,6 +234,18 @@ const projectCollection = [
   },
 ] as const;
 type CollectionProject = (typeof projectCollection)[number];
+type ConnectionPrefetchProfile = { enabled: boolean; intentDistance: number; velocityThreshold: number };
+
+function getConnectionPrefetchProfile(): ConnectionPrefetchProfile {
+  const fallback = { enabled: true, intentDistance: 18, velocityThreshold: .35 };
+  if (typeof navigator === "undefined") return fallback;
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string; downlink?: number; rtt?: number } }).connection;
+  if (!connection) return fallback;
+  const constrained = connection.saveData || connection.effectiveType === "slow-2g" || connection.effectiveType === "2g" || (typeof connection.downlink === "number" && connection.downlink < 1.5) || (typeof connection.rtt === "number" && connection.rtt > 600);
+  if (constrained) return { enabled: false, intentDistance: Number.POSITIVE_INFINITY, velocityThreshold: Number.POSITIVE_INFINITY };
+  const cautious = connection.effectiveType === "3g" || (typeof connection.downlink === "number" && connection.downlink < 3) || (typeof connection.rtt === "number" && connection.rtt > 250);
+  return cautious ? { enabled: true, intentDistance: 32, velocityThreshold: .55 } : fallback;
+}
 
 const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   id: index,
@@ -701,7 +713,7 @@ export default function Home() {
   }
 
   function prefetchCollectionArtwork(index: number) {
-    if (lowDataMode || index < 0 || index >= projectCollection.length) return;
+    if (lowDataMode || !getConnectionPrefetchProfile().enabled || index < 0 || index >= projectCollection.length) return;
     const project = projectCollection[index];
     if (collectionPrefetches.current.has(project.image)) return;
     const image = new Image();
@@ -729,9 +741,8 @@ export default function Home() {
     const deltaY = touch.clientY - touchStart.y;
     const elapsed = Math.max(event.timeStamp - touchStart.time, 1);
     const velocity = Math.abs(deltaX) / elapsed;
-    const intentDistance = 18;
-    const velocityThreshold = .35;
-    if (Math.abs(deltaX) < intentDistance || Math.abs(deltaX) < Math.abs(deltaY) * 1.25 || velocity < velocityThreshold) return;
+    const profile = getConnectionPrefetchProfile();
+    if (!profile.enabled || Math.abs(deltaX) < profile.intentDistance || Math.abs(deltaX) < Math.abs(deltaY) * 1.25 || velocity < profile.velocityThreshold) return;
     const direction: 1 | -1 = deltaX < 0 ? 1 : -1;
     const nextIndex = touchStart.index + direction;
     touchStart.triggered = true;

@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Detect connection quality and data-saving preferences before speculative Project Collection artwork loading.
+- [x] Apply stricter touch-intent thresholds or skip prefetching on constrained connections.
+- [x] Verify adaptive prefetching preserves fast-network responsiveness and saves data on slow networks.
 - [x] Detect early horizontal touch intent within the mobile Project Collection.
 - [x] Gate adjacent artwork prefetching behind a calibrated swipe-velocity threshold.
 - [x] Verify fast intentional swipes prefetch correctly while slow drags and taps do not alter dialog or swipe behavior.
