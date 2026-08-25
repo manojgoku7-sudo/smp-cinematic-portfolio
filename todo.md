@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Detect early horizontal touch intent within the mobile Project Collection.
+- [x] Gate adjacent artwork prefetching behind a calibrated swipe-velocity threshold.
+- [x] Verify fast intentional swipes prefetch correctly while slow drags and taps do not alter dialog or swipe behavior.
 - [x] Detect the mobile collection swipe direction when a card snaps to centre.
 - [x] Use the detected touch direction to prefetch the likely next Project Collection artwork.
 - [x] Verify directional prefetching preserves swipe behavior, dialog readiness, and collection content/actions.

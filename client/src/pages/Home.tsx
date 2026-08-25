@@ -535,7 +535,6 @@ export default function Home() {
   const [collectionDialogLoading, setCollectionDialogLoading] = useState(false);
   const [collectionFocus, setCollectionFocus] = useState<number | null>(null);
   const [mobileCollectionSnap, setMobileCollectionSnap] = useState(0);
-  const [mobileCollectionDirection, setMobileCollectionDirection] = useState<1 | -1>(1);
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -544,6 +543,7 @@ export default function Home() {
   const lastActiveSection = useRef(active);
   const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const mobileCollectionScrollLeft = useRef(0);
+  const mobileCollectionTouchStart = useRef<{ x: number; y: number; time: number; index: number; triggered: boolean } | null>(null);
   const reduceMotion = useReducedMotion();
   const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
   const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
@@ -605,25 +605,16 @@ export default function Home() {
   }, [activeCollectionProject, reduceMotion]);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) return;
     const activeIndex = activeCollectionProject
       ? projectCollection.findIndex((project) => project.id === activeCollectionProject.id)
-      : collectionFocus ?? (typeof window !== "undefined" && window.innerWidth < 768 ? mobileCollectionSnap : null);
+      : collectionFocus;
     if (lowDataMode || activeIndex === null || activeIndex < 0) return;
-    const preferredDirection = typeof window !== "undefined" && window.innerWidth < 768 ? mobileCollectionDirection : 1;
-    const nextIndex = activeIndex + preferredDirection;
+    const nextIndex = activeIndex + 1;
     if (nextIndex < 0 || nextIndex >= projectCollection.length) return;
-    const nextProject = projectCollection[nextIndex];
-    if (collectionPrefetches.current.has(nextProject.image)) return;
-    const prefetchTimer = window.setTimeout(() => {
-      const image = new Image();
-      image.decoding = "async";
-      image.fetchPriority = "low";
-      image.src = nextProject.image;
-      collectionPrefetches.current.set(nextProject.image, image);
-      image.decode?.().catch(() => undefined);
-    }, 90);
+    const prefetchTimer = window.setTimeout(() => prefetchCollectionArtwork(nextIndex), 90);
     return () => window.clearTimeout(prefetchTimer);
-  }, [activeCollectionProject, collectionFocus, lowDataMode, mobileCollectionDirection, mobileCollectionSnap]);
+  }, [activeCollectionProject, collectionFocus, lowDataMode]);
 
   useEffect(() => {
     const video = heroVideoRef.current;
@@ -709,11 +700,52 @@ export default function Home() {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
   }
 
+  function prefetchCollectionArtwork(index: number) {
+    if (lowDataMode || index < 0 || index >= projectCollection.length) return;
+    const project = projectCollection[index];
+    if (collectionPrefetches.current.has(project.image)) return;
+    const image = new Image();
+    image.decoding = "async";
+    image.fetchPriority = "low";
+    image.src = project.image;
+    collectionPrefetches.current.set(project.image, image);
+    image.decode?.().catch(() => undefined);
+  }
+
+  function handleMobileCollectionTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    if (window.innerWidth >= 768) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    mobileCollectionScrollLeft.current = event.currentTarget.scrollLeft;
+    mobileCollectionTouchStart.current = { x: touch.clientX, y: touch.clientY, time: event.timeStamp, index: mobileCollectionSnap, triggered: false };
+  }
+
+  function handleMobileCollectionTouchMove(event: React.TouchEvent<HTMLDivElement>) {
+    if (window.innerWidth >= 768) return;
+    const touchStart = mobileCollectionTouchStart.current;
+    const touch = event.touches[0];
+    if (!touchStart || !touch || touchStart.triggered) return;
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = touch.clientY - touchStart.y;
+    const elapsed = Math.max(event.timeStamp - touchStart.time, 1);
+    const velocity = Math.abs(deltaX) / elapsed;
+    const intentDistance = 18;
+    const velocityThreshold = .35;
+    if (Math.abs(deltaX) < intentDistance || Math.abs(deltaX) < Math.abs(deltaY) * 1.25 || velocity < velocityThreshold) return;
+    const direction: 1 | -1 = deltaX < 0 ? 1 : -1;
+    const nextIndex = touchStart.index + direction;
+    touchStart.triggered = true;
+    prefetchCollectionArtwork(nextIndex);
+  }
+
+  function clearMobileCollectionTouchIntent() {
+    mobileCollectionTouchStart.current = null;
+  }
+
   function handleMobileCollectionScroll(event: React.UIEvent<HTMLDivElement>) {
     if (window.innerWidth >= 768) return;
     const stage = event.currentTarget;
     const scrollDelta = stage.scrollLeft - mobileCollectionScrollLeft.current;
-    if (Math.abs(scrollDelta) > 2) setMobileCollectionDirection(scrollDelta > 0 ? 1 : -1);
     mobileCollectionScrollLeft.current = stage.scrollLeft;
     const stageCenter = stage.getBoundingClientRect().left + stage.clientWidth / 2;
     const nextSnap = projectCollection.reduce((nearest, _, index) => {
@@ -976,7 +1008,7 @@ export default function Home() {
       <AIContentStudioDialog open={aiContentStudioOpen} onOpenChange={setAiContentStudioOpen} />
       <PolurCharmDialog open={polurCharmOpen} onOpenChange={setPolurCharmOpen} />
       <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911] py-28 md:py-40">
-        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="collection-guidance" id="collection-guidance" aria-live="polite"><span className="collection-guidance-kicker">Browse the hand</span><span className="collection-guidance-state">{collectionFocus === null ? "Hover or focus a card to bring its signal forward." : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}</span><span className="collection-guidance-hint">Select for full brief <ArrowUpRight size={13} /></span></div><div className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`} onScroll={handleMobileCollectionScroll} aria-label="Project Collection. Select a project card to view its details." aria-describedby="collection-guidance">{projectCollection.map((project, index) => <div key={project.id} className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}><button type="button" className={`collection-card collection-card-${index + 1}`} onClick={() => { setCollectionFocus(index); setCollectionDialogLoading(!reduceMotion); setActiveCollectionProject(project); }} onMouseEnter={() => setCollectionFocus(index)} onMouseLeave={() => setCollectionFocus(null)} onFocus={() => setCollectionFocus(index)} onBlur={() => setCollectionFocus(null)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></div>)}</div><div className="collection-snap-indicator" aria-live="polite"><span className="collection-snap-line" aria-hidden="true" />{projectCollection.map((project, index) => <span key={project.id} className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`} aria-hidden="true" />)}<span className="sr-only">Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {projectCollection[mobileCollectionSnap].title}</span></div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
+        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="collection-guidance" id="collection-guidance" aria-live="polite"><span className="collection-guidance-kicker">Browse the hand</span><span className="collection-guidance-state">{collectionFocus === null ? "Hover or focus a card to bring its signal forward." : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}</span><span className="collection-guidance-hint">Select for full brief <ArrowUpRight size={13} /></span></div><div className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`} onScroll={handleMobileCollectionScroll} onTouchStart={handleMobileCollectionTouchStart} onTouchMove={handleMobileCollectionTouchMove} onTouchEnd={clearMobileCollectionTouchIntent} onTouchCancel={clearMobileCollectionTouchIntent} aria-label="Project Collection. Select a project card to view its details." aria-describedby="collection-guidance">{projectCollection.map((project, index) => <div key={project.id} className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}><button type="button" className={`collection-card collection-card-${index + 1}`} onClick={() => { setCollectionFocus(index); setCollectionDialogLoading(!reduceMotion); setActiveCollectionProject(project); }} onMouseEnter={() => setCollectionFocus(index)} onMouseLeave={() => setCollectionFocus(null)} onFocus={() => setCollectionFocus(index)} onBlur={() => setCollectionFocus(null)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></div>)}</div><div className="collection-snap-indicator" aria-live="polite"><span className="collection-snap-line" aria-hidden="true" />{projectCollection.map((project, index) => <span key={project.id} className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`} aria-hidden="true" />)}<span className="sr-only">Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {projectCollection[mobileCollectionSnap].title}</span></div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
       </section>
       <ProjectCollectionDialog project={activeCollectionProject} loading={collectionDialogLoading} onOpenChange={(open) => { if (!open) { setCollectionDialogLoading(false); setActiveCollectionProject(null); } }} />
 
