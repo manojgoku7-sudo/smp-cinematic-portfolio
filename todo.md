@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add restrained click-response motion to the approved Project Collection cards.
+- [x] Improve and verify responsive collection access without changing project content or actions.
 - [x] Add subtle hover and focus feedback to the protected Project Collection note.
 - [x] Verify the note feedback preserves readability, clearance, and motion safeguards.
 - [x] Restore full readability of the Project Collection explanatory note beneath the card fan.
