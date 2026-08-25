@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a compact active-card color legend to the Project Collection guidance area.
+- [x] Verify the legend communicates each hue accessibly and remains clear on desktop and mobile.
 - [x] Define restrained, accessible accent hues for the four Project Collection projects.
 - [x] Apply project-specific color cues to cards and dialogs without changing artwork, content, or action policy.
 - [x] Verify accent contrast, responsive presentation, dialog behavior, and motion safeguards.

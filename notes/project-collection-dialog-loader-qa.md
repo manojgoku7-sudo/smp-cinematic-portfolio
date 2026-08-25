@@ -47,3 +47,11 @@ With the existing Motion control paused, the aperture receives its `is-static` s
 Per-project accents were verified directly: Card 01 uses rose, Card 02 uses blue, Card 03 uses teal, and Card 04 uses amber, each retaining a readable 0.92-opacity label. The MyJob opening dialog inherits the matching teal accent while preserving the loader, visible close control, and no-source-link policy.
 
 After the handoff, MyJob retains its teal dialog accent and accessible visual tag, its supplied Live Demo remains present, and no source link is introduced. The portfolio was captured at 390 × 844 after the accent refinement; the responsive collection remains intact, with no browser-console warnings recorded.
+
+The new legend is visible with four labelled entries and synchronizes to MyJob as its third active signal while the existing dialog and Live Demo remain intact. The active-dot color computed as transparent in the first inspection, so the accent-dot selector is being checked before finalizing the legend.
+
+After the preview restart, the legend stylesheet applied correctly. The clean desktop view shows the compact signal-hue row without displacing the fan; all four hue variables resolve correctly, and the active Anime dot renders rose at 6.08 px. The active marker shifts with the collection state.
+
+Selecting the second collection card moves the legend’s active treatment to its blue AI media processing signal and opens the matching blue dialog cue. The existing no-source-link policy remains intact.
+
+The legend was also captured within the responsive 390 × 844 portfolio view and remains compact above the mobile collection. No browser-console warnings were recorded during legend state and dialog checks.
