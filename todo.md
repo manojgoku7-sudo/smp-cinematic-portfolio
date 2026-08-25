@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add subtle hover and focus feedback to the protected Project Collection note.
+- [x] Verify the note feedback preserves readability, clearance, and motion safeguards.
 - [x] Restore full readability of the Project Collection explanatory note beneath the card fan.
 - [x] Verify the note remains unobstructed without changing the approved fan interactions.
 - [x] Enhance the “More signals in the field” collection with clearer fan guidance, visibility, and interaction feedback.
