@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Move Polur Charm into the open right-side position beneath the Delivery card on desktop.
+- [x] Verify the four-card stagger remains balanced on desktop and preserves logical mobile stacking.
 - [x] Add Polur Charm as a fourth integrated portfolio project card.
 - [x] Include its live site, repository, navigation, project detail, and responsive staggered-layout treatment.
 - [x] Verify the four-project sequence, links, and motion-safe interactions across desktop and phone layouts.
