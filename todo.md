@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a subtle mobile visual indicator when a Project Collection card snaps to centre.
+- [x] Verify the snap feedback preserves swipe, card click, and motion-safe behavior.
 - [x] Add restrained click-response motion to the approved Project Collection cards.
 - [x] Improve and verify responsive collection access without changing project content or actions.
 - [x] Add subtle hover and focus feedback to the protected Project Collection note.
