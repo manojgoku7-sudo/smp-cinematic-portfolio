@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a short completion pulse to the AI Content Studio publish stage.
+- [x] Verify the publish pulse respects replay and motion-safe states.
 - [x] Add a compact replayable automation walkthrough to the AI Content Studio card.
 - [x] Verify the walkthrough remains responsive and motion-safe.
 - [x] Rebuild the AI Content Studio showcase in the same portrait-card proportion as the first two projects.
