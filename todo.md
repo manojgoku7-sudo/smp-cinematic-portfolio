@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a restrained pulse to the active Project Collection card violet glow.
+- [x] Verify the glow pulse preserves card access and motion safeguards.
 - [x] Increase the active Project Collection card violet hover and focus glow slightly.
 - [x] Verify the calibrated glow preserves label contrast and card interactions.
 - [x] Add a subtle violet hover and focus glow to the approved Project Collection cards.
