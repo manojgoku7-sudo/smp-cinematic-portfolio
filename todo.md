@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
+- [x] Verify the entrance returns to the approved fan geometry and preserves card interactions.
+- [x] Restore the development server and confirm the portfolio preview responds.
 - [x] Polish the approved Project Collection fan without changing its geometry, artwork, content, dialogs, or external actions.
 - [x] Verify title and category visibility, card depth, aligned borders, hover pull-out behavior, and mobile access.
 - [x] Replace the current collection positioning with the attached real shared-origin overlapping fan implementation.
