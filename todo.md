@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Align the desktop lower edge and spacing of Polur Charm with the AI Content Studio card.
 - [x] Remove the Polur Charm Trip micro-flow and validate the streamlined card layout.
 - [x] Add a replayable video-style Polur Charm discovery walkthrough.
 - [x] Add a compact interactive trip-planning micro-flow with motion-safe fallbacks.

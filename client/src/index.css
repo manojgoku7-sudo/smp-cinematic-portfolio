@@ -499,7 +499,8 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
   #work .project-grid { grid-template-areas: "attack delivery" "studio delivery" "studio polur"; grid-template-rows: auto auto auto; align-items: start; }
   #work .project-grid > div:nth-child(1) { grid-area: attack; }
   #work .project-grid > div:nth-child(2) { grid-area: delivery; align-self: start; margin-top: 4rem; }
-  #work .project-grid > .project-sequence-third { grid-area: studio; margin-top: 1.25rem; }
+  #work .project-grid > .project-sequence-third { display: flex; grid-area: studio; align-self: stretch; margin-top: 1.25rem; }
+  #work .project-grid > .project-sequence-third .ai-studio-project { flex: 1 1 auto; }
   #work .project-grid > .project-sequence-fourth { grid-area: polur; margin-top: 1.25rem; }
   #experience .experience-layout { margin-left: clamp(1rem, 5vw, 4.5rem); }
   .capability-grid > div:nth-child(2), .capability-grid > div:nth-child(5) { transform: translateY(1.8rem); }
