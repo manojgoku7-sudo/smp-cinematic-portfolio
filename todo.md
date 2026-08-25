@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Add a replayable video-style Polur Charm discovery walkthrough.
+- [x] Add a compact interactive trip-planning micro-flow with motion-safe fallbacks.
+- [x] Verify playback, replay, and responsive presentation across desktop and phone layouts.
 - [x] Move Polur Charm into the open right-side position beneath the Delivery card on desktop.
 - [x] Verify the four-card stagger remains balanced on desktop and preserves logical mobile stacking.
 - [x] Add Polur Charm as a fourth integrated portfolio project card.
