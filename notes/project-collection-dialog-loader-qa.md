@@ -24,6 +24,32 @@ On the live Card 03 click, the pointer-down state was active and used the new 0.
 
 The dialog then closed cleanly. The final style inspection confirms the tailored Card 03 press transform, the compact mobile press fallback, and the reduced-motion `transform: none` safeguard are all present.
 
+The dialog-close refinement is present as a dedicated `collection-dialog-dismiss` closed-state animation. Card 03 was positioned for live close testing; the reduced-motion rule will be checked through its media scope rather than stylesheet text serialization.
+
+The MyJob dialog opened with its existing close control available. A mutation observer is armed against the dialog’s `data-state` transition so the actual closed-state animation can be verified before delayed content cleanup.
+
+The first live close exposed a controlled-state handoff issue: the direct close control began delayed cleanup but did not update the dialog’s local open state. The close callback was corrected to update both states before the delayed project cleanup, and the live close test is being repeated.
+
+After the correction and a fresh preview load, Card 03 was available and positioned for the repeat close-transition validation.
+
+The repeat MyJob dialog opened with `data-state="open"` and its close control available. A fresh closed-state observer is armed against the corrected lifecycle.
+
+The repeat close returned the visible four-card fan immediately, but the first post-close scripted state read remained inconclusive. The retained dialog state is being inspected directly before finalizing the lifecycle verification.
+
+The close lifecycle now uses an explicit `is-closing` visual phase with dedicated dismissal styles. A fresh preview confirms Card 03 and the controlled close styles are ready for final live validation.
+
+The final live test confirms the dialog enters `is-closing` while remaining open for its visible `collection-dialog-dismiss` phase. The delayed cleanup timing is being measured beyond the initial 290 ms sampling window before focus restoration is finalized.
+
+The end-to-end MyJob test confirms the dialog remains visually present with `collection-dialog-dismiss` at 20 ms and 130 ms, clears after the close phase, and restores focus to “Open details for MyJob AI Radar.”
+
+With Motion paused, the dialog skips the custom close animation and clears immediately; focus restoration is scheduled after the dialog primitive’s own static close cleanup before the final paused-motion check.
+
+The paused-motion close correctly clears the dialog and returns Motion to live, but the first 380 ms focus sample still resolves to the page body. The static cleanup’s focus ordering is being refined separately from the already verified live-motion close path.
+
+The static close now retains the originating card index and resolves the card from the mounted collection after portal cleanup, avoiding reliance on an event-held element reference.
+
+Final verification passed: live Motion uses the controlled visual dismissal before cleanup, while paused Motion skips that nonessential animation. Both paths close the MyJob dialog successfully, restore focus to its originating collection card, and return the global Motion control to live.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

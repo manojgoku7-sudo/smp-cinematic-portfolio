@@ -9,6 +9,11 @@
 @media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) { .project-collection-stage .collection-card:active { transition-duration: .12s !important; filter: brightness(1.01) saturate(1.04) !important; box-shadow: 0 16px 34px rgb(0 0 0 / .5), inset 0 2px 9px rgb(0 0 0 / .34), inset 0 1px 0 rgb(255 255 255 / .11) !important; }.project-collection-stage .collection-card-1:active { transform: translateX(-.78rem) translateY(.96rem) rotate(-17deg) rotateY(4deg) scale(.94) !important; }.project-collection-stage .collection-card-2:active { transform: translateX(-.28rem) translateY(.16rem) rotate(-7.5deg) rotateY(1.5deg) scale(.99) !important; }.project-collection-stage .collection-card-3:active { transform: translateX(.28rem) translateY(-.02rem) rotate(6.5deg) rotateY(-1.5deg) scale(.995) !important; }.project-collection-stage .collection-card-4:active { transform: translateX(.78rem) translateY(.72rem) rotate(16deg) rotateY(-4deg) scale(.94) !important; } }
 @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) { .collection-card:active { transform: scale(.985); transition-duration: .12s; box-shadow: 0 14px 30px rgb(0 0 0 / .38), inset 0 2px 8px rgb(0 0 0 / .28); } }
 @media (prefers-reduced-motion: reduce) { .collection-card:active { transform: none !important; } }
+/* Obsidian Studio dialog dismissal: content eases downward into the field before controlled state cleanup. */
+@keyframes collection-dialog-dismiss { from { opacity: 1; filter: brightness(1); transform: translate(-50%, -50%) scale(1); } to { opacity: 0; filter: brightness(.94); transform: translate(-50%, calc(-50% + .42rem)) scale(.982); } }
+@keyframes collection-dialog-overlay-dismiss { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) { .collection-dialog.is-closing { animation: collection-dialog-dismiss .24s cubic-bezier(.23, 1, .32, 1) both !important; }.page-shell:has(.collection-dialog.is-closing) [data-slot="dialog-overlay"] { animation: collection-dialog-overlay-dismiss .24s cubic-bezier(.23, 1, .32, 1) both !important; } }
+@media (prefers-reduced-motion: reduce) { .collection-dialog.is-closing { animation: none !important; } }
 
 @custom-variant dark (&:is(.dark *));
 
