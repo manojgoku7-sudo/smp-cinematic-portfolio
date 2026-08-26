@@ -50,6 +50,18 @@ The static close now retains the originating card index and resolves the card fr
 
 Final verification passed: live Motion uses the controlled visual dismissal before cleanup, while paused Motion skips that nonessential animation. Both paths close the MyJob dialog successfully, restore focus to its originating collection card, and return the global Motion control to live.
 
+For the image-entry timing refinement, the MyJob dialog was opened through its existing loader. The first 460 ms probe still reflected the loader handoff, so selected-artwork decode timing is being allowed to complete before inspecting the tuned visual transition.
+
+The completed MyJob handoff now resolves the selected visual and its supplied Live Demo. The artwork uses the intended 0.34 s opacity entry after a 0.06 s beat, with a 0.54 s scale settle after 0.02 s; the settled dialog remains readable and unobstructed.
+
+The Motion-pause probe returned the portfolio to its live state with no dialog retained. The direct paused opening sequence will be checked separately after a fresh interaction, rather than relying on a chained close-and-reopen probe.
+
+The live page was confirmed dialog-free before the final pause probe. The page shell now reports the paused state, and the control is being resolved by its rendered label so the check can complete and restore Motion live.
+
+The paused MyJob dialog resolves its selected visual and retained Live Demo correctly, but the computed artwork transition remains present. The pause rule is being strengthened so the global control also suppresses this newly tuned entry transition.
+
+Final image-entry verification passed. Live Motion uses the 0.06 s delayed opacity reveal and 0.02 s delayed scale settle; with Motion paused, the portal-rendered dialog receives `is-static` and reports a 0 s transition with no transform. The dialog then closed successfully, focus returned to MyJob, and Motion was restored live.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.
