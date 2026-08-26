@@ -79,6 +79,8 @@
 - [x] Simplify and verify a smooth, consistent card-to-dialog opening handoff.
 - [x] Add accessible previous and next controls to the Project Collection dialog.
 - [x] Verify dialog navigation order, boundaries, card focus return, and motion-safe behavior.
+- [x] Fix Project Collection dialog navigation controls overlapping at narrow desktop widths.
+- [x] Verify Previous, project count, and Next remain legible across dialog breakpoints.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
