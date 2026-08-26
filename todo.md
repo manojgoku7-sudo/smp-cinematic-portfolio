@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a brief signal-thread handoff from the active color legend marker to its Project Collection card.
+- [x] Verify thread targeting, pause/reduced-motion behavior, and responsive collection layout.
 - [x] Add a compact active-card color legend to the Project Collection guidance area.
 - [x] Verify the legend communicates each hue accessibly and remains clear on desktop and mobile.
 - [x] Define restrained, accessible accent hues for the four Project Collection projects.

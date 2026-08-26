@@ -55,3 +55,7 @@ After the preview restart, the legend stylesheet applied correctly. The clean de
 Selecting the second collection card moves the legend’s active treatment to its blue AI media processing signal and opens the matching blue dialog cue. The existing no-source-link policy remains intact.
 
 The legend was also captured within the responsive 390 × 844 portfolio view and remains compact above the mobile collection. No browser-console warnings were recorded during legend state and dialog checks.
+
+The signal-thread handoff was checked from Card 03: the active legend state moved to MyJob’s teal marker, the matching `thread-tone-3` was present, and its line ran `collection-signal-thread-travel` for 0.46 seconds. The fan and card focus behavior remained available.
+
+With the global Motion control paused, the thread receives its static state, resolves to `display: none` with no animation, and the prior live setting restores correctly. The desktop-only thread is also omitted from the 390 × 844 collection view. No browser-console warnings were recorded.
