@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the recent Project Collection color legend, accent treatments, signal thread, and active-card overlay effects.
+- [x] Verify the approved baseline fan, cards, dialogs, actions, and responsive layout remain intact after removal.
 - [x] Add a subtle cinematic aperture transition to Project Collection dialog opening.
 - [x] Verify the aperture preserves loader visibility, close controls, dialog content, global motion pause, and reduced-motion behavior.
 - [x] Add one smooth, purposeful animation refinement to the approved Project Collection.
