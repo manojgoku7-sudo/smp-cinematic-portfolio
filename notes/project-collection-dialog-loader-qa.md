@@ -151,3 +151,7 @@ The desktop sweep resolves to the intended `collection-behind-fan-signal-sweep` 
 The live Motion control was then exercised successfully: the page entered its paused state and the engaged signal sweep reported `animation-play-state: paused`. Live motion was restored afterward, and the temporary active state was cleared from the fan.
 
 After the sweep verification, MyJob AI Radar still opened through its established dialog handoff and exposed its permitted Live Demo. Closing through Back to collection returned the stable four-card fan, demonstrating the behind-layer effect does not block card selection or regress the existing dialog route.
+
+The new central selection pulse was sampled 24 ms after selecting MyJob AI Radar: the card carried its short-lived trigger class, the pulse reported `collection-selection-pulse` for 0.48 s with `pointer-events: none`, and the existing dialog was already present. This confirms the feedback begins without delaying the direct dialog handoff.
+
+With Motion paused, Card 01 opened its existing dialog directly while the central pulse correctly reported `none` and the trigger class remained absent. After closing, the dialog cleared, focus returned to Anime Pinterest Automation Bot, and Motion was restored live.
