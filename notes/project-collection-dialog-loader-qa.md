@@ -59,3 +59,7 @@ The legend was also captured within the responsive 390 × 844 portfolio view and
 The signal-thread handoff was checked from Card 03: the active legend state moved to MyJob’s teal marker, the matching `thread-tone-3` was present, and its line ran `collection-signal-thread-travel` for 0.46 seconds. The fan and card focus behavior remained available.
 
 With the global Motion control paused, the thread receives its static state, resolves to `display: none` with no animation, and the prior live setting restores correctly. The desktop-only thread is also omitted from the 390 × 844 collection view. No browser-console warnings were recorded.
+
+The arrival ripple was checked on Card 02. Its focused wrapper became active, displayed the blue `collection-card-arrival-ripple` and core animations for 0.48 seconds, kept focus on the card, and moved the legend to the matching second signal.
+
+When the global Motion control is paused, the active Card 04 ripple resolves to `display: none`; the Motion control then restores to its prior live state. The ripple is desktop-only, so the responsive 390 × 844 collection remains clean. No browser-console warnings were recorded.

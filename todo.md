@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a quiet accent-matched arrival ripple when a Project Collection card becomes active.
+- [x] Verify ripple timing, card targeting, mobile behavior, global pause, and reduced-motion safeguards.
 - [x] Add a brief signal-thread handoff from the active color legend marker to its Project Collection card.
 - [x] Verify thread targeting, pause/reduced-motion behavior, and responsive collection layout.
 - [x] Add a compact active-card color legend to the Project Collection guidance area.
