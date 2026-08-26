@@ -62,6 +62,10 @@ The paused MyJob dialog resolves its selected visual and retained Live Demo corr
 
 Final image-entry verification passed. Live Motion uses the 0.06 s delayed opacity reveal and 0.02 s delayed scale settle; with Motion paused, the portal-rendered dialog receives `is-static` and reports a 0 s transition with no transform. The dialog then closed successfully, focus returned to MyJob, and Motion was restored live.
 
+The loader-copy cadence now runs as intended: “Aligning project signal” enters over 0.16 s after 0.025 s, followed by the project-specific preparation line over 0.2 s after 0.075 s. The selected artwork handoff is being allowed to finish before final dialog verification.
+
+The loader handed off cleanly to the ready MyJob dialog with its Live Demo intact. Under Motion pause, the dialog receives `is-static` and both loader-copy animations resolve to `none`; the global Motion state is being restored after the check.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

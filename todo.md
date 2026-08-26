@@ -60,6 +60,8 @@
 - [x] Verify close control access, focus restoration, loader behavior, and reduced-motion safeguards.
 - [x] Refine Project Collection dialog image-entry timing for a more natural visual handoff.
 - [x] Verify image entry preserves the loader, dialog content, dismissal, and motion-safe behavior.
+- [x] Refine Project Collection loader copy cadence for a smoother status handoff.
+- [x] Verify loader copy preserves timing, dialog content, dismissal, and motion-safe behavior.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
