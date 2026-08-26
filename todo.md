@@ -85,6 +85,7 @@
 - [x] Add and verify a restrained behind-the-fan signal sweep for Project Collection.
 - [x] Add and verify a click-triggered central pulse when a Project Collection card is selected.
 - [x] Add and verify a restrained Smart Aroma ambient vapor effect in Project Collection.
+- [x] Add and verify a Smart Aroma sensor-ring pulse on Project Collection card selection.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.

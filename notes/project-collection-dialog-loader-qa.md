@@ -161,3 +161,7 @@ Initial desktop inspection of the Smart Aroma card kept its title and category l
 The Smart Aroma vapor reports `smart-aroma-vapor-drift` at 4.8 s, stays at z-index 0 with pointer events disabled, and remains beneath the title at z-index 4 while the card keeps pointer access. The global Motion control correctly paused the vapor animation and returned the page to live motion afterward.
 
 Smart Aroma still opened its unchanged detail dialog with the expected final-card navigation boundary. Back to collection closed the dialog and returned to the four-card fan, preserving the established project route and focus behavior.
+
+The Smart Aroma selection pulse was sampled 24 ms after a live Card 04 selection: its `is-opening` trigger was present, the dedicated sensor-ring animation reported `smart-aroma-sensor-ring-pulse` for 0.46 s, pointer events remained disabled, and the existing detail dialog had already mounted.
+
+With Motion paused, Smart Aroma opened its existing direct dialog without the `is-opening` trigger or sensor-ring animation. After the safeguard check, the dialog cleared, focus returned to “Open details for Smart Aroma Diffuser,” and Motion was restored live.
