@@ -66,6 +66,10 @@ The loader-copy cadence now runs as intended: “Aligning project signal” ente
 
 The loader handed off cleanly to the ready MyJob dialog with its Live Demo intact. Under Motion pause, the dialog receives `is-static` and both loader-copy animations resolve to `none`; the global Motion state is being restored after the check.
 
+The new progress rail mounts with the intended 0.46 s progress-settle animation and 0.045 s start beat while the MyJob loader is active. Its runtime fill state and completed dialog handoff are being checked separately before finalizing the feedback.
+
+The MyJob loader then handed off normally to decoded artwork and its supplied Live Demo. Under Motion pause, the dialog uses `is-static`: the progress animation is `none` and the rail holds a restrained 0.82 fill state. Motion is being restored after this static check.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.
