@@ -63,3 +63,7 @@ With the global Motion control paused, the thread receives its static state, res
 The arrival ripple was checked on Card 02. Its focused wrapper became active, displayed the blue `collection-card-arrival-ripple` and core animations for 0.48 seconds, kept focus on the card, and moved the legend to the matching second signal.
 
 When the global Motion control is paused, the active Card 04 ripple resolves to `display: none`; the Motion control then restores to its prior live state. The ripple is desktop-only, so the responsive 390 × 844 collection remains clean. No browser-console warnings were recorded.
+
+The active effect was redesigned and checked on Card 02: its scrim `::before` now runs `collection-card-white-wave` for 0.52 seconds, uses a white repeating radial wave field with `inset: 0` across the complete card surface, and keeps the card focused with the second legend signal active.
+
+When the global Motion control is paused, the white wave resolves to `display: none`; its prior live state restores correctly. The desktop-only wave is omitted from the 390 × 844 collection view, and no browser-console warnings were recorded.

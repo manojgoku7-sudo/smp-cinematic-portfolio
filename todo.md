@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace the active-card accent ripple with a restrained white wave spanning the card surface.
+- [x] Verify full-card wave coverage, card access, mobile omission, global pause, and reduced-motion safeguards.
 - [x] Add a quiet accent-matched arrival ripple when a Project Collection card becomes active.
 - [x] Verify ripple timing, card targeting, mobile behavior, global pause, and reduced-motion safeguards.
 - [x] Add a brief signal-thread handoff from the active color legend marker to its Project Collection card.
