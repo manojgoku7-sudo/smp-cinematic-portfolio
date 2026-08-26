@@ -12,6 +12,12 @@ The new baseline-preserving card-edge glint was checked on Card 02. Its focused 
 
 With the global Motion control paused, the edge glint resolves to `display: none`; the original live motion state restores correctly. The glint is desktop-only, so the 390 × 844 collection remains unchanged. No browser-console warnings were recorded.
 
+The desktop hover/focus elevation now uses a 0.42-second `cubic-bezier(.22, .8, .32, 1)` transition. Card 03 retained its original rotated physical-fan transform while moving outward on keyboard focus, preserving its accessible name and violet border state.
+
+A live desktop pointer check also brought Card 02 smoothly forward without changing any card position, artwork, label, or visible fan geometry. The other three cards remained readable and available behind it.
+
+The refined transition is scoped to desktop hover-capable screens with no reduced-motion preference; the existing reduced-motion rules remain present. The Motion control entered its paused state during verification and was restored to “Motion live” afterwards.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

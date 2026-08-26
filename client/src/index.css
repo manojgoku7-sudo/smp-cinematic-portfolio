@@ -3,6 +3,9 @@
 @import "tw-animate-css";
 @import "./components/EntryLoader.css";
 
+/* Obsidian Studio: an asymmetrical black-and-violet cinematic system; Project Collection motion stays restrained, physical, and accessibility-aware. */
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) { .collection-card { transition: transform .42s cubic-bezier(.22, .8, .32, 1) !important, box-shadow .42s cubic-bezier(.22, .8, .32, 1) !important, filter .34s cubic-bezier(.22, .8, .32, 1) !important, border-color .28s var(--ease-out) !important; }.collection-card:hover, .collection-card:focus-visible { transition-timing-function: cubic-bezier(.22, .8, .32, 1) !important; }.collection-card:active { transition-duration: .14s !important; } }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
