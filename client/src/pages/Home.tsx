@@ -3,6 +3,7 @@
  */
 import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { createPortal } from "react-dom";
 import { Dialog, Dialog as DialogRoot, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -10,6 +11,8 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   CircleCheckBig,
+  ChevronLeft,
+  ChevronRight,
   Code2,
   Download,
   Github,
@@ -494,7 +497,7 @@ function CollectionDialogAperture({ staticMotion }: { staticMotion: boolean }) {
   return <span className={`collection-dialog-aperture ${staticMotion ? "is-static" : ""}`} aria-hidden="true"><i /><i /><i /></span>;
 }
 
-function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpenChange, onCloseAutoFocus, motionPaused }: { project: CollectionProject | null; loading: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus: () => void; motionPaused: boolean }) {
+function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProjectOpenChange, onCloseAutoFocus, motionPaused }: { project: CollectionProject | null; loading: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus: () => void; motionPaused: boolean }) {
   const [dialogImageReady, setDialogImageReady] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(Boolean(project));
   const [isClosing, setIsClosing] = useState(false);
@@ -535,6 +538,43 @@ function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpen
   if (!project) return null;
   if (loading) return <Dialog open={Boolean(project)} onOpenChange={onOpenChange}><DialogContent className={`collection-dialog collection-dialog-loading-shell ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}><CollectionDialogAperture staticMotion={staticMotion} /><DialogTitle className="sr-only">Loading {project.title}</DialogTitle><DialogDescription className="sr-only">Preparing project collection details.</DialogDescription><div className="collection-dialog-loader" role="status" aria-live="polite"><img className={`collection-dialog-loader-image ${dialogImageReady ? "is-ready" : ""}`} src={project.image} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /><div className="collection-dialog-loader-orbit"><Spinner className="size-7 text-violet-200" /></div><p className="label text-violet-200">Aligning project signal</p><span>Preparing {project.title}</span><div className="collection-loader-progress" aria-hidden="true"><i /></div></div><button type="button" className="credential-preview-close collection-dialog-loader-close" onClick={() => onOpenChange(false)} aria-label="Close project collection details"><X size={16} /></button></DialogContent></Dialog>;
   return <Dialog open={Boolean(project)} onOpenChange={onOpenChange}><DialogContent className={`collection-dialog ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}><div className="collection-dialog-shell"><div className={`collection-dialog-visual ${dialogImageReady ? "is-image-ready" : ""}`} aria-hidden="true"><img src={project.image} alt="" fetchPriority="high" decoding="async" onLoad={() => setDialogImageReady(true)} onError={() => setDialogImageReady(true)} /><span>Collection / {String(projectCollection.findIndex((entry) => entry.id === project.id) + 1).padStart(2, "0")}</span></div><div className="collection-dialog-copy"><div className="flex items-start justify-between gap-5"><div><p className="label text-violet-200">Project collection</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{project.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project collection details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#d3cbdf]">{project.tagline}</DialogDescription><p className="mt-5 text-sm leading-6 text-[#bcb4ca]">{project.description}</p><dl className="collection-dialog-summary"><div><dt>Category</dt><dd>{project.category}</dd></div><div><dt>Status</dt><dd>{project.status}</dd></div><div><dt>{"role" in project ? "Role" : "Context"}</dt><dd>{"role" in project ? project.role : "context" in project ? project.context : "Project collection"}</dd></div></dl><section className="collection-detail-section"><p className="label">Problem solved</p><p>{project.problem}</p></section><section className="collection-detail-section"><p className="label">Main features</p><ul>{project.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="collection-detail-section"><p className="label">Technologies & skills</p><div className="collection-tech-list">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></section>{"results" in project ? <section className="collection-detail-section"><p className="label">Important results</p><ul>{project.results.map((result) => <li key={result}><span className="ai-studio-bullet" aria-hidden="true" /><span>{result}</span></li>)}</ul></section> : null}<section className="collection-detail-section"><p className="label">Tags</p><div className="collection-tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>{"liveUrl" in project ? <a className="collection-live-demo" href={project.liveUrl} target="_blank" rel="noreferrer">Live demo <ArrowUpRight size={15} /></a> : null}<p className="collection-security-note"><span className="signal-dot" aria-hidden="true" />This collection entry does not expose source code or repository links.</p></div></div></DialogContent></Dialog>;
+}
+
+function CollectionDialogNavigator({ project, loading }: { project: CollectionProject | null; loading: boolean }) {
+  const [target, setTarget] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!project || loading) {
+      setTarget(null);
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => setTarget(document.querySelector<HTMLDivElement>(".collection-dialog-copy > .flex")));
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, project]);
+
+  if (!project || !target) return null;
+  const projectIndex = projectCollection.findIndex((entry) => entry.id === project.id);
+  const previousProject = projectCollection[projectIndex - 1];
+  const nextProject = projectCollection[projectIndex + 1];
+  const navigateTo = (index: number) => document.querySelector<HTMLButtonElement>(`.collection-card-${index + 1}`)?.click();
+
+  return createPortal(
+    <nav className="collection-dialog-nav" aria-label="Project Collection navigation">
+      <button type="button" onClick={() => navigateTo(projectIndex - 1)} disabled={!previousProject} aria-label={previousProject ? `Previous project: ${previousProject.title}` : "No previous project"}>
+        <ChevronLeft size={15} aria-hidden="true" />
+        <span>Previous</span>
+      </button>
+      <p aria-live="polite"><span>Project</span> {String(projectIndex + 1).padStart(2, "0")} <i>/</i> {String(projectCollection.length).padStart(2, "0")}</p>
+      <button type="button" onClick={() => navigateTo(projectIndex + 1)} disabled={!nextProject} aria-label={nextProject ? `Next project: ${nextProject.title}` : "No next project"}>
+        <span>Next</span>
+        <ChevronRight size={15} aria-hidden="true" />
+      </button>
+    </nav>,
+    target,
+  );
+}
+
+function ProjectCollectionDialog({ project, loading, onOpenChange, onCloseAutoFocus, motionPaused }: { project: CollectionProject | null; loading: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus: () => void; motionPaused: boolean }) {
+  return <><ProjectCollectionDialogBase project={project} loading={loading} onOpenChange={onOpenChange} onCloseAutoFocus={onCloseAutoFocus} motionPaused={motionPaused} /><CollectionDialogNavigator project={project} loading={loading} /></>;
 }
 
 export default function Home() {
