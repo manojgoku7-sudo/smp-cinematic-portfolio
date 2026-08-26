@@ -155,3 +155,9 @@ After the sweep verification, MyJob AI Radar still opened through its establishe
 The new central selection pulse was sampled 24 ms after selecting MyJob AI Radar: the card carried its short-lived trigger class, the pulse reported `collection-selection-pulse` for 0.48 s with `pointer-events: none`, and the existing dialog was already present. This confirms the feedback begins without delaying the direct dialog handoff.
 
 With Motion paused, Card 01 opened its existing dialog directly while the central pulse correctly reported `none` and the trigger class remained absent. After closing, the dialog cleared, focus returned to Anime Pinterest Automation Bot, and Motion was restored live.
+
+Initial desktop inspection of the Smart Aroma card kept its title and category label readable while the card retained the approved fan placement. The contained vapor layer is being measured directly and checked against the existing Motion safeguard before finalizing.
+
+The Smart Aroma vapor reports `smart-aroma-vapor-drift` at 4.8 s, stays at z-index 0 with pointer events disabled, and remains beneath the title at z-index 4 while the card keeps pointer access. The global Motion control correctly paused the vapor animation and returned the page to live motion afterward.
+
+Smart Aroma still opened its unchanged detail dialog with the expected final-card navigation boundary. Back to collection closed the dialog and returned to the four-card fan, preserving the established project route and focus behavior.
