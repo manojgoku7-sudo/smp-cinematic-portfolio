@@ -18,6 +18,12 @@ A live desktop pointer check also brought Card 02 smoothly forward without chang
 
 The refined transition is scoped to desktop hover-capable screens with no reduced-motion preference; the existing reduced-motion rules remain present. The Motion control entered its paused state during verification and was restored to “Motion live” afterwards.
 
+For the tactile press validation, Card 03 was positioned in view with its refined 0.42-second hover transition intact and a one-time pointer-down probe armed before its existing detail-dialog action.
+
+On the live Card 03 click, the pointer-down state was active and used the new 0.12-second response with a compact 16 px outer shadow plus tactile inset shadow. The existing MyJob dialog opened successfully with its permitted Live Demo still available; the dialog-only source-action check is being isolated from unrelated page links.
+
+The dialog then closed cleanly. The final style inspection confirms the tailored Card 03 press transform, the compact mobile press fallback, and the reduced-motion `transform: none` safeguard are all present.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

@@ -54,6 +54,8 @@
 - [x] Verify the refined hover/focus motion preserves card access and fan geometry.
 - [x] Retune the desktop Project Collection hover lift with a smoother physical easing.
 - [x] Verify hover and keyboard focus preserve the four-card fan, motion controls, and reduced-motion fallback.
+- [x] Refine Project Collection card press feedback for a tactile, immediate response.
+- [x] Verify press feedback preserves card selection, dialogs, fan geometry, and motion-safe behavior.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
