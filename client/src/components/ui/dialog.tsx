@@ -94,6 +94,7 @@ function DialogContent({
   children,
   showCloseButton = true,
   onEscapeKeyDown,
+  onPointerDownOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -128,6 +129,13 @@ function DialogContent({
           className
         )}
         onEscapeKeyDown={handleEscapeKeyDown}
+        onPointerDownOutside={(event) => {
+          if (className?.includes("collection-dialog")) {
+            event.preventDefault();
+            return;
+          }
+          onPointerDownOutside?.(event);
+        }}
         {...props}
       >
         {children}
@@ -206,4 +214,3 @@ export {
   DialogTitle,
   DialogTrigger
 };
-
