@@ -70,6 +70,10 @@ The new progress rail mounts with the intended 0.46 s progress-settle animation 
 
 The MyJob loader then handed off normally to decoded artwork and its supplied Live Demo. Under Motion pause, the dialog uses `is-static`: the progress animation is `none` and the rail holds a restrained 0.82 fill state. Motion is being restored after this static check.
 
+The dialog close control is present during the MyJob handoff and retains its existing border, background, and transform transition. The new scoped active press rule is loaded; the complete visual handoff and actual close/focus lifecycle are being exercised next.
+
+The MyJob detail completed with its Live Demo present. Closing through the refined control completed the existing dismissal, removed the dialog, returned focus to MyJob, and left Motion live. The press response is static in the dialog’s `is-static` Motion-pause state and under reduced-motion preferences.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.
