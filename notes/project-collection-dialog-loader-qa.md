@@ -43,31 +43,3 @@ The control was restored successfully to its prior live state (`aria-pressed="fa
 The Project Collection loader now renders the dialog aperture successfully: it exposes three rings, runs `collection-dialog-aperture-open` for 0.42 seconds, retains the existing loader, and keeps the close control visible throughout the handoff.
 
 With the existing Motion control paused, the aperture receives its `is-static` state and its ring animation resolves to `none`, while the close control remains visible. The control was restored to its prior live state afterwards. The reduced-motion CSS fallback also removes the aperture entirely.
-
-Per-project accents were verified directly: Card 01 uses rose, Card 02 uses blue, Card 03 uses teal, and Card 04 uses amber, each retaining a readable 0.92-opacity label. The MyJob opening dialog inherits the matching teal accent while preserving the loader, visible close control, and no-source-link policy.
-
-After the handoff, MyJob retains its teal dialog accent and accessible visual tag, its supplied Live Demo remains present, and no source link is introduced. The portfolio was captured at 390 × 844 after the accent refinement; the responsive collection remains intact, with no browser-console warnings recorded.
-
-The new legend is visible with four labelled entries and synchronizes to MyJob as its third active signal while the existing dialog and Live Demo remain intact. The active-dot color computed as transparent in the first inspection, so the accent-dot selector is being checked before finalizing the legend.
-
-After the preview restart, the legend stylesheet applied correctly. The clean desktop view shows the compact signal-hue row without displacing the fan; all four hue variables resolve correctly, and the active Anime dot renders rose at 6.08 px. The active marker shifts with the collection state.
-
-Selecting the second collection card moves the legend’s active treatment to its blue AI media processing signal and opens the matching blue dialog cue. The existing no-source-link policy remains intact.
-
-The legend was also captured within the responsive 390 × 844 portfolio view and remains compact above the mobile collection. No browser-console warnings were recorded during legend state and dialog checks.
-
-The signal-thread handoff was checked from Card 03: the active legend state moved to MyJob’s teal marker, the matching `thread-tone-3` was present, and its line ran `collection-signal-thread-travel` for 0.46 seconds. The fan and card focus behavior remained available.
-
-With the global Motion control paused, the thread receives its static state, resolves to `display: none` with no animation, and the prior live setting restores correctly. The desktop-only thread is also omitted from the 390 × 844 collection view. No browser-console warnings were recorded.
-
-The arrival ripple was checked on Card 02. Its focused wrapper became active, displayed the blue `collection-card-arrival-ripple` and core animations for 0.48 seconds, kept focus on the card, and moved the legend to the matching second signal.
-
-When the global Motion control is paused, the active Card 04 ripple resolves to `display: none`; the Motion control then restores to its prior live state. The ripple is desktop-only, so the responsive 390 × 844 collection remains clean. No browser-console warnings were recorded.
-
-The active effect was redesigned and checked on Card 02: its scrim `::before` now runs `collection-card-white-wave` for 0.52 seconds, uses a white repeating radial wave field with `inset: 0` across the complete card surface, and keeps the card focused with the second legend signal active.
-
-When the global Motion control is paused, the white wave resolves to `display: none`; its prior live state restores correctly. The desktop-only wave is omitted from the 390 × 844 collection view, and no browser-console warnings were recorded.
-
-The radial wave treatment was removed. On Card 02, the active overlay now runs `collection-card-white-line-overlay` for 0.46 seconds using a bright white linear sweep and contained repeating diagonal white lines across the full `inset: 0` card surface. The runtime check confirms no radial gradient remains, card focus persists, and the matching second legend signal stays active.
-
-When the global Motion control is paused, the contained white-line overlay resolves to `display: none`; the prior live state restores correctly. The desktop-only overlay is omitted from the 390 × 844 collection, and no browser-console warnings were recorded.

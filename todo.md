@@ -1,18 +1,4 @@
 # Enhancement Checklist
-- [x] Remove the active card’s radial white wave lines.
-- [x] Add a contained white-line overlay that sweeps across the active card surface.
-- [x] Verify reference-aligned line coverage, card access, mobile omission, global pause, and reduced-motion safeguards.
-- [x] Replace the active-card accent ripple with a restrained white wave spanning the card surface.
-- [x] Verify full-card wave coverage, card access, mobile omission, global pause, and reduced-motion safeguards.
-- [x] Add a quiet accent-matched arrival ripple when a Project Collection card becomes active.
-- [x] Verify ripple timing, card targeting, mobile behavior, global pause, and reduced-motion safeguards.
-- [x] Add a brief signal-thread handoff from the active color legend marker to its Project Collection card.
-- [x] Verify thread targeting, pause/reduced-motion behavior, and responsive collection layout.
-- [x] Add a compact active-card color legend to the Project Collection guidance area.
-- [x] Verify the legend communicates each hue accessibly and remains clear on desktop and mobile.
-- [x] Define restrained, accessible accent hues for the four Project Collection projects.
-- [x] Apply project-specific color cues to cards and dialogs without changing artwork, content, or action policy.
-- [x] Verify accent contrast, responsive presentation, dialog behavior, and motion safeguards.
 - [x] Add a subtle cinematic aperture transition to Project Collection dialog opening.
 - [x] Verify the aperture preserves loader visibility, close controls, dialog content, global motion pause, and reduced-motion behavior.
 - [x] Add one smooth, purposeful animation refinement to the approved Project Collection.
