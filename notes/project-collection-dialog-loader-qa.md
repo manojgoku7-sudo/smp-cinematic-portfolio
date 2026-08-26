@@ -8,6 +8,10 @@ The Anime Pinterest Automation Bot was also checked after the image-priority ref
 
 At the user’s request, the approved baseline fan was restored from the checkpoint immediately before the six recent card-level enhancements. The color legend, per-card accent treatments, signal thread, active ripple, and white-line overlay are absent; all four original cards and the existing MyJob dialog action remain available. The initial MyJob check entered its brief loader correctly, then completed with its supplied Live Demo present and no source link introduced.
 
+The new baseline-preserving card-edge glint was checked on Card 02. Its focused card runs `collection-card-edge-glint` once for 0.34 seconds, using a masked white conic highlight along the perimeter (`inset: -1.28px`) rather than covering the artwork; the card remains focused and its scrim remains available.
+
+With the global Motion control paused, the edge glint resolves to `display: none`; the original live motion state restores correctly. The glint is desktop-only, so the 390 × 844 collection remains unchanged. No browser-console warnings were recorded.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

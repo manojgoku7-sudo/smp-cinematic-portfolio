@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a single restrained white glint that traces the active Project Collection card edge.
+- [x] Verify the glint preserves card text, artwork, dialogs, mobile behavior, global pause, and reduced-motion safeguards.
 - [x] Remove the recent Project Collection color legend, accent treatments, signal thread, and active-card overlay effects.
 - [x] Verify the approved baseline fan, cards, dialogs, actions, and responsive layout remain intact after removal.
 - [x] Add a subtle cinematic aperture transition to Project Collection dialog opening.
