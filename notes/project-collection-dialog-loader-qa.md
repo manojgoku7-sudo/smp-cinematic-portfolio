@@ -90,6 +90,8 @@ Final static-motion check passed: the global control applied the paused state, C
 
 Dialog stability check: the Smart Aroma detail remained open after a body-level pointer move and an overlay-targeted outside-pointer probe. The intentional close control still dismissed the dialog and restored focus to Card 04.
 
+Final lifecycle stress check: Smart Aroma stayed open during 24 repeated page-level pointer moves, background scroll events, and internal dialog scrolling. Its complete title remained mounted, and the deliberate close control cleared the dialog and restored focus to Card 04.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.

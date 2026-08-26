@@ -1,7 +1,7 @@
 /**
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
  */
-import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Dialog, Dialog as DialogRoot, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
@@ -506,7 +506,7 @@ function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpen
       setIsClosing(false);
     }
   }, [project]);
-  const onOpenChange = (open: boolean) => {
+  const onOpenChange = useCallback((open: boolean) => {
     if (open) {
       setIsClosing(false);
       setDialogOpen(true);
@@ -515,8 +515,8 @@ function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpen
     if (staticMotion) setDialogOpen(false);
     else setIsClosing(true);
     onProjectOpenChange(false);
-  };
-  const Dialog = ({ children }: { children: ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) => <DialogRoot open={dialogOpen} onOpenChange={onOpenChange}>{children}</DialogRoot>;
+  }, [onProjectOpenChange, staticMotion]);
+  const Dialog = useMemo(() => ({ children }: { children: ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) => <DialogRoot open={dialogOpen} onOpenChange={onOpenChange}>{children}</DialogRoot>, [dialogOpen, onOpenChange]);
   useEffect(() => {
     if (!project) return;
     setDialogImageReady(false);

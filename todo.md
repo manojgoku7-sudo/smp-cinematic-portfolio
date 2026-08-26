@@ -73,6 +73,8 @@
 - [x] Verify all four card openings use a consistent dialog handoff and motion-safe fallback.
 - [x] Trace and remove unintended pointer-driven Project Collection dialog dismissal.
 - [x] Verify the dialog stays open during pointer movement and closes only through deliberate controls.
+- [x] Instrument the remaining Project Collection dialog close trigger under real pointer use.
+- [x] Correct the underlying dialog lifecycle and verify stable scrolling, pointer movement, and deliberate close behavior.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.
