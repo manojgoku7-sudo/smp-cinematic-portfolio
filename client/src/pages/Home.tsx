@@ -571,6 +571,7 @@ export default function Home() {
   const [activeCollectionProject, setActiveCollectionProject] = useState<CollectionProject | null>(null);
   const [collectionDialogLoading, setCollectionDialogLoading] = useState(false);
   const [collectionFocus, setCollectionFocus] = useState<number | null>(null);
+  const [collectionOpeningIndex, setCollectionOpeningIndex] = useState<number | null>(null);
   const [mobileCollectionSnap, setMobileCollectionSnap] = useState(0);
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
@@ -580,6 +581,7 @@ export default function Home() {
   const lastActiveSection = useRef(active);
   const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const collectionDialogTriggerIndex = useRef<number | null>(null);
+  const collectionOpeningTimer = useRef<number | null>(null);
   const mobileCollectionScrollLeft = useRef(0);
   const mobileCollectionTouchStart = useRef<{ x: number; y: number; time: number; index: number; triggered: boolean } | null>(null);
   const reduceMotion = useReducedMotion();
@@ -634,13 +636,36 @@ export default function Home() {
   }, [reduceMotion, lowDataMode]);
 
   useEffect(() => {
-    if (!activeCollectionProject || reduceMotion) {
+    if (!activeCollectionProject || reduceMotion || motionPaused) {
       setCollectionDialogLoading(false);
       return;
     }
     const timer = window.setTimeout(() => setCollectionDialogLoading(false), 260);
     return () => window.clearTimeout(timer);
-  }, [activeCollectionProject, reduceMotion]);
+  }, [activeCollectionProject, motionPaused, reduceMotion]);
+
+  useEffect(() => () => {
+    if (collectionOpeningTimer.current !== null) window.clearTimeout(collectionOpeningTimer.current);
+  }, []);
+
+  const openCollectionProject = (project: CollectionProject, index: number) => {
+    collectionDialogTriggerIndex.current = index + 1;
+    setCollectionFocus(index);
+    if (collectionOpeningTimer.current !== null) window.clearTimeout(collectionOpeningTimer.current);
+    if (reduceMotion || motionPaused) {
+      setCollectionOpeningIndex(null);
+      setCollectionDialogLoading(false);
+      setActiveCollectionProject(project);
+      return;
+    }
+    setCollectionOpeningIndex(index);
+    collectionOpeningTimer.current = window.setTimeout(() => {
+      setCollectionDialogLoading(true);
+      setActiveCollectionProject(project);
+      setCollectionOpeningIndex(null);
+      collectionOpeningTimer.current = null;
+    }, 120);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 768) return;
@@ -1045,7 +1070,7 @@ export default function Home() {
       <AIContentStudioDialog open={aiContentStudioOpen} onOpenChange={setAiContentStudioOpen} />
       <PolurCharmDialog open={polurCharmOpen} onOpenChange={setPolurCharmOpen} />
       <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911] py-28 md:py-40">
-        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="collection-guidance" id="collection-guidance" aria-live="polite"><span className="collection-guidance-kicker">Browse the hand</span><span className="collection-guidance-state">{collectionFocus === null ? "Hover or focus a card to bring its signal forward." : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}</span><span className="collection-guidance-hint">Select for full brief <ArrowUpRight size={13} /></span></div><div className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`} onScroll={handleMobileCollectionScroll} onTouchStart={handleMobileCollectionTouchStart} onTouchMove={handleMobileCollectionTouchMove} onTouchEnd={clearMobileCollectionTouchIntent} onTouchCancel={clearMobileCollectionTouchIntent} aria-label="Project Collection. Select a project card to view its details." aria-describedby="collection-guidance">{projectCollection.map((project, index) => <div key={project.id} className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}><button type="button" className={`collection-card collection-card-${index + 1}`} onClick={() => { collectionDialogTriggerIndex.current = index + 1; setCollectionFocus(index); setCollectionDialogLoading(!reduceMotion); setActiveCollectionProject(project); }} onMouseEnter={() => setCollectionFocus(index)} onMouseLeave={() => setCollectionFocus(null)} onFocus={() => setCollectionFocus(index)} onBlur={() => setCollectionFocus(null)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></div>)}</div><div className="collection-snap-indicator" aria-live="polite"><span className="collection-snap-line" aria-hidden="true" />{projectCollection.map((project, index) => <span key={project.id} className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`} aria-hidden="true" />)}<span className="sr-only">Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {projectCollection[mobileCollectionSnap].title}</span></div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
+        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="collection-guidance" id="collection-guidance" aria-live="polite"><span className="collection-guidance-kicker">Browse the hand</span><span className="collection-guidance-state">{collectionFocus === null ? "Hover or focus a card to bring its signal forward." : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}</span><span className="collection-guidance-hint">Select for full brief <ArrowUpRight size={13} /></span></div><div className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`} onScroll={handleMobileCollectionScroll} onTouchStart={handleMobileCollectionTouchStart} onTouchMove={handleMobileCollectionTouchMove} onTouchEnd={clearMobileCollectionTouchIntent} onTouchCancel={clearMobileCollectionTouchIntent} aria-label="Project Collection. Select a project card to view its details." aria-describedby="collection-guidance">{projectCollection.map((project, index) => <div key={project.id} className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}><button type="button" className={`collection-card collection-card-${index + 1} ${collectionOpeningIndex === index ? "is-opening" : ""}`} onClick={() => openCollectionProject(project, index)} onMouseEnter={() => setCollectionFocus(index)} onMouseLeave={() => setCollectionFocus(null)} onFocus={() => setCollectionFocus(index)} onBlur={() => setCollectionFocus(null)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></div>)}</div><div className="collection-snap-indicator" aria-live="polite"><span className="collection-snap-line" aria-hidden="true" />{projectCollection.map((project, index) => <span key={project.id} className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`} aria-hidden="true" />)}<span className="sr-only">Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {mobileCollectionSnap + 1} / {projectCollection.length} · {projectCollection[mobileCollectionSnap].title}</span></div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
       </section>
       <ProjectCollectionDialog project={activeCollectionProject} loading={collectionDialogLoading} motionPaused={motionPaused} onCloseAutoFocus={() => window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 0)} onOpenChange={(open) => { if (!open) { setCollectionDialogLoading(false); const staticClose = reduceMotion || motionPaused; window.setTimeout(() => { setActiveCollectionProject(null); if (!staticClose) window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 24); }, staticClose ? 0 : 260); } }} />
 

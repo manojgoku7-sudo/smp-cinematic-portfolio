@@ -69,6 +69,8 @@
 - [x] Audit Project Collection cards for runtime, layout, and interaction issues.
 - [x] Refine Project Collection card motion while preserving the approved four-card fan.
 - [x] Verify card behavior across desktop, mobile, dialogs, and motion-safe settings.
+- [x] Trace and correct the inconsistent Project Collection card-opening animation.
+- [x] Verify all four card openings use a consistent dialog handoff and motion-safe fallback.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.

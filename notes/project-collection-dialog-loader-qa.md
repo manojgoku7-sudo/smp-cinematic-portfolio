@@ -82,6 +82,12 @@ MyJob continued to complete its existing dialog handoff after the card-motion no
 
 The desktop normalization is isolated to the 1024 px-and-up interaction path, so the mobile swipe layout remains structurally unchanged. Full-page mobile review completed with the collection content and downstream portfolio sections retained; no new browser-console or resource errors were found during the card audit.
 
+Opening-handoff trace: every collection card now holds a short `is-opening` press state before its dialog mounts, then reaches the correct existing loader and loading title. Cards 01–03 cleared cleanly and restored focus. Card 04 cleared but did not report focus restoration in the automated sequence, so its close focus path is being isolated before finalizing.
+
+With the original Smart Aroma trigger explicitly focused, the close sequence removed its dialog and correctly returned focus to Card 04. An initial Motion-pause probe sampled before the new 120 ms handoff could mount, so the static path will be rechecked only after its card state has settled.
+
+Final static-motion check passed: the global control applied the paused state, Card 02 bypassed `is-opening`, opened its dialog directly without the loader, received `is-static`, closed cleanly, and returned the global control to live motion.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.
