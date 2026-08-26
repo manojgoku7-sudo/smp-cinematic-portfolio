@@ -498,8 +498,12 @@ function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpen
   const [dialogImageReady, setDialogImageReady] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(Boolean(project));
   const [isClosing, setIsClosing] = useState(false);
+  const onProjectOpenChangeRef = useRef(onProjectOpenChange);
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
+  useEffect(() => {
+    onProjectOpenChangeRef.current = onProjectOpenChange;
+  }, [onProjectOpenChange]);
   useEffect(() => {
     if (project) {
       setDialogOpen(true);
@@ -514,8 +518,8 @@ function ProjectCollectionDialog({ project, loading, onOpenChange: onProjectOpen
     }
     if (staticMotion) setDialogOpen(false);
     else setIsClosing(true);
-    onProjectOpenChange(false);
-  }, [onProjectOpenChange, staticMotion]);
+    onProjectOpenChangeRef.current(false);
+  }, [staticMotion]);
   const Dialog = useMemo(() => ({ children }: { children: ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) => <DialogRoot open={dialogOpen} onOpenChange={onOpenChange}>{children}</DialogRoot>, [dialogOpen, onOpenChange]);
   useEffect(() => {
     if (!project) return;
@@ -652,19 +656,9 @@ export default function Home() {
     collectionDialogTriggerIndex.current = index + 1;
     setCollectionFocus(index);
     if (collectionOpeningTimer.current !== null) window.clearTimeout(collectionOpeningTimer.current);
-    if (reduceMotion || motionPaused) {
-      setCollectionOpeningIndex(null);
-      setCollectionDialogLoading(false);
-      setActiveCollectionProject(project);
-      return;
-    }
-    setCollectionOpeningIndex(index);
-    collectionOpeningTimer.current = window.setTimeout(() => {
-      setCollectionDialogLoading(true);
-      setActiveCollectionProject(project);
-      setCollectionOpeningIndex(null);
-      collectionOpeningTimer.current = null;
-    }, 120);
+    setCollectionOpeningIndex(null);
+    setCollectionDialogLoading(!reduceMotion && !motionPaused);
+    setActiveCollectionProject(project);
   };
 
   useEffect(() => {
