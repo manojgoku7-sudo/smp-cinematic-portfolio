@@ -67,3 +67,7 @@ When the global Motion control is paused, the active Card 04 ripple resolves to 
 The active effect was redesigned and checked on Card 02: its scrim `::before` now runs `collection-card-white-wave` for 0.52 seconds, uses a white repeating radial wave field with `inset: 0` across the complete card surface, and keeps the card focused with the second legend signal active.
 
 When the global Motion control is paused, the white wave resolves to `display: none`; its prior live state restores correctly. The desktop-only wave is omitted from the 390 × 844 collection view, and no browser-console warnings were recorded.
+
+The radial wave treatment was removed. On Card 02, the active overlay now runs `collection-card-white-line-overlay` for 0.46 seconds using a bright white linear sweep and contained repeating diagonal white lines across the full `inset: 0` card surface. The runtime check confirms no radial gradient remains, card focus persists, and the matching second legend signal stays active.
+
+When the global Motion control is paused, the contained white-line overlay resolves to `display: none`; the prior live state restores correctly. The desktop-only overlay is omitted from the 390 × 844 collection, and no browser-console warnings were recorded.

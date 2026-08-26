@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Remove the active card’s radial white wave lines.
+- [x] Add a contained white-line overlay that sweeps across the active card surface.
+- [x] Verify reference-aligned line coverage, card access, mobile omission, global pause, and reduced-motion safeguards.
 - [x] Replace the active-card accent ripple with a restrained white wave spanning the card surface.
 - [x] Verify full-card wave coverage, card access, mobile omission, global pause, and reduced-motion safeguards.
 - [x] Add a quiet accent-matched arrival ripple when a Project Collection card becomes active.
