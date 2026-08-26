@@ -143,3 +143,11 @@ With the existing Motion control paused, the aperture receives its `is-static` s
 The new top-of-dialog Back to collection breadcrumb is visible alongside the existing project heading and Previous/Next controls. On MyJob AI Radar, its accessible label closed the dialog cleanly and returned the viewport to the Project Collection fan; MyJob’s Live Demo and the no-source-link policy remained unchanged.
 
 Post-action validation found no dialog remaining, focus restored to “Open details for MyJob AI Radar,” and the Project Collection heading aligned at the top of the viewport (within 28 px), confirming the breadcrumb preserves the established close-focus lifecycle.
+
+The Project Collection fan remained fully visible and interactive during the initial desktop hover review after the behind-the-fan signal-sweep addition. Motion-state and interaction-boundary checks are recorded with the final verification.
+
+The desktop sweep resolves to the intended `collection-behind-fan-signal-sweep` animation for 0.82 seconds, with z-index 0 and `pointer-events: none`; the collection cards retain `pointer-events: auto`. The first scripted Motion-control lookup did not enter the paused page state, so the established control is being retried through its live accessible label before finalizing that safeguard.
+
+The live Motion control was then exercised successfully: the page entered its paused state and the engaged signal sweep reported `animation-play-state: paused`. Live motion was restored afterward, and the temporary active state was cleared from the fan.
+
+After the sweep verification, MyJob AI Radar still opened through its established dialog handoff and exposed its permitted Live Demo. Closing through Back to collection returned the stable four-card fan, demonstrating the behind-layer effect does not block card selection or regress the existing dialog route.
