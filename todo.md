@@ -66,6 +66,9 @@
 - [x] Verify progress feedback preserves the loader duration, dialog handoff, and motion-safe behavior.
 - [x] Add tactile press feedback to the Project Collection dialog close control.
 - [x] Verify close-button feedback preserves dialog dismissal, focus restoration, and motion-safe behavior.
+- [x] Audit Project Collection cards for runtime, layout, and interaction issues.
+- [x] Refine Project Collection card motion while preserving the approved four-card fan.
+- [x] Verify card behavior across desktop, mobile, dialogs, and motion-safe settings.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.

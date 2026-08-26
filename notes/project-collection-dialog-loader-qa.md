@@ -74,6 +74,14 @@ The dialog close control is present during the MyJob handoff and retains its exi
 
 The MyJob detail completed with its Live Demo present. Closing through the refined control completed the existing dismissal, removed the dialog, returned focus to MyJob, and left Motion live. The press response is static in the dialog’s `is-static` Motion-pause state and under reduced-motion preferences.
 
+Project Collection audit: all four cards render, the third card accepts keyboard focus, their baseline transforms and desktop 0.42 s card transitions are present, and no failed resource entries were detected. The active card’s stacking requires a final transition refinement so focus/hover elevation remains clearly above the physical fan while retaining the approved geometry.
+
+The refined desktop focus path now raises the active card wrapper to z-index 60 and uses the normalized 0.36 s card transition. A direct MyJob card selection continues into its existing detail dialog; the mobile swipe presentation and the motion-safe paths are being checked next.
+
+MyJob continued to complete its existing dialog handoff after the card-motion normalization. Its close control removed the dialog and returned focus to the originating card, confirming the refined fan interaction has not regressed the dialog lifecycle.
+
+The desktop normalization is isolated to the 1024 px-and-up interaction path, so the mobile swipe layout remains structurally unchanged. Full-page mobile review completed with the collection content and downstream portfolio sections retained; no new browser-console or resource errors were found during the card audit.
+
 Desktop dialog inspection confirms the decoded Anime artwork is fully visible, contained, and readable beside the unchanged detail content. The portfolio was also captured at a 390 × 844 phone viewport after the refinement; the existing responsive collection presentation remains intact.
 
 For the adjacent-card prefetch check, selecting Card 01 left Card 02’s 1440 px artwork completely available during the first dialog’s loading handoff. After the first dialog had closed, Card 02 opened with its complete 1440 px artwork and the ready-state fade applied; its no-source-link policy also remains intact.
