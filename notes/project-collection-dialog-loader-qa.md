@@ -139,3 +139,7 @@ The control was restored successfully to its prior live state (`aria-pressed="fa
 The Project Collection loader now renders the dialog aperture successfully: it exposes three rings, runs `collection-dialog-aperture-open` for 0.42 seconds, retains the existing loader, and keeps the close control visible throughout the handoff.
 
 With the existing Motion control paused, the aperture receives its `is-static` state and its ring animation resolves to `none`, while the close control remains visible. The control was restored to its prior live state afterwards. The reduced-motion CSS fallback also removes the aperture entirely.
+
+The new top-of-dialog Back to collection breadcrumb is visible alongside the existing project heading and Previous/Next controls. On MyJob AI Radar, its accessible label closed the dialog cleanly and returned the viewport to the Project Collection fan; MyJob’s Live Demo and the no-source-link policy remained unchanged.
+
+Post-action validation found no dialog remaining, focus restored to “Open details for MyJob AI Radar,” and the Project Collection heading aligned at the top of the viewport (within 28 px), confirming the breadcrumb preserves the established close-focus lifecycle.
