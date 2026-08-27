@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Enhance the Hero Memoji pupil movement and blink animation for smoother, more natural coordinated eye behavior.
 - [x] Add a subtle dynamic hover scale to the Hero Memoji while preserving its eye, glasses, shadow, and backdrop motion.
 - [x] Brighten and softly tint the Hero Memoji lens reflections and add a restrained mouse-responsive background glow.
 - [x] Brighten the Hero Memoji lens reflections, extend their parallax travel, and smooth their return to centre.

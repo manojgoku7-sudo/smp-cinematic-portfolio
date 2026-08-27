@@ -345,3 +345,11 @@ The new dynamic hover refinement adds a restrained 1.035 scale only while the di
 Direct portrait-hover validation confirms the `is-gazing` state applies the intended 1.035 scale alongside the existing +4.29 px pupil and +3.11 px tinted-reflection movement. The slightly enlarged portrait remains balanced in the Hero without crowding the text or actions, and clears cleanly back to its resting size on pointer exit.
 
 Final 390 px validation confirms the portrait remains at its normal compact size, with no hover scale or additional interactive layers active. The Hero copy, actions, reel, and contact dock remain clearly separated.
+
+The eye-motion refinement retains the original source-crop pupils and single glasses pair at rest. The new treatment extends pupil response timing to 180 ms with a smoother ease-out curve, while the blink now closes from the upper eyelid edge through intermediate closure and reopening frames for a more organic motion path.
+
+Live lower-left validation confirms both pupils receive the same -4.27 px / +2.24 px movement through the revised 180 ms `cubic-bezier(.18, .84, .28, 1)` curve. They retain their corrected shared baseline, individual source texture, original glasses placement, and coordinated head response.
+
+The explicit closed-eye preview confirms both eyelids use matching top-edge origins, full-width warm eyelid coverage, and the same curved crease geometry inside the original round glasses. The added intermediate frames make the blink compress and release smoothly rather than appearing as an abrupt cover.
+
+After the closed-eye inspection, the live preview was restored to the normal 9.2-second blink cadence and neutral gaze. Both pupil variables are clear and no temporary hover state remains.

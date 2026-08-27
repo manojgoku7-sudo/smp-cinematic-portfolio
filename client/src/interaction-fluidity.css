@@ -148,7 +148,7 @@
   filter: brightness(.93) contrast(1.3);
   transform: translate3d(var(--hero-memoji-eye-x, 0px), var(--hero-memoji-eye-y, 0px), 0);
   transform-origin: 50% 50%;
-  transition: transform 130ms cubic-bezier(.16, .9, .28, 1);
+  transition: transform 180ms cubic-bezier(.18, .84, .28, 1);
   will-change: transform;
 }
 .hero-memoji-pupil-window.left { left: 38.4%; }
@@ -167,16 +167,16 @@
   opacity: 0;
   pointer-events: none;
   transform: scaleY(.02);
-  transform-origin: center;
+  transform-origin: center top;
 }
 .hero-memoji-lid.left { left: 38.4%; }
 .hero-memoji-lid.right { left: 53.8%; }
 .hero-memoji-lid::after {
   position: absolute;
-  top: 40%;
+  top: 34%;
   left: 15%;
   width: 70%;
-  height: 33%;
+  height: 37%;
   content: "";
   border-bottom: 1.4px solid rgb(88 45 24 / .68);
   border-radius: 0 0 50% 50%;
@@ -212,8 +212,10 @@
 .hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .86; }
 
 @keyframes smp-memoji-blink {
-  0%, 45%, 50%, 100% { opacity: 0; transform: scaleY(.02); }
+  0%, 43%, 51%, 100% { opacity: 0; transform: scaleY(.02); }
+  45.5% { opacity: .96; transform: scaleY(.72); }
   47%, 48% { opacity: 1; transform: scaleY(1); }
+  49.5% { opacity: .92; transform: scaleY(.58); }
 }
 
 @media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
