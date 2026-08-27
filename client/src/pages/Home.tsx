@@ -1091,7 +1091,7 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-memoji-reference-scene_4cb72ab2.png" alt="Illustrated developer avatar peeking over a light-gray laptop" />
+            <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-stylized-memoji-scene-a_1451ece7.png" alt="Stylized 3D Memoji-like developer avatar peeking over a light-gray laptop" />
           </motion.div>
         </div>
       </section>

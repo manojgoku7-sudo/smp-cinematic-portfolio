@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Replace the semi-realistic Hero portrait with a clearly stylized Memoji-like avatar while retaining the compact peeking-laptop composition.
 - [x] Match the Hero portrait to the supplied compact Memoji reference composition and simplify its surrounding stage.
 - [x] Replace the full-body Hero avatar with a compact peeking Memoji-style head-and-laptop portrait.
 - [x] Replace the Hero section’s right-side abstract artwork with a polished Memoji-style developer avatar.
