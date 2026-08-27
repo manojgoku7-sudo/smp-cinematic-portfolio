@@ -199,3 +199,5 @@ The anchored smoke paused under the global Motion control and resumed live state
 Smoke brightness was rebalanced from a concentrated glow to a translucent material layer. The live `smart-aroma-neck-smoke-balanced` animation reported a mid-cycle opacity near 0.41 with a 3.6 px blur and pointer events disabled; the adjacent temperature/humidity readout remains independent and unobstructed.
 
 The card preserved a visible Smart Aroma title under keyboard focus, and the balanced plume paused with the global Motion control before resuming the expected `smart-aroma-neck-smoke-balanced` animation.
+
+The diffuser-neck plume cadence was slowed to 6.8 s under normal desktop motion, using the established composited cubic-bezier curve. Its layer remains pointer-transparent and the Smart Aroma title stays present throughout the slower ambient cycle.
