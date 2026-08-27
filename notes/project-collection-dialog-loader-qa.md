@@ -207,3 +207,7 @@ The Anime Pinterest card now exposes one brief `anime-pinterest-scan-frame` pass
 The scan-frame paused with the global Motion control and resumed correctly. Card 01 remained selectable after the effect was introduced, opening its existing project brief with its expected first-project boundary state intact.
 
 Closing the Anime Pinterest brief through Back to collection removed the dialog cleanly and restored focus to the original Card 01 trigger, confirming that the scan-frame change did not disturb the established close lifecycle.
+
+All four collection cards now use an image-only desktop pointer parallax with a maximum 3.5 px horizontal and 2.5 px vertical offset. Synthetic pointer verification populated the expected artwork CSS variables without moving label rails, and a normal mouse-exit event removed the active class and both offsets cleanly.
+
+Motion-paused testing confirmed no parallax class or offsets are applied. Desktop and 390 px responsive reviews preserved the existing physical fan and mobile snap presentation, respectively. Opening MyJob AI Radar remained immediate with its existing Live Demo, and closing via Back to collection restored focus to the original Card 03 trigger.
