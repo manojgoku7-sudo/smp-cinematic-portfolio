@@ -840,10 +840,12 @@ export default function Home() {
     portrait.classList.add("is-gazing");
     portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.35).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.3).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.6).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 2.45).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.1).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 1.1).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * .55).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -856,6 +858,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-tilt-y");
     portrait.style.removeProperty("--hero-memoji-shadow-x");
     portrait.style.removeProperty("--hero-memoji-shadow-y");
+    portrait.style.removeProperty("--hero-memoji-glasses-x");
+    portrait.style.removeProperty("--hero-memoji-glasses-y");
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1121,12 +1125,13 @@ export default function Home() {
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
-            <div ref={heroMemojiRef} className="hero-memoji-portrait">
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
+            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
+              <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-ring left" /><i className="hero-memoji-glasses-ring right" /><i className="hero-memoji-glasses-bridge" /></span>
             </div>
           </motion.div>
         </div>

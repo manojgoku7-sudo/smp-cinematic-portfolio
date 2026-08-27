@@ -98,17 +98,17 @@
   bottom: 0;
   width: min(27rem, 100%);
   aspect-ratio: 4 / 3;
-  pointer-events: none;
+  pointer-events: auto;
   -webkit-mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
   mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
   transform: translate3d(-50%, 0, 0) rotateX(var(--hero-memoji-tilt-x, 0deg)) rotateY(var(--hero-memoji-tilt-y, 0deg));
   transform-origin: 50% 78%;
-  filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.35rem + var(--hero-memoji-shadow-y, 0px)) 1.65rem rgb(0 0 0 / .5)) drop-shadow(0 0 .9rem rgb(167 139 250 / .18));
+  filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.35rem + var(--hero-memoji-shadow-y, 0px)) 1.75rem rgb(0 0 0 / .62)) drop-shadow(0 0 .9rem rgb(167 139 250 / .18));
   transition: transform 220ms cubic-bezier(.16, .9, .28, 1), filter 220ms var(--ease-out);
   will-change: transform;
 }
 .hero-memoji-reference-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: brightness(.93) contrast(1.3); }
-.hero-memoji-portrait.is-gazing { filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.5rem + var(--hero-memoji-shadow-y, 0px)) 1.8rem rgb(0 0 0 / .54)) drop-shadow(0 0 1.1rem rgb(196 181 253 / .27)); }
+.hero-memoji-portrait.is-gazing { filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.5rem + var(--hero-memoji-shadow-y, 0px)) 1.9rem rgb(0 0 0 / .68)) drop-shadow(0 0 1.1rem rgb(196 181 253 / .27)); }
 .hero-memoji-pupil-window {
   position: absolute;
   z-index: 2;
@@ -164,6 +164,38 @@
   border-radius: 0 0 50% 50%;
   box-shadow: 0 1px 0 rgb(255 235 214 / .24);
 }
+.hero-memoji-glasses-layer {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  transform: translate3d(var(--hero-memoji-glasses-x, 0px), var(--hero-memoji-glasses-y, 0px), 0);
+  transition: transform 170ms cubic-bezier(.16, .9, .28, 1);
+  will-change: transform;
+}
+.hero-memoji-glasses-ring {
+  position: absolute;
+  top: 47.45%;
+  display: block;
+  width: 10.9%;
+  aspect-ratio: 1 / .88;
+  border: 1.25px solid rgb(17 12 15 / .5);
+  border-radius: 48%;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .10), 0 0 2px rgb(0 0 0 / .18);
+}
+.hero-memoji-glasses-ring.left { left: 36.55%; }
+.hero-memoji-glasses-ring.right { left: 52.45%; }
+.hero-memoji-glasses-bridge {
+  position: absolute;
+  top: 51.55%;
+  left: 47.25%;
+  display: block;
+  width: 5.15%;
+  height: 1px;
+  border-radius: 999px;
+  background: rgb(17 12 15 / .5);
+}
 
 @keyframes smp-memoji-blink {
   0%, 45%, 50%, 100% { opacity: 0; transform: scaleY(.02); }
@@ -177,7 +209,7 @@
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .hero-visual { overflow: hidden; }
   .hero-memoji-portrait { width: min(19rem, 100%); transform: translate3d(-50%, 0, 0); transition: none; }
-  .hero-memoji-pupil-window, .hero-memoji-lid { display: none; }
+  .hero-memoji-pupil-window, .hero-memoji-lid, .hero-memoji-glasses-layer { display: none; }
 }
 footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 253 / .7); box-shadow: inset 0 0 18px rgb(139 92 246 / .26), 0 0 20px rgb(139 92 246 / .18); }
 

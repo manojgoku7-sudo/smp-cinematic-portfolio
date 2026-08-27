@@ -317,3 +317,9 @@ Final desktop directional testing at the lower-right Hero edge produced a shared
 The refined treatment increases the head response to a maximum 1.60° vertical and 2.45° horizontal tilt. Its soft cast shadow now counter-shifts by up to 4.6 px horizontally and 2.8 px vertically to support the sense of depth. The closed-eye frame has an added curved eyelid crease and warmer skin gradient while the resting Hero remains visually unchanged.
 
 At the lower-right desktop extent, the final interaction resolved to +4.32 px / +2.28 px pupil movement, -1.58° / +2.43° head rotation, and a paired -4.57 px / +2.77 px shadow shift. The portrait retained natural eye alignment and its visual footprint remained clear of the Hero copy and controls.
+
+The hover-only refinement moves pointer listeners from the whole Hero visual onto the portrait itself. At rest, the added glasses-outline layer remains aligned with the original round frames and bridge; it is suppressed on mobile and reduced-motion presentations. Direct-hover testing will confirm the softened tilt, darker shadow, and small independent frame offset work together.
+
+Direct portrait-hover validation at the lower-right edge produced a shared +4.29 px pupil offset, a softer +1.63° horizontal head tilt, a darker -4.54 px counter-shadow, and a deliberately small +1.08 px / +0.54 px glasses offset. The portrait is unreactive across the rest of the Hero, while the layered glasses motion remains subtle enough not to separate visually from the original frames.
+
+At 390 px, the glasses parallax layer, pupil windows, eyelid layers, and portrait-hover response are all absent. The static Memoji remains proportionate below the Hero actions, and the visible mobile contact dock stays unobstructed.
