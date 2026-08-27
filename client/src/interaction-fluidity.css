@@ -68,3 +68,57 @@ footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 2
 .credential-preview-reel .credential-preview-spark-field {
   display: none;
 }
+
+/* Obsidian Studio Work Orbit: slow concentric rotation gives the central selector a living signal without moving its readable project label. */
+@keyframes smp-work-orbit-spin {
+  from { transform: rotate(-28deg); }
+  to { transform: rotate(332deg); }
+}
+
+@keyframes smp-work-orbit-halo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .project-orbit-core::before,
+  .project-orbit-core::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  .project-orbit-core::before {
+    inset: -0.38rem;
+    border: 1px solid rgb(210 193 255 / 0.34);
+    border-right-color: rgb(246 232 255 / 0.82);
+    border-bottom-color: rgb(139 92 246 / 0.78);
+    box-shadow: 0 0 19px rgb(139 92 246 / 0.14);
+    animation: smp-work-orbit-halo-spin 16s linear infinite;
+  }
+
+  .project-orbit-core::after {
+    inset: 0.27rem;
+    border: 1px solid transparent;
+    border-top-color: rgb(244 233 255 / 0.56);
+    border-left-color: rgb(167 139 250 / 0.5);
+    animation: smp-work-orbit-halo-spin 10.5s linear infinite reverse;
+  }
+
+  .project-orbit-core i {
+    animation: smp-work-orbit-spin 8.8s linear infinite !important;
+  }
+}
+
+.motion-paused .project-orbit-core::before,
+.motion-paused .project-orbit-core::after,
+.motion-paused .project-orbit-core i {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-orbit-core::before,
+  .project-orbit-core::after,
+  .project-orbit-core i { animation: none !important; }
+}

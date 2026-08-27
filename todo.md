@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Add and verify a calm living spin to the central Work Orbit visual with motion safeguards.
 - [x] Remove click-to-expand credential previews while retaining the compact credential card list.
 - [x] Remove the spinning animation from credential preview orbit artwork while preserving its static appearance.
 - [x] Refine card, navigation, and dialog timing so high-frequency interactions feel more fluid without weakening motion safeguards.
