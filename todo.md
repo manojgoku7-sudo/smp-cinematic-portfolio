@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Strengthen the synchronized Hero Memoji eye tracking and add a restrained natural blink with motion-safe fallbacks.
 - [x] Replace the flawed Hero eye overlays with accurately placed synchronized pupil-only tracking.
 - [x] Correct the Hero Memoji pupil alignment and synchronize its pointer-following movement.
 - [x] Add true desktop pupil tracking so the Hero Memoji eyes follow the mouse and reset on exit.

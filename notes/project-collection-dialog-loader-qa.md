@@ -301,3 +301,11 @@ A matching far-right pointer exercise set one shared +2.58 px horizontal value a
 The prior artificial eye graphics were removed after the user reported that their pupil shape remained incorrect. At rest, each new pupil window is now a clipped copy of its exact original source eye, so both iris texture, eye-white shape, and the surrounding glasses geometry are preserved before pointer movement is applied.
 
 The repaired pupil windows now use true 1:1 source-crop positioning rather than a scaled miniature portrait. Resting desktop inspection confirms the original eye whites, pupils, reflections, and glasses sit naturally; a live far-left exercise applies the same -2.58 px vector to both cropped pupils while preserving their shared visual baseline. Phone styling continues to suppress these desktop-only windows.
+
+The enhanced-motion baseline keeps the repaired resting eye treatment intact. The strengthened cursor range is constrained to a shared 4.35 px horizontal and 2.3 px vertical maximum so it remains inside both original eye shapes; a paired skin-tone eyelid layer has been added for the requested periodic desktop blink. The next check exercises both strong movement and the blink-close state.
+
+The live upper-right cursor exercise resolved to a shared +4.32 px horizontal and -2.26 px vertical pupil vector. Both eyes moved together within their original lenses and remained aligned. The blink layers are paired, brief, and desktop-only; they remain absent in the phone and reduced-motion fallbacks.
+
+The blink-close frame was explicitly previewed: both eyelids close symmetrically within the existing round glasses silhouette, then the animation returns to the repaired original eyes. The range and blink are intentionally desktop-only so the static compact phone Hero remains unchanged.
+
+Final validation passed. Desktop cursor tracking reaches the requested stronger shared range while retaining equal eye direction, and both pupil variables clear on exit. The live blink preview resets cleanly to its automatic cadence. At 390 px, the pupil and lid layers are suppressed, leaving the original portrait, Hero actions, reel, and contact dock unobstructed.

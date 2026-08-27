@@ -136,11 +136,37 @@
 .hero-memoji-pupil-window.left { left: 38.4%; }
 .hero-memoji-pupil-window.right { left: 53.8%; }
 .hero-memoji-pupil-window.right img { left: -748%; }
+.hero-memoji-lid {
+  position: absolute;
+  z-index: 3;
+  top: 49.2%;
+  display: block;
+  width: 7.2%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 20%, #ffd2aa 0%, #f3b783 62%, #dfa06e 100%);
+  box-shadow: inset 0 1px 1px rgb(255 244 234 / .42), 0 1px 1px rgb(117 58 28 / .12);
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleY(.02);
+  transform-origin: center;
+}
+.hero-memoji-lid.left { left: 38.4%; }
+.hero-memoji-lid.right { left: 53.8%; }
+
+@keyframes smp-memoji-blink {
+  0%, 45%, 50%, 100% { opacity: 0; transform: scaleY(.02); }
+  47%, 48% { opacity: 1; transform: scaleY(1); }
+}
+
+@media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-lid { animation: smp-memoji-blink 6.4s cubic-bezier(.2, .8, .28, 1) infinite; }
+}
 
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .hero-visual { overflow: hidden; }
   .hero-memoji-portrait { width: min(19rem, 100%); transform: translate3d(-50%, 0, 0); transition: none; }
-  .hero-memoji-pupil-window { display: none; }
+  .hero-memoji-pupil-window, .hero-memoji-lid { display: none; }
 }
 footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 253 / .7); box-shadow: inset 0 0 18px rgb(139 92 246 / .26), 0 0 20px rgb(139 92 246 / .18); }
 

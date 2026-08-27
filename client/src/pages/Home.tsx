@@ -838,8 +838,8 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 2.6).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 1.45).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.35).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.3).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -1118,6 +1118,7 @@ export default function Home() {
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
+              <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
             </div>
           </motion.div>
         </div>
