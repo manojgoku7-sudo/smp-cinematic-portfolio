@@ -751,6 +751,32 @@ export default function Home() {
   }, [motionPaused, reduceMotion, lowDataMode]);
 
   useEffect(() => {
+    const portrait = heroMemojiRef.current;
+    if (!portrait || motionPaused || reduceMotion || lowDataMode || window.innerWidth < 768) {
+      portrait?.classList.remove("is-blinking");
+      return;
+    }
+    let blinkTimer: number | undefined;
+    let releaseTimer: number | undefined;
+    const scheduleBlink = () => {
+      const naturalDelay = 7600 + Math.round(Math.random() * 3200);
+      blinkTimer = window.setTimeout(() => {
+        portrait.classList.add("is-blinking");
+        releaseTimer = window.setTimeout(() => {
+          portrait.classList.remove("is-blinking");
+          scheduleBlink();
+        }, 410);
+      }, naturalDelay);
+    };
+    scheduleBlink();
+    return () => {
+      if (blinkTimer !== undefined) window.clearTimeout(blinkTimer);
+      if (releaseTimer !== undefined) window.clearTimeout(releaseTimer);
+      portrait.classList.remove("is-blinking");
+    };
+  }, [lowDataMode, motionPaused, reduceMotion]);
+
+  useEffect(() => {
     if (motionPaused || reduceMotion || lowDataMode) return;
     const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
     return () => window.clearInterval(cycle);
@@ -848,8 +874,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 3.15).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.55).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 10).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 7).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 14).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 9).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {

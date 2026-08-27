@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Add subtle natural variation to the Hero Memoji blink cadence and strengthen its soft cursor-following backdrop glow.
 - [x] Perform a final focused polish pass on the Hero Memoji eye tracking and blink choreography.
 - [x] Slightly extend Hero Memoji side-to-side eye tracking and add restrained cursor-and-blink-responsive eyebrow movement.
 - [x] Enhance the Hero Memoji pupil movement and blink animation for smoother, more natural coordinated eye behavior.

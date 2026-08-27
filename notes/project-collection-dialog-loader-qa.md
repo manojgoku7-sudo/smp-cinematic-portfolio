@@ -365,3 +365,9 @@ The final polish shortens the visible blink sequence while retaining its calm 9.
 Live leftward tracking reaches -5.08 px at the intended 155 ms pupil response, while both eyebrow layers retain their matching 185 ms motion curve. The direct visual check confirms the pupils remain synchronized and contained inside the original glasses, with the compact Hero composition preserved.
 
 The final forced closed-eye inspection confirms two aligned eyelid layers, matching top-edge origins, and the restrained 0.85 px brow acknowledgement. The shorter staged blink retains a clear symmetrical closure inside the round frames and reopens without changing the original eye or glasses geometry.
+
+The lifelike-motion refinement replaces the fixed repeating blink with a timer-scheduled desktop blink that varies naturally between 7.6 and 10.8 seconds. At rest, the strengthened backdrop remains a soft diffuse violet field behind the Memoji, without creating a visible rectangular visual stage.
+
+The upper-right direct-hover test confirmed a +13.81 px / -8.83 px backdrop shift. The strengthened glow enlarges modestly and rises to the intended hover intensity after transition settling, while the rest of the Hero stays unobstructed and no persistent blink class was present outside its scheduled interval.
+
+Final 390 px validation confirms the Memoji remains static: the timer-driven blink, pupil and brow response, and cursor-reactive glow are all absent, while the original compact portrait and mobile controls remain clear.
