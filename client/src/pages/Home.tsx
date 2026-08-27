@@ -497,6 +497,26 @@ function CollectionDialogAperture({ staticMotion }: { staticMotion: boolean }) {
   return <span className={`collection-dialog-aperture ${staticMotion ? "is-static" : ""}`} aria-hidden="true"><i /><i /><i /></span>;
 }
 
+/* Obsidian Studio Smart Aroma detail: quiet, evidence-led control loop that only appears inside the matching project brief. */
+function SmartAromaWorkflowLoop({ staticMotion }: { staticMotion: boolean }) {
+  return <section className={`smart-aroma-workflow ${staticMotion ? "is-static" : ""}`} aria-labelledby="smart-aroma-workflow-title"><div className="smart-aroma-workflow-head"><p className="label" id="smart-aroma-workflow-title">Diffusion control loop</p><span><i aria-hidden="true" />Adaptive output</span></div><div className="smart-aroma-workflow-track"><span className="smart-aroma-workflow-packet" aria-hidden="true"><i /></span><ol><li><span>01</span><div><b>Sense</b><em>Temp + humidity</em></div></li><li><span>02</span><div><b>Interpret</b><em>Fuzzy Logic</em></div></li><li><span>03</span><div><b>Diffuse</b><em>Adaptive output</em></div></li></ol></div><p className="smart-aroma-workflow-note">A compact visual loop of the prototype’s sensor-to-output control sequence.</p></section>;
+}
+
+function SmartAromaWorkflowPortal({ project, loading, motionPaused }: { project: CollectionProject | null; loading: boolean; motionPaused: boolean }) {
+  const [target, setTarget] = useState<HTMLDivElement | null>(null);
+  const reduceMotion = useReducedMotion();
+  useEffect(() => {
+    if (!project || loading || project.id !== "smart-aroma-diffuser") {
+      setTarget(null);
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => setTarget(document.querySelector<HTMLDivElement>(".collection-dialog-copy .collection-detail-section:nth-of-type(2)")));
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, project]);
+  if (!target || !project || project.id !== "smart-aroma-diffuser" || loading) return null;
+  return createPortal(<SmartAromaWorkflowLoop staticMotion={motionPaused || Boolean(reduceMotion)} />, target);
+}
+
 function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProjectOpenChange, onCloseAutoFocus, motionPaused }: { project: CollectionProject | null; loading: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus: () => void; motionPaused: boolean }) {
   const [dialogImageReady, setDialogImageReady] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(Boolean(project));
@@ -578,7 +598,7 @@ function CollectionDialogNavigator({ project, loading }: { project: CollectionPr
 }
 
 function ProjectCollectionDialog({ project, loading, onOpenChange, onCloseAutoFocus, motionPaused }: { project: CollectionProject | null; loading: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus: () => void; motionPaused: boolean }) {
-  return <><ProjectCollectionDialogBase project={project} loading={loading} onOpenChange={onOpenChange} onCloseAutoFocus={onCloseAutoFocus} motionPaused={motionPaused} /><CollectionDialogNavigator project={project} loading={loading} /></>;
+  return <><ProjectCollectionDialogBase project={project} loading={loading} onOpenChange={onOpenChange} onCloseAutoFocus={onCloseAutoFocus} motionPaused={motionPaused} /><CollectionDialogNavigator project={project} loading={loading} /><SmartAromaWorkflowPortal project={project} loading={loading} motionPaused={motionPaused} /></>;
 }
 
 export default function Home() {

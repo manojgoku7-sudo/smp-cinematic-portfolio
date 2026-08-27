@@ -171,3 +171,15 @@ Initial desktop hover review of Card 04 retained the protected Smart Aroma title
 The temperature readout has the expected `SENSOR · 22.4°C` content, remains in the title rail at z-index 4, and its shimmer has pointer events disabled. Keyboard focus reached the Card 04 focus-visible state and started the 0.52 s shimmer without opening a dialog; a settled-frame measurement and Motion safeguard remain to be recorded.
 
 After the focus transition settled, the readout reached its intended 0.86 opacity. The global Motion control paused the shimmer successfully and returned to live state afterward; no dialog was opened during either check.
+
+Smart Aroma’s desktop hover readout now exposes `TEMP 22.4°C · HUM 54%` as one quiet companion line. Its matching detail dialog mounts a three-stage Sense → Interpret → Diffuse workflow loop; the packet animation was present at 3.6 s and then corrected to remain pointer-transparent before final Motion and closure checks.
+
+The loop packet now reports pointer events disabled. Closing Smart Aroma and opening MyJob’s project brief did not carry the Smart Aroma workflow into that dialog, confirming the loop is scoped to Card 04. Static-motion is being checked through the remounted dialog element rather than a stale animation reference.
+
+With Motion paused, the remounted Smart Aroma loop carried `is-static`, removed its packet animation, and rendered the packet at its intended 0.72 static opacity. After restoring live motion, Smart Aroma reached its loaded detail title and the workflow was present at the dialog’s natural lower position (`scrollTop` 424 of `scrollHeight` 1361), without modifying the initial dialog layout.
+
+Live placement inspection found the first portal location sat below the visual dialog viewport despite the outer scroll being at its maximum. The loop was therefore moved directly beneath Smart Aroma’s Main features list, where it remains in normal reading order and can be checked without displacing the dialog header or navigator.
+
+The corrected loop is now a child of Smart Aroma’s Main features section and becomes fully visible when that section is reached (`scrollTop` 595). This preserves the dialog’s concise header while presenting the control-loop evidence alongside the related feature list.
+
+Visual review confirmed the contained Diffusion control loop renders with the three concise Sense, Interpret, and Diffuse states beneath Smart Aroma’s feature evidence. Returning through Back to collection closed the dialog cleanly and restored the stable Card 04 browsing state.
