@@ -826,16 +826,20 @@ export default function Home() {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
   }
 
-  // Obsidian Studio collection parallax: update image-only CSS variables without React state so pointer movement cannot disturb dialogs.
+  // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
   function handleCollectionArtworkParallax(event: ReactPointerEvent<HTMLButtonElement>) {
     if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 1024) return;
     const card = event.currentTarget;
     const bounds = card.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
+    const depth = Math.min(1, Math.hypot(x, y) / Math.SQRT2);
     card.classList.add("is-artwork-parallax");
-    card.style.setProperty("--collection-art-parallax-x", `${(x * 3.5).toFixed(2)}px`);
-    card.style.setProperty("--collection-art-parallax-y", `${(y * 2.5).toFixed(2)}px`);
+    card.style.setProperty("--collection-art-parallax-x", `${(x * 6.25).toFixed(2)}px`);
+    card.style.setProperty("--collection-art-parallax-y", `${(y * 4.25).toFixed(2)}px`);
+    card.style.setProperty("--collection-art-parallax-rotate-x", `${(y * -1.35).toFixed(2)}deg`);
+    card.style.setProperty("--collection-art-parallax-rotate-y", `${(x * 1.6).toFixed(2)}deg`);
+    card.style.setProperty("--collection-art-parallax-scale", `${(1.078 + depth * .022).toFixed(3)}`);
   }
 
   function resetCollectionArtworkParallax(event: React.SyntheticEvent<HTMLButtonElement>) {
@@ -843,6 +847,9 @@ export default function Home() {
     card.classList.remove("is-artwork-parallax");
     card.style.removeProperty("--collection-art-parallax-x");
     card.style.removeProperty("--collection-art-parallax-y");
+    card.style.removeProperty("--collection-art-parallax-rotate-x");
+    card.style.removeProperty("--collection-art-parallax-rotate-y");
+    card.style.removeProperty("--collection-art-parallax-scale");
   }
 
   function prefetchCollectionArtwork(index: number) {

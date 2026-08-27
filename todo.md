@@ -95,6 +95,7 @@
 - [x] Tune and verify a slower, more natural Smart Aroma smoke-plume cadence.
 - [x] Add and verify a restrained Anime Pinterest manga-style scan-frame on card hover.
 - [x] Add and verify gentle pointer-led artwork parallax across all Project Collection cards.
+- [x] Deepen the desktop artwork parallax across all Project Collection cards while retaining fixed labels and motion safeguards.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.

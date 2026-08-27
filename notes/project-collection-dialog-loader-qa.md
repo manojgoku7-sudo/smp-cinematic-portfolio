@@ -211,3 +211,9 @@ Closing the Anime Pinterest brief through Back to collection removed the dialog 
 All four collection cards now use an image-only desktop pointer parallax with a maximum 3.5 px horizontal and 2.5 px vertical offset. Synthetic pointer verification populated the expected artwork CSS variables without moving label rails, and a normal mouse-exit event removed the active class and both offsets cleanly.
 
 Motion-paused testing confirmed no parallax class or offsets are applied. Desktop and 390 px responsive reviews preserved the existing physical fan and mobile snap presentation, respectively. Opening MyJob AI Radar remained immediate with its existing Live Demo, and closing via Back to collection restored focus to the original Card 03 trigger.
+
+The desktop artwork parallax is now deeper: the image can travel up to 6.25 px horizontally and 4.25 px vertically, with at most 1.35° X / 1.60° Y plane tilt and a 1.078–1.100 scale settle. All four cards populated those depth variables, left their label rails without inline transforms, and cleared every depth variable on a normal mouse exit. The global Motion pause blocks the expanded effect and restored correctly to live motion.
+
+Final full-page desktop and 390 px mobile reviews retained the approved Obsidian Studio composition and the existing mobile card treatment. The independent desktop visual review marked the direction ready to ship.
+
+The final Project Collection route exposed all four card actions after the refinement, and the live preview console was clear.
