@@ -1091,16 +1091,11 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
-            {lowDataMode ? <img className="hero-image" src="/manus-storage/smp-hero-orbit_86f3fd46.jpg" alt="Abstract ultraviolet orbit study" /> : <video ref={heroVideoRef} className="hero-video" autoPlay={!reduceMotion && !motionPaused} loop muted playsInline preload="metadata" poster="/manus-storage/smp-hero-orbit_86f3fd46.jpg" aria-hidden="true">
-              <source src="/manus-storage/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" />
-            </video>}
+            <div className="hero-memoji-stage"><img className="hero-memoji" src="/manus-storage/manoj-hero-memoji-peek_bfa39c48.png" alt="Illustrated developer avatar peeking over a laptop" /></div>
             <div className="hero-grid" />
             <div className="nebula-starfield" aria-hidden="true">{nebulaStars.map((star) => <span key={star.id} className={`nebula-star ${star.tone}`} style={{ left: `${star.left}%`, top: `${star.top}%`, "--star-size": `${star.size}px`, "--star-opacity": star.opacity, "--star-delay": `${star.delay}s`, "--star-speed": `${star.speed}s` } as React.CSSProperties} />)}{starBursts.map((burst) => <span key={burst.id} className="nebula-burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }} />)}</div>
             <div className="constellation-trail" aria-hidden="true">{constellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{constellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
-            <div className="hero-seal" aria-label="SMP signal mark"><span className="signal-stroke one" /><span className="signal-stroke two" /><span className="signal-stroke three" /></div>
-            <span className="hero-seal-caption">SMP / orbit study</span>
-            <div className="orbit" aria-hidden="true" />
-            <div className="absolute left-5 top-5 z-10 flex items-center gap-2 border border-white/10 bg-[#0b0a12]/50 px-3 py-2 backdrop-blur-md"><Sparkles size={13} className="text-violet-300" /><span className="label text-[0.55rem] text-white/80">SMP orbit, in motion</span></div>
+            <div className="absolute left-5 top-5 z-10 flex items-center gap-2 border border-white/10 bg-[#0b0a12]/50 px-3 py-2 backdrop-blur-md"><Sparkles size={13} className="text-violet-300" /><span className="label text-[0.55rem] text-white/80">SMP portrait, in focus</span></div>
             <div className="absolute bottom-5 left-5 z-10 max-w-[13rem] border-l border-violet-300/60 pl-3"><p className="label text-[0.57rem] text-violet-200">Based in</p><p className="mt-1 text-sm font-semibold text-white">Polur, Tamil Nadu</p></div>
           </motion.div>
         </div>

@@ -74,3 +74,4 @@ The mark is an interlocked **SMP monogram** formed from three angled signal stro
 - Ultraviolet effects are reduced when they do not identify navigation, chronology, proof, project focus, or the SMP mark; non-functional HUD decoration remains visually secondary.
 - Each project specimen leads with one legible outcome, one dominant visual artifact, and one concise process note before secondary technical detail.
 - The SMP three-stroke orbit visibly informs the hero, project framing, navigation identity, and footer seal as one coherent studio geometry.
+- Human imagery is handled as a cinematic studio artifact: a Memoji-style developer portrait is integrated into the Hero through the SMP orbit, shadow, and restrained violet signal geometry rather than presented as a generic profile card.

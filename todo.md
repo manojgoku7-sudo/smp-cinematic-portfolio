@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Replace the full-body Hero avatar with a compact peeking Memoji-style head-and-laptop portrait.
+- [x] Replace the Hero section’s right-side abstract artwork with a polished Memoji-style developer avatar.
 - [x] Remove the third featured project’s creator-avatar panel and restore its prior project evidence flow.
 - [x] Create an illustrated avatar and use it in place of the animated preview in the third featured project.
 - [x] Complete a recruiter-facing portfolio checklist review without modifying the website.

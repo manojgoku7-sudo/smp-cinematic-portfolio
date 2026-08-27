@@ -283,3 +283,5 @@ The generated avatar asset loaded in the third project’s creator panel at desk
 Closing the third-project detail dialog returned to the AI Content Studio card cleanly, with the avatar artifact and original project controls still available.
 
 The requested creator-avatar artifact was subsequently removed. The third project now returns directly from its outcome marker to the existing Reliability reel and Open project brief action, with no avatar asset or creator-panel copy rendered. Desktop visual review retained the approved project composition.
+
+The Hero visual now uses the compact peeking Memoji portrait: hair, eyes, and the laptop form the central artifact, while the Hero’s label and Polur location remain readable. Desktop and 390 px mobile checks kept the portrait contained within its visual stage and left the Hero copy, actions, and mobile contact dock unobstructed.
