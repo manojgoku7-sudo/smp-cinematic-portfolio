@@ -642,6 +642,7 @@ export default function Home() {
   const heroMemojiRef = useRef<HTMLDivElement>(null);
   const heroMemojiTapReleaseTimer = useRef<number | null>(null);
   const heroMemojiHoverTimer = useRef<number | null>(null);
+  const heroMemojiSmileTimer = useRef<number | null>(null);
   const heroMemojiTouchStart = useRef<{ x: number; y: number } | null>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
@@ -782,6 +783,7 @@ export default function Home() {
   useEffect(() => () => {
     if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
     if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
+    if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
   }, []);
 
   useEffect(() => {
@@ -940,6 +942,23 @@ export default function Home() {
       portrait.classList.remove("is-mobile-blinking");
       heroMemojiTapReleaseTimer.current = null;
     }, 460);
+  }
+
+  function triggerHeroMemojiSmile(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || motionPaused || lowDataMode || (event.pointerType !== "mouse" && event.pointerType !== "touch")) return;
+    const portrait = heroMemojiRef.current;
+    if (!portrait) return;
+    portrait.classList.add("is-smiling");
+    if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
+    heroMemojiSmileTimer.current = window.setTimeout(() => {
+      portrait.classList.remove("is-smiling");
+      heroMemojiSmileTimer.current = null;
+    }, 780);
+  }
+
+  function handleHeroMemojiPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    triggerMobileMemojiBlink(event);
+    triggerHeroMemojiSmile(event);
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1206,7 +1225,7 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={triggerMobileMemojiBlink}>
+            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={handleHeroMemojiPointerUp}>
               <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
@@ -1217,6 +1236,7 @@ export default function Home() {
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
               <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-glint left" /><i className="hero-memoji-glasses-glint right" /></span>
             </div>
+            <span className="hero-memoji-greeting" aria-hidden="true">Hi, I’m Manoj</span>
           </motion.div>
         </div>
       </section>
