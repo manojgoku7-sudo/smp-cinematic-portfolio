@@ -309,3 +309,7 @@ The live upper-right cursor exercise resolved to a shared +4.32 px horizontal an
 The blink-close frame was explicitly previewed: both eyelids close symmetrically within the existing round glasses silhouette, then the animation returns to the repaired original eyes. The range and blink are intentionally desktop-only so the static compact phone Hero remains unchanged.
 
 Final validation passed. Desktop cursor tracking reaches the requested stronger shared range while retaining equal eye direction, and both pupil variables clear on exit. The live blink preview resets cleanly to its automatic cadence. At 390 px, the pupil and lid layers are suppressed, leaving the original portrait, Hero actions, reel, and contact dock unobstructed.
+
+The blink cadence is now slowed from 6.4 seconds to a quieter 9.2-second interval. A complementary head tilt uses the same cursor direction as the pupils, capped at 1.15° vertical and 1.85° horizontal rotation so the portrait remains composed at rest. Desktop directional validation and the unchanged mobile fallback are the final checks.
+
+Final desktop directional testing at the lower-right Hero edge produced a shared pupil offset of +4.32 px by +2.28 px and a complementary -1.14° by +1.84° head tilt. The motion remained subtle and coherent with both eyes aligned. The slower blink rhythm is retained, while phones and reduced-motion preferences keep the Hero portrait static.

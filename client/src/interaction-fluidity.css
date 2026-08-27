@@ -101,7 +101,7 @@
   pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
   mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
-  transform: translate3d(-50%, 0, 0);
+  transform: translate3d(-50%, 0, 0) rotateX(var(--hero-memoji-tilt-x, 0deg)) rotateY(var(--hero-memoji-tilt-y, 0deg));
   transform-origin: 50% 78%;
   filter: drop-shadow(0 1.35rem 1.65rem rgb(0 0 0 / .5)) drop-shadow(0 0 .9rem rgb(167 139 250 / .18));
   transition: transform 220ms cubic-bezier(.16, .9, .28, 1), filter 220ms var(--ease-out);
@@ -160,7 +160,7 @@
 }
 
 @media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-lid { animation: smp-memoji-blink 6.4s cubic-bezier(.2, .8, .28, 1) infinite; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-lid { animation: smp-memoji-blink 9.2s cubic-bezier(.2, .8, .28, 1) infinite; }
 }
 
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
