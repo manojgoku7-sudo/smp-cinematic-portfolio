@@ -339,3 +339,9 @@ The depth treatment adds violet-blue tinted lens glints and a low-opacity ellipt
 The upper-left direct-hover test produced a coordinated -3.11 px / -1.52 px tinted lens-reflection shift and -9.86 px / -6.87 px backdrop-glow shift. The glow remains soft and low opacity behind the avatar, supporting depth without obscuring the original portrait or Hero copy. All response variables clear when direct portrait hover ends.
 
 At 390 px, the tinted lens glints and responsive backdrop glow remain suppressed. The static compact Memoji retains its original single glasses pair and stays visually contained between the Hero actions and the mobile contact dock.
+
+The new dynamic hover refinement adds a restrained 1.035 scale only while the direct-portrait `is-gazing` state is active. Resting desktop inspection confirms that the Memoji’s size, one-pair-of-glasses appearance, tinted reflections, and backdrop remain unchanged until direct hover begins.
+
+Direct portrait-hover validation confirms the `is-gazing` state applies the intended 1.035 scale alongside the existing +4.29 px pupil and +3.11 px tinted-reflection movement. The slightly enlarged portrait remains balanced in the Hero without crowding the text or actions, and clears cleanly back to its resting size on pointer exit.
+
+Final 390 px validation confirms the portrait remains at its normal compact size, with no hover scale or additional interactive layers active. The Hero copy, actions, reel, and contact dock remain clearly separated.
