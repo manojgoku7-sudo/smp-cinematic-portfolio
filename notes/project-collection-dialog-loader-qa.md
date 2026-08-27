@@ -371,3 +371,5 @@ The lifelike-motion refinement replaces the fixed repeating blink with a timer-s
 The upper-right direct-hover test confirmed a +13.81 px / -8.83 px backdrop shift. The strengthened glow enlarges modestly and rises to the intended hover intensity after transition settling, while the rest of the Hero stays unobstructed and no persistent blink class was present outside its scheduled interval.
 
 Final 390 px validation confirms the Memoji remains static: the timer-driven blink, pupil and brow response, and cursor-reactive glow are all absent, while the original compact portrait and mobile controls remain clear.
+
+Expression refinement QA: synchronized source-crop pupils now travel up to 5.65 px horizontally and 2.55 px vertically with a fast 145 ms direct-hover response and softer 235 ms reset. The blink uses a 460 ms layered close, brief hold, and release path with matched lids and brow acknowledgement. Desktop resting and 390 px layouts remain clean, and the recent browser-console check returned no errors.
