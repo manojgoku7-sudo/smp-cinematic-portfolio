@@ -840,8 +840,10 @@ export default function Home() {
     portrait.classList.add("is-gazing");
     portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.35).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.3).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.15).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.85).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.6).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 2.45).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -852,6 +854,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-eye-y");
     portrait.style.removeProperty("--hero-memoji-tilt-x");
     portrait.style.removeProperty("--hero-memoji-tilt-y");
+    portrait.style.removeProperty("--hero-memoji-shadow-x");
+    portrait.style.removeProperty("--hero-memoji-shadow-y");
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.

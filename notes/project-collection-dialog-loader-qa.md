@@ -313,3 +313,7 @@ Final validation passed. Desktop cursor tracking reaches the requested stronger 
 The blink cadence is now slowed from 6.4 seconds to a quieter 9.2-second interval. A complementary head tilt uses the same cursor direction as the pupils, capped at 1.15° vertical and 1.85° horizontal rotation so the portrait remains composed at rest. Desktop directional validation and the unchanged mobile fallback are the final checks.
 
 Final desktop directional testing at the lower-right Hero edge produced a shared pupil offset of +4.32 px by +2.28 px and a complementary -1.14° by +1.84° head tilt. The motion remained subtle and coherent with both eyes aligned. The slower blink rhythm is retained, while phones and reduced-motion preferences keep the Hero portrait static.
+
+The refined treatment increases the head response to a maximum 1.60° vertical and 2.45° horizontal tilt. Its soft cast shadow now counter-shifts by up to 4.6 px horizontally and 2.8 px vertically to support the sense of depth. The closed-eye frame has an added curved eyelid crease and warmer skin gradient while the resting Hero remains visually unchanged.
+
+At the lower-right desktop extent, the final interaction resolved to +4.32 px / +2.28 px pupil movement, -1.58° / +2.43° head rotation, and a paired -4.57 px / +2.77 px shadow shift. The portrait retained natural eye alignment and its visual footprint remained clear of the Hero copy and controls.
