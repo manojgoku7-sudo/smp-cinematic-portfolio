@@ -297,3 +297,7 @@ The user reported that the first pupil-tracking pass made the two eyes appear un
 The revised tracking routine removes competing head rotation and applies one shared horizontal/vertical cursor vector to both pupils. A live far-left pointer exercise set the shared value to -2.58 px horizontally and 0 px vertically; both pupils rendered together within their respective glasses lenses rather than splitting in direction. Final resting-state and mobile checks remain in progress.
 
 A matching far-right pointer exercise set one shared +2.58 px horizontal value and 0 px vertical value. The live browser view showed both pupils travelling right together from the same baseline, without the earlier divergent head rotation. The resting state and 390 px static fallback remain visually clean.
+
+The prior artificial eye graphics were removed after the user reported that their pupil shape remained incorrect. At rest, each new pupil window is now a clipped copy of its exact original source eye, so both iris texture, eye-white shape, and the surrounding glasses geometry are preserved before pointer movement is applied.
+
+The repaired pupil windows now use true 1:1 source-crop positioning rather than a scaled miniature portrait. Resting desktop inspection confirms the original eye whites, pupils, reflections, and glasses sit naturally; a live far-left exercise applies the same -2.58 px vector to both cropped pupils while preserving their shared visual baseline. Phone styling continues to suppress these desktop-only windows.

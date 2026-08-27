@@ -1116,7 +1116,8 @@ export default function Home() {
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
             <div ref={heroMemojiRef} className="hero-memoji-portrait">
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
-              <span className="hero-memoji-gaze" aria-hidden="true"><i className="hero-memoji-eye left" /><i className="hero-memoji-eye right" /></span>
+              <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
+              <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
             </div>
           </motion.div>
         </div>
