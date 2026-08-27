@@ -217,3 +217,13 @@ The desktop artwork parallax is now deeper: the image can travel up to 6.25 px h
 Final full-page desktop and 390 px mobile reviews retained the approved Obsidian Studio composition and the existing mobile card treatment. The independent desktop visual review marked the direction ready to ship.
 
 The final Project Collection route exposed all four card actions after the refinement, and the live preview console was clear.
+
+All four cards now contain a pointer-transparent, aria-hidden edge-refraction layer beneath the fixed title rails and controls. Desktop pointer coordinates correctly set the localized reflection position (for example, 82% / 26%) and normal mouse exit cleared both refraction coordinates with the shared active state; labels received no inline transform.
+
+Motion pause blocks refraction activation and resolves its layer to `display: none`; the low-data presentation also hides the layer. MyJob AI Radar still opened directly through its established dialog handoff with the allowed Live Demo present, confirming that the refraction layer does not capture selection.
+
+Closing the MyJob dialog through Back to collection removed the dialog and restored focus to the original Card 03 trigger, preserving the established return lifecycle.
+
+Final desktop and 390 px mobile reviews retained the approved physical fan and mobile snap presentation. The independent desktop visual review confirmed the Obsidian Studio direction remains ready to ship.
+
+The final live Project Collection route continued to expose all four card actions, with no console output recorded after the refraction enhancement.
