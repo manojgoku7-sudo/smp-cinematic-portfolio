@@ -259,3 +259,7 @@ The Introduction to IoT credential trigger remained enabled and retained its int
 The open Introduction to IoT credential preview retained its orbit artwork as a static composition: both orbit rings, the accretion detail, and the central pulse reported no animation, while orbital spark elements were hidden. The credential dialog remained open and usable.
 
 The credential preview also closed normally and restored focus to the Introduction to IoT record trigger.
+
+Credential interaction simplification verified that the section no longer exposes credential buttons or a preview dialog trigger. Desktop and 390 px phone presentations retain the compact credential record list without an expanded on-click view.
+
+Final DOM verification confirmed four credential cards, zero credential-card buttons, and no mounted preview dialog.
