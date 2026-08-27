@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Audit and refine responsive layout and high-frequency interaction smoothness across desktop, tablet, and phone.
 - [x] Add a single restrained white glint that traces the active Project Collection card edge.
 - [x] Verify the glint preserves card text, artwork, dialogs, mobile behavior, global pause, and reduced-motion safeguards.
 - [x] Remove the recent Project Collection color legend, accent treatments, signal thread, and active-card overlay effects.

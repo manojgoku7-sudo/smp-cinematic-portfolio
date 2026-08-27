@@ -605,7 +605,6 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("about");
-  const [cursor, setCursor] = useState({ x: -100, y: -100, active: false });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
@@ -642,8 +641,9 @@ export default function Home() {
   const [collectionOpeningIndex, setCollectionOpeningIndex] = useState<number | null>(null);
   const [mobileCollectionSnap, setMobileCollectionSnap] = useState(0);
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
-  const [projectFinder, setProjectFinder] = useState({ x: -100, y: -100, active: false });
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const projectFinderRef = useRef<HTMLSpanElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastActiveSection = useRef(active);
@@ -760,13 +760,18 @@ export default function Home() {
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 24);
+      const nextScrolled = window.scrollY > 24;
       const maximum = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0);
+      const nextProgress = maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0;
+      setScrolled((current) => current === nextScrolled ? current : nextScrolled);
+      setScrollProgress((current) => Math.abs(current - nextProgress) < .25 ? current : nextProgress);
     };
-    const onPointer = (event: PointerEvent) => setCursor((current) => ({ ...current, x: event.clientX, y: event.clientY }));
-    const onEnter = () => setCursor((current) => ({ ...current, active: true }));
-    const onLeave = () => setCursor((current) => ({ ...current, active: false }));
+    const onPointer = (event: PointerEvent) => {
+      const cursor = cursorRef.current;
+      if (cursor) cursor.style.transform = `translate3d(${event.clientX - 5}px, ${event.clientY - 5}px, 0)`;
+    };
+    const onEnter = () => cursorRef.current?.classList.add("is-active");
+    const onLeave = () => cursorRef.current?.classList.remove("is-active");
     const interactive = Array.from(document.querySelectorAll<HTMLElement>("a,button,input,textarea"));
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
@@ -952,13 +957,21 @@ export default function Home() {
   }
 
   function followProjectFinder(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused) return;
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    setProjectFinder({ x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100, active: true });
+    const finder = projectFinderRef.current;
+    if (!finder) return;
+    finder.style.left = `${((event.clientX - bounds.left) / bounds.width) * 100}%`;
+    finder.style.top = `${((event.clientY - bounds.top) / bounds.height) * 100}%`;
+    finder.classList.add("is-active");
+  }
+
+  function resetProjectFinder() {
+    projectFinderRef.current?.classList.remove("is-active");
   }
 
   function extendConstellation(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused) return;
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - bounds.left) / bounds.width) * 100;
     const y = ((event.clientY - bounds.top) / bounds.height) * 100;
@@ -978,7 +991,7 @@ export default function Home() {
   }
 
   function extendContactConstellation(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused) return;
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - bounds.left) / bounds.width) * 100;
     const y = ((event.clientY - bounds.top) / bounds.height) * 100;
@@ -1017,7 +1030,7 @@ export default function Home() {
   return (
     <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${lightPreset ? "contrast-light" : ""} ${recruiterReviewOpen ? "recruiter-review-active" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
-      {!reduceMotion && <div className={`cursor ${cursor.active ? "is-active" : ""}`} style={{ transform: `translate3d(${cursor.x - 5}px, ${cursor.y - 5}px, 0)` }} />}
+      {!reduceMotion && <div ref={cursorRef} className="cursor" aria-hidden="true" />}
       <div className="grain" aria-hidden="true" />
       <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
@@ -1129,8 +1142,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={() => setProjectFinder((current) => ({ ...current, active: false }))}>
-        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span className={`project-orbital-finder ${projectFinder.active ? "is-active" : ""}`} style={{ left: `${projectFinder.x}%`, top: `${projectFinder.y}%` }}><i /><i /></span></div>
+      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
+        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused project studies across applied machine learning, mobile product design, autonomous content operations, and civic discovery." motionPaused={motionPaused} /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button><button onClick={() => scrollToSection("ai-content-studio")}>03 AI studio</button><button onClick={() => scrollToSection("polur-charm")}>04 Polur Charm</button></nav>
           <div className="project-orbit-selector" aria-label="Featured project selector">
