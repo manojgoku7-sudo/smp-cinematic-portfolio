@@ -359,3 +359,9 @@ The expression refinement introduces source-matched eyebrow windows positioned o
 The far-right desktop test produced a wider +5.08 px pupil offset, with both eyebrow crops following at +1.33 px / -0.26 px through matching 220 ms ease-out transitions. The brows remain source-matched, aligned with the original artwork, and gain only a 1.2 px downward acknowledgement during the already-established blink-close frame. The mobile CSS continues to suppress both nonessential layers.
 
 Final 390 px confirmation shows the compact Memoji remains static with its original eye and brow artwork, preserving clear spacing around the Hero controls, reel, and mobile contact dock.
+
+The final polish shortens the visible blink sequence while retaining its calm 9.2-second cadence: a staged 0.37-second close-and-release replaces the earlier longer cover. Pupil tracking uses a 155 ms response and eyebrow tracking uses 185 ms, both with the same controlled ease-out curve to make the expression feel responsive without a detached layered effect.
+
+Live leftward tracking reaches -5.08 px at the intended 155 ms pupil response, while both eyebrow layers retain their matching 185 ms motion curve. The direct visual check confirms the pupils remain synchronized and contained inside the original glasses, with the compact Hero composition preserved.
+
+The final forced closed-eye inspection confirms two aligned eyelid layers, matching top-edge origins, and the restrained 0.85 px brow acknowledgement. The shorter staged blink retains a clear symmetrical closure inside the round frames and reopens without changing the original eye or glasses geometry.
