@@ -201,3 +201,9 @@ Smoke brightness was rebalanced from a concentrated glow to a translucent materi
 The card preserved a visible Smart Aroma title under keyboard focus, and the balanced plume paused with the global Motion control before resuming the expected `smart-aroma-neck-smoke-balanced` animation.
 
 The diffuser-neck plume cadence was slowed to 6.8 s under normal desktop motion, using the established composited cubic-bezier curve. Its layer remains pointer-transparent and the Smart Aroma title stays present throughout the slower ambient cycle.
+
+The Anime Pinterest card now exposes one brief `anime-pinterest-scan-frame` pass on its real desktop hover state. The masked white-lilac shutter layer is pointer-transparent at z-index 1 while the preserved title rail sits at z-index 4, so the automation title remains readable throughout the pass.
+
+The scan-frame paused with the global Motion control and resumed correctly. Card 01 remained selectable after the effect was introduced, opening its existing project brief with its expected first-project boundary state intact.
+
+Closing the Anime Pinterest brief through Back to collection removed the dialog cleanly and restored focus to the original Card 01 trigger, confirming that the scan-frame change did not disturb the established close lifecycle.
