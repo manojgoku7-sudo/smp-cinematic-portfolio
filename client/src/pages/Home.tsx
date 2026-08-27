@@ -880,6 +880,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-ground-shadow-x", `${(x * -3.35).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-ground-shadow-y", `${(y * 1.45).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 3.15).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.55).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 14).toFixed(2)}px`);
@@ -901,6 +903,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-tilt-y");
     portrait.style.removeProperty("--hero-memoji-shadow-x");
     portrait.style.removeProperty("--hero-memoji-shadow-y");
+    portrait.style.removeProperty("--hero-memoji-ground-shadow-x");
+    portrait.style.removeProperty("--hero-memoji-ground-shadow-y");
     portrait.style.removeProperty("--hero-memoji-glasses-x");
     portrait.style.removeProperty("--hero-memoji-glasses-y");
     portrait.style.removeProperty("--hero-memoji-backdrop-x");
@@ -915,7 +919,7 @@ export default function Home() {
     heroMemojiHoverTimer.current = window.setTimeout(() => {
       portrait.classList.add("is-settled");
       heroMemojiHoverTimer.current = null;
-    }, 1350);
+    }, 980);
   }
 
   function noteHeroMemojiTouchStart(event: ReactPointerEvent<HTMLDivElement>) {
@@ -1203,6 +1207,7 @@ export default function Home() {
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
             <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={triggerMobileMemojiBlink}>
+              <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
