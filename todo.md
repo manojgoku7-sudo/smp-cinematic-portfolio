@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Correct the Hero Memoji left-right pupil tracking so both pupils remain naturally centred inside their original eye shapes.
 - [x] Add a click-or-tap Memoji smile reaction, a smoother glasses-reflection exit, and a compact friendly hover greeting.
 - [x] Slightly brighten the Hero Memoji hover reflection and finalize pupil-to-face integration with aligned, error-free eye motion.
 - [x] Calm the Hero Memoji gaze tracking and refine its hover-only glasses light reflection without adding a duplicate frame.
