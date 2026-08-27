@@ -191,3 +191,7 @@ The refined plume reports a 6.4 s `smart-aroma-vapor-drift` animation with point
 Card 04 remained selectable after the smog refinement and completed its normal handoff to the loaded Smart Aroma dialog. The detail retained its workflow loop and visible Back to collection close route, confirming that the upgraded card-only plume does not affect the project brief lifecycle.
 
 The verified Smart Aroma breadcrumb close removed the dialog and restored focus to Card 04, whose expected title content remained present. This confirms the floating-smog layer did not interfere with selection or the established close-focus return route.
+
+The live-smoke correction now runs as `smart-aroma-neck-smoke` over 5.6 s from the lower diffuser-side anchor (`right` 3 px, `bottom` 33 px) with pointer events disabled. The plume and its temperature/humidity readout coexisted without moving or hiding the protected title rail.
+
+The anchored smoke paused under the global Motion control and resumed live state afterward. Card 04 remained selectable while the plume was active and entered its established Smart Aroma dialog handoff, with all dialog navigation and close controls intact.
