@@ -844,8 +844,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 1.1).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * .55).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 2.25).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.15).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -1131,7 +1131,7 @@ export default function Home() {
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
-              <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-ring left" /><i className="hero-memoji-glasses-ring right" /><i className="hero-memoji-glasses-bridge" /></span>
+              <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-glint left" /><i className="hero-memoji-glasses-glint right" /></span>
             </div>
           </motion.div>
         </div>

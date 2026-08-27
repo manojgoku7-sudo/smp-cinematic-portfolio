@@ -323,3 +323,9 @@ The hover-only refinement moves pointer listeners from the whole Hero visual ont
 Direct portrait-hover validation at the lower-right edge produced a shared +4.29 px pupil offset, a softer +1.63° horizontal head tilt, a darker -4.54 px counter-shadow, and a deliberately small +1.08 px / +0.54 px glasses offset. The portrait is unreactive across the rest of the Hero, while the layered glasses motion remains subtle enough not to separate visually from the original frames.
 
 At 390 px, the glasses parallax layer, pupil windows, eyelid layers, and portrait-hover response are all absent. The static Memoji remains proportionate below the Hero actions, and the visible mobile contact dock stays unobstructed.
+
+The duplicated ring-and-bridge outline has been removed. Resting desktop inspection now shows the original single pair of glasses only; the replacement layer contains two small light-reflection glints that will travel with a larger, clean independent offset on direct portrait hover.
+
+Live verification confirms no duplicate glasses-ring markup remains and two reflection glints replace it. At the right portrait edge, the glint layer receives a more noticeable +2.22 px horizontal / -0.23 px vertical offset without affecting the original single pair of frames. The resting and hover states retain the clean Memoji appearance, and the reflection layer remains absent on mobile and reduced-motion views.
+
+Final 390 px verification confirms the mobile Memoji has one clean static pair of glasses, with no reflection glints or hover layers visible. The portrait stays centered below the actions and above the contact dock without overlap.
