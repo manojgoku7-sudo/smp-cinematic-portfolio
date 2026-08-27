@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Add true desktop pupil tracking so the Hero Memoji eyes follow the mouse and reset on exit.
 - [x] Replace the Hero portrait with a transparent lighter-skinned glasses-wearing Memoji and add a motion-safe cursor-following gaze.
 - [x] Replace the semi-realistic Hero portrait with a clearly stylized Memoji-like avatar while retaining the compact peeking-laptop composition.
 - [x] Match the Hero portrait to the supplied compact Memoji reference composition and simplify its surrounding stage.

@@ -842,6 +842,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-gaze-y", `${(y * 4).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-gaze-rotate-x", `${(y * -1.6).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-gaze-rotate-y", `${(x * 2.5).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.8).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.8).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -852,6 +854,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-gaze-y");
     portrait.style.removeProperty("--hero-memoji-gaze-rotate-x");
     portrait.style.removeProperty("--hero-memoji-gaze-rotate-y");
+    portrait.style.removeProperty("--hero-memoji-eye-x");
+    portrait.style.removeProperty("--hero-memoji-eye-y");
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1120,6 +1124,7 @@ export default function Home() {
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
             <div ref={heroMemojiRef} className="hero-memoji-portrait">
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
+              <span className="hero-memoji-gaze" aria-hidden="true"><i className="hero-memoji-eye left" /><i className="hero-memoji-eye right" /></span>
             </div>
           </motion.div>
         </div>
