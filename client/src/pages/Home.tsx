@@ -844,8 +844,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 2.25).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.15).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 3.15).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.55).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {

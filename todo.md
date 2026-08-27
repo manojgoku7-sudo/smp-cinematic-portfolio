@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Brighten the Hero Memoji lens reflections, extend their parallax travel, and smooth their return to centre.
 - [x] Remove the duplicate Hero glasses outline and replace it with a clean, more noticeable reflection-only parallax effect.
 - [x] Soften the Hero Memoji tilt for portrait hover, deepen its shadow, and add subtle independent glasses parallax with motion-safe fallbacks.
 - [x] Increase the Hero Memoji head tilt, add a directional soft shadow, and refine the blink-close frame with motion-safe fallbacks.

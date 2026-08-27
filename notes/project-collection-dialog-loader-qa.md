@@ -329,3 +329,7 @@ The duplicated ring-and-bridge outline has been removed. Resting desktop inspect
 Live verification confirms no duplicate glasses-ring markup remains and two reflection glints replace it. At the right portrait edge, the glint layer receives a more noticeable +2.22 px horizontal / -0.23 px vertical offset without affecting the original single pair of frames. The resting and hover states retain the clean Memoji appearance, and the reflection layer remains absent on mobile and reduced-motion views.
 
 Final 390 px verification confirms the mobile Memoji has one clean static pair of glasses, with no reflection glints or hover layers visible. The portrait stays centered below the actions and above the contact dock without overlap.
+
+The reflection refinement brightens the diagonal glints, expands them modestly, and raises their possible cursor offset to 3.15 px horizontally and 1.55 px vertically. Entering hover uses a responsive 145 ms curve; clearing portrait hover leaves the longer 280 ms ease-out transition to return the glints gently to their natural centre.
+
+The direct lower-right hover test resolved to +3.12 px / +1.53 px reflection travel across both glints with the intended 145 ms response curve. The brighter highlights remain clean against the original single glasses pair. On portrait exit, the hover class is removed and the 280 ms ease-out return takes over, giving the reflections a smoother natural settle instead of a snap.
