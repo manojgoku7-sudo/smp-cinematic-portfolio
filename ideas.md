@@ -71,3 +71,6 @@ The mark is an interlocked **SMP monogram** formed from three angled signal stro
 - Each major chapter must break the default centered-template rhythm with at least one offset: a left signal rail, displaced specimen panel, section label, or side-note.
 - Ultraviolet is functional wayfinding: active navigation, chronology points, proof numerals, orbital identity marks, and primary actions only. It is never used as a general neon fill.
 - The SMP monogram is a recurring studio seal. Its angled three-stroke orbit language must connect the hero composition, navigation identity, and footer.
+- Ultraviolet effects are reduced when they do not identify navigation, chronology, proof, project focus, or the SMP mark; non-functional HUD decoration remains visually secondary.
+- Each project specimen leads with one legible outcome, one dominant visual artifact, and one concise process note before secondary technical detail.
+- The SMP three-stroke orbit visibly informs the hero, project framing, navigation identity, and footer seal as one coherent studio geometry.

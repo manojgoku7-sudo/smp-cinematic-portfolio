@@ -241,3 +241,13 @@ The final console check remained clear, and MyJob AI Radar still opened directly
 Closing the responsive-check dialog through Back to collection removed the dialog and returned focus to the original MyJob AI Radar card trigger.
 
 The final smoothness pass moves the custom cursor and selected-work finder directly on their visual elements instead of triggering a page-level React update for every pointer position. Decorative constellation traces are mouse-only and dormant in low-data mode, while collection cards now permit horizontal browsing, vertical page scrolling, and pinch zoom on phones. TypeScript passed after these refinements.
+
+Interaction-fluidity audit confirmed the Project Collection wrapper continues ambient motion during hover and its artwork adopts the intended shorter transform transition. The card shell timing was then isolated for a declaration correction before final validation.
+
+The corrected live card shell now transitions transform and shadow over 440 ms with a smooth custom easing; label rails and the Open cue retain coordinated 300 ms and 220 ms transitions. A live central-card hover continued to preserve the physical fan and all four card actions.
+
+MyJob AI Radar continued to open directly with the calibrated dialog timing and closed cleanly through the Back to collection breadcrumb, preserving the established card collection return path.
+
+Final desktop and 390 px phone presentations retained the established Obsidian Studio hierarchy, card composition, readable single-column mobile flow, and fixed mobile contact action. The final visual pass also confirmed the stronger SMP geometry and lower decorative signal density preserve the project-led reading order.
+
+The final live preview remained available from the portfolio root and the browser console reported no errors after the interaction-fluidity calibration.

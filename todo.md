@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Refine card, navigation, and dialog timing so high-frequency interactions feel more fluid without weakening motion safeguards.
 - [x] Audit and refine responsive layout and high-frequency interaction smoothness across desktop, tablet, and phone.
 - [x] Add a single restrained white glint that traces the active Project Collection card edge.
 - [x] Verify the glint preserves card text, artwork, dialogs, mobile behavior, global pause, and reduced-motion safeguards.
