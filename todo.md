@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Add a delayed desktop hover head tilt, more noticeable eyebrow lift, and compact mobile tap glow to the Hero Memoji with motion-safe behavior.
 - [x] Add a hover-only eyebrow lift, mobile tap-triggered blink, and softer integrated Hero Memoji eyelid contours with motion-safe behavior.
 - [x] Integrate a more lifelike attached eye-edge contour and coordinated expression animation into the Hero Memoji without separate-looking eye graphics.
 - [x] Further enhance the Hero Memoji eye movement and blink with smoother gaze response and softer close-and-reopen choreography.

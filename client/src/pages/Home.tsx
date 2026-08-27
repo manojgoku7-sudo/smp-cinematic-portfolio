@@ -641,6 +641,7 @@ export default function Home() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroMemojiRef = useRef<HTMLDivElement>(null);
   const heroMemojiTapReleaseTimer = useRef<number | null>(null);
+  const heroMemojiHoverTimer = useRef<number | null>(null);
   const heroMemojiTouchStart = useRef<{ x: number; y: number } | null>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
@@ -780,6 +781,7 @@ export default function Home() {
 
   useEffect(() => () => {
     if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
+    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
   }, []);
 
   useEffect(() => {
@@ -887,7 +889,10 @@ export default function Home() {
   function resetHeroMemojiGaze() {
     const portrait = heroMemojiRef.current;
     if (!portrait) return;
+    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
+    heroMemojiHoverTimer.current = null;
     portrait.classList.remove("is-gazing");
+    portrait.classList.remove("is-settled");
     portrait.style.removeProperty("--hero-memoji-eye-x");
     portrait.style.removeProperty("--hero-memoji-eye-y");
     portrait.style.removeProperty("--hero-memoji-brow-x");
@@ -900,6 +905,17 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-glasses-y");
     portrait.style.removeProperty("--hero-memoji-backdrop-x");
     portrait.style.removeProperty("--hero-memoji-backdrop-y");
+  }
+
+  function beginHeroMemojiHover(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
+    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
+    const portrait = heroMemojiRef.current;
+    if (!portrait) return;
+    heroMemojiHoverTimer.current = window.setTimeout(() => {
+      portrait.classList.add("is-settled");
+      heroMemojiHoverTimer.current = null;
+    }, 1350);
   }
 
   function noteHeroMemojiTouchStart(event: ReactPointerEvent<HTMLDivElement>) {
@@ -1186,7 +1202,7 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={triggerMobileMemojiBlink}>
+            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={triggerMobileMemojiBlink}>
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
