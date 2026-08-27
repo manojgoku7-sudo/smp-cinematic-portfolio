@@ -838,22 +838,14 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    portrait.style.setProperty("--hero-memoji-gaze-x", `${(x * 8).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-gaze-y", `${(y * 4).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-gaze-rotate-x", `${(y * -1.6).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-gaze-rotate-y", `${(x * 2.5).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.8).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.8).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 2.6).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 1.45).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
     const portrait = heroMemojiRef.current;
     if (!portrait) return;
     portrait.classList.remove("is-gazing");
-    portrait.style.removeProperty("--hero-memoji-gaze-x");
-    portrait.style.removeProperty("--hero-memoji-gaze-y");
-    portrait.style.removeProperty("--hero-memoji-gaze-rotate-x");
-    portrait.style.removeProperty("--hero-memoji-gaze-rotate-y");
     portrait.style.removeProperty("--hero-memoji-eye-x");
     portrait.style.removeProperty("--hero-memoji-eye-y");
   }

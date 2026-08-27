@@ -291,3 +291,9 @@ The Hero portrait is now a lighter-skinned Memoji with round glasses. Its dark s
 For the true desktop pupil-tracking refinement, the generated source was mapped directly before positioning the overlays: the left and right eye centres resolve at approximately 30.5% and 66.5% across the 4:3 source, with a shared 39% vertical centre. The overlay coordinates were adjusted to that source geometry before live motion validation.
 
 The measured eye overlays now sit within the Memoji’s glasses at rest. On desktop mouse input, only the pupils move toward the pointer direction through direct CSS variables and ease back to centre on exit; the portrait’s existing small directional tilt remains complementary. The 390 px phone presentation suppresses the nonessential pupil layer, keeping the compact visual static and all Hero controls clear.
+
+The user reported that the first pupil-tracking pass made the two eyes appear uneven. Live desktop DOM measurement confirms the overlay eye bounds are correctly paired at 42.2% and 57.7% across the portrait, sharing the same 54.3% vertical centre. The movement implementation is being reduced and reworked from this equal baseline so both eyes remain visually synchronized.
+
+The revised tracking routine removes competing head rotation and applies one shared horizontal/vertical cursor vector to both pupils. A live far-left pointer exercise set the shared value to -2.58 px horizontally and 0 px vertically; both pupils rendered together within their respective glasses lenses rather than splitting in direction. Final resting-state and mobile checks remain in progress.
+
+A matching far-right pointer exercise set one shared +2.58 px horizontal value and 0 px vertical value. The live browser view showed both pupils travelling right together from the same baseline, without the earlier divergent head rotation. The resting state and 390 px static fallback remain visually clean.
