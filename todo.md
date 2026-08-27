@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [ ] Push the current Photofolio portfolio source, including the latest Hero Memoji updates, to GitHub.
 - [x] Replace the remaining unstable Hero Memoji pupil crop behavior with a stable, integrated gaze treatment that preserves the original eye shapes.
 - [x] Correct the Hero Memoji left-right pupil tracking so both pupils remain naturally centred inside their original eye shapes.
 - [x] Add a click-or-tap Memoji smile reaction, a smoother glasses-reflection exit, and a compact friendly hover greeting.

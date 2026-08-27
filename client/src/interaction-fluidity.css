@@ -271,11 +271,8 @@
   inset: 0;
   display: block;
   pointer-events: none;
-  transform: translate3d(var(--hero-memoji-glasses-x, 0px), var(--hero-memoji-glasses-y, 0px), 0);
-  transition: transform 280ms cubic-bezier(.22, 1, .36, 1);
-  will-change: transform;
+  transform: none;
 }
-.hero-memoji-portrait.is-gazing .hero-memoji-glasses-layer { transition: transform 145ms cubic-bezier(.16, .9, .28, 1); }
 .hero-memoji-glasses-glint {
   position: absolute;
   top: 49.1%;
@@ -288,13 +285,14 @@
   mix-blend-mode: screen;
   box-shadow: 0 0 5px rgb(167 139 250 / .26), 0 0 2px rgb(226 232 255 / .46);
   opacity: .34;
-  transform: rotate(-24deg);
+  transform: translate3d(var(--hero-memoji-glint-x, 0px), var(--hero-memoji-glint-y, 0px), 0) rotate(var(--hero-memoji-glint-angle));
   transform-origin: center;
-  transition: opacity 360ms cubic-bezier(.22, 1, .36, 1), filter 360ms cubic-bezier(.22, 1, .36, 1), box-shadow 360ms var(--ease-out);
+  transition: transform 320ms cubic-bezier(.22, 1, .36, 1), opacity 360ms cubic-bezier(.22, 1, .36, 1), filter 360ms cubic-bezier(.22, 1, .36, 1), box-shadow 360ms var(--ease-out);
+  will-change: transform, opacity;
 }
-.hero-memoji-glasses-glint.left { left: 39.2%; }
-.hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .28; }
-.hero-memoji-portrait.is-gazing .hero-memoji-glasses-glint { filter: blur(.1px); box-shadow: 0 0 7px rgb(167 139 250 / .56), 0 0 3px rgb(226 232 255 / .86); opacity: .98; }
+.hero-memoji-glasses-glint.left { --hero-memoji-glint-angle: -24deg; left: 39.2%; }
+.hero-memoji-glasses-glint.right { --hero-memoji-glint-angle: 24deg; left: 54.55%; opacity: .28; }
+.hero-memoji-portrait.is-gazing .hero-memoji-glasses-glint { filter: blur(.1px); box-shadow: 0 0 7px rgb(167 139 250 / .56), 0 0 3px rgb(226 232 255 / .86); opacity: .98; transition-duration: 150ms, 180ms, 180ms, 180ms; transition-timing-function: cubic-bezier(.16, .9, .28, 1), cubic-bezier(.16, .9, .28, 1), cubic-bezier(.16, .9, .28, 1), var(--ease-out); }
 .hero-memoji-portrait.is-gazing .hero-memoji-glasses-glint.right { opacity: .84; }
 
 @keyframes smp-memoji-blink {

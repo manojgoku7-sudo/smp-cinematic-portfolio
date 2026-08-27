@@ -884,8 +884,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-ground-shadow-x", `${(x * -3.35).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-ground-shadow-y", `${(y * 1.45).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 3.15).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.55).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glint-x", `${(x * 1.75).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glint-y", `${(y * .85).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 14).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 9).toFixed(2)}px`);
   }
@@ -907,8 +907,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-shadow-y");
     portrait.style.removeProperty("--hero-memoji-ground-shadow-x");
     portrait.style.removeProperty("--hero-memoji-ground-shadow-y");
-    portrait.style.removeProperty("--hero-memoji-glasses-x");
-    portrait.style.removeProperty("--hero-memoji-glasses-y");
+    portrait.style.removeProperty("--hero-memoji-glint-x");
+    portrait.style.removeProperty("--hero-memoji-glint-y");
     portrait.style.removeProperty("--hero-memoji-backdrop-x");
     portrait.style.removeProperty("--hero-memoji-backdrop-y");
   }
