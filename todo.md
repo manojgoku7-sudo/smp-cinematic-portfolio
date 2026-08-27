@@ -89,6 +89,7 @@
 - [x] Add and verify a muted Smart Aroma temperature-readout shimmer on card hover.
 - [x] Add and verify a quiet Smart Aroma humidity-readout companion on card hover.
 - [x] Add and verify a dialog-only Smart Aroma diffuser workflow loop animation.
+- [x] Refine and verify a slow-floating Smart Aroma smog plume on the Project Collection card.
 - [x] Add a restrained constellation-and-signal sweep to the approved Project Collection fan.
 - [x] Verify the collection overlay respects motion safeguards and preserves card access on desktop and mobile.
 - [x] Add a smooth, motion-safe fan-opening entrance for the approved Project Collection cards.

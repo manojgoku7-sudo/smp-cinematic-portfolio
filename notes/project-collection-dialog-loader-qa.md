@@ -183,3 +183,11 @@ Live placement inspection found the first portal location sat below the visual d
 The corrected loop is now a child of Smart Aroma’s Main features section and becomes fully visible when that section is reached (`scrollTop` 595). This preserves the dialog’s concise header while presenting the control-loop evidence alongside the related feature list.
 
 Visual review confirmed the contained Diffusion control loop renders with the three concise Sense, Interpret, and Diffuse states beneath Smart Aroma’s feature evidence. Returning through Back to collection closed the dialog cleanly and restored the stable Card 04 browsing state.
+
+Initial live review of Card 04 confirmed the revised plume stays contained in the lower diffuser area and leaves the project title rail unobstructed. Hover/focus opacity, floating motion, and the Motion-control safeguard are being verified directly.
+
+The refined plume reports a 6.4 s `smart-aroma-vapor-drift` animation with pointer events disabled and a live opacity near 0.30. It paused successfully with the global Motion control and resumed its named animation on restoration, without opening a dialog.
+
+Card 04 remained selectable after the smog refinement and completed its normal handoff to the loaded Smart Aroma dialog. The detail retained its workflow loop and visible Back to collection close route, confirming that the upgraded card-only plume does not affect the project brief lifecycle.
+
+The verified Smart Aroma breadcrumb close removed the dialog and restored focus to Card 04, whose expected title content remained present. This confirms the floating-smog layer did not interfere with selection or the established close-focus return route.
