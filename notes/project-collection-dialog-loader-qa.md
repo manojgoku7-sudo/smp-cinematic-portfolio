@@ -373,3 +373,5 @@ The upper-right direct-hover test confirmed a +13.81 px / -8.83 px backdrop shif
 Final 390 px validation confirms the Memoji remains static: the timer-driven blink, pupil and brow response, and cursor-reactive glow are all absent, while the original compact portrait and mobile controls remain clear.
 
 Expression refinement QA: synchronized source-crop pupils now travel up to 5.65 px horizontally and 2.55 px vertically with a fast 145 ms direct-hover response and softer 235 ms reset. The blink uses a 460 ms layered close, brief hold, and release path with matched lids and brow acknowledgement. Desktop resting and 390 px layouts remain clean, and the recent browser-console check returned no errors.
+
+Integrated eye-edge QA: both existing eyelid layers contain their new upper contour and lower crease within the original circular eye bounds (`overflow: hidden`), with identical measured contour widths. The contours animate only through the scheduled desktop blink and do not create detached eyes or a second glasses frame. Desktop and 390 px mobile checks remain clean; no browser-console errors were recorded.

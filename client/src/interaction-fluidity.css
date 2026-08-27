@@ -190,8 +190,9 @@
   width: 7.2%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 8%, #ffe1bf 0%, #fac496 56%, #e7a775 100%);
-  box-shadow: inset 0 1px 1px rgb(255 244 234 / .48), inset 0 -1px 1px rgb(133 72 35 / .12), 0 1px 1px rgb(117 58 28 / .12);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 8%, #ffe6c7 0%, #fac496 56%, #e7a775 100%);
+  box-shadow: inset 0 1px 1px rgb(255 244 234 / .58), inset 0 -1.2px 1px rgb(133 72 35 / .18), 0 1px 1px rgb(117 58 28 / .14);
   opacity: 0;
   pointer-events: none;
   transform: scaleY(.02);
@@ -199,6 +200,20 @@
 }
 .hero-memoji-lid.left { left: 38.4%; }
 .hero-memoji-lid.right { left: 53.8%; }
+.hero-memoji-lid::before {
+  position: absolute;
+  top: 13%;
+  left: 9%;
+  width: 82%;
+  height: 29%;
+  content: "";
+  border-top: 1.15px solid rgb(111 58 30 / .46);
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 -1px 0 rgb(255 237 218 / .26);
+  opacity: .7;
+  transform: translateY(-.3px) scaleX(.92);
+  transform-origin: center;
+}
 .hero-memoji-lid::after {
   position: absolute;
   top: 34%;
@@ -206,9 +221,11 @@
   width: 70%;
   height: 37%;
   content: "";
-  border-bottom: 1.4px solid rgb(88 45 24 / .68);
+  border-bottom: 1.35px solid rgb(88 45 24 / .7);
   border-radius: 0 0 50% 50%;
-  box-shadow: 0 1px 0 rgb(255 235 214 / .24);
+  box-shadow: 0 1px 0 rgb(255 235 214 / .28);
+  transform: translateY(.2px) scaleX(.94);
+  transform-origin: center;
 }
 .hero-memoji-glasses-layer {
   position: absolute;
@@ -256,8 +273,18 @@
   65% { transform: translateY(.08px); }
 }
 
+@keyframes smp-memoji-eye-edge {
+  0%, 12%, 72%, 100% { opacity: 0; transform: translateY(-.6px) scaleX(.82); }
+  24% { opacity: .28; transform: translateY(-.25px) scaleX(.9); }
+  36%, 45% { opacity: .86; transform: translateY(0) scaleX(1); }
+  57% { opacity: .42; transform: translateY(.1px) scaleX(.94); }
+  66% { opacity: .08; transform: translateY(.2px) scaleX(.87); }
+}
+
 @media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid { animation: smp-memoji-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::before,
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge .46s cubic-bezier(.2, .8, .28, 1) both; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-brow-window { animation: smp-memoji-brow-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
 }
 
