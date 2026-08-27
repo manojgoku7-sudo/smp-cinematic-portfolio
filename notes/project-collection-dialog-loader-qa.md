@@ -195,3 +195,7 @@ The verified Smart Aroma breadcrumb close removed the dialog and restored focus 
 The live-smoke correction now runs as `smart-aroma-neck-smoke` over 5.6 s from the lower diffuser-side anchor (`right` 3 px, `bottom` 33 px) with pointer events disabled. The plume and its temperature/humidity readout coexisted without moving or hiding the protected title rail.
 
 The anchored smoke paused under the global Motion control and resumed live state afterward. Card 04 remained selectable while the plume was active and entered its established Smart Aroma dialog handoff, with all dialog navigation and close controls intact.
+
+Smoke brightness was rebalanced from a concentrated glow to a translucent material layer. The live `smart-aroma-neck-smoke-balanced` animation reported a mid-cycle opacity near 0.41 with a 3.6 px blur and pointer events disabled; the adjacent temperature/humidity readout remains independent and unobstructed.
+
+The card preserved a visible Smart Aroma title under keyboard focus, and the balanced plume paused with the global Motion control before resuming the expected `smart-aroma-neck-smoke-balanced` animation.
