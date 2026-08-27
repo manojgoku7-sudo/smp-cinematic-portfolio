@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Diagnose and correct the Hero Memoji eye movement so both pupils track and reset in clean synchronized alignment.
 - [x] Soften and diffuse the dynamic Hero Memoji under-shadow so it blends more naturally with the dark Hero background.
 - [x] Make the sustained Hero Memoji head tilt trigger sooner and add a restrained dynamic under-shadow that responds to the settled tilt.
 - [x] Add a delayed desktop hover head tilt, more noticeable eyebrow lift, and compact mobile tap glow to the Hero Memoji with motion-safe behavior.
