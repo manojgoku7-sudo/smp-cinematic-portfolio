@@ -195,10 +195,10 @@
   filter: brightness(.93) contrast(1.18);
   transform: translate3d(var(--hero-memoji-eye-x, 0px), var(--hero-memoji-eye-y, 0px), 0);
   transform-origin: 50% 50%;
-  transition: transform 165ms cubic-bezier(.22, 1, .36, 1);
+  transition: transform 205ms cubic-bezier(.22, 1, .36, 1);
   will-change: transform;
 }
-.hero-memoji-portrait.is-gazing .hero-memoji-pupil-window img { transition-duration: 135ms; transition-timing-function: cubic-bezier(.16, .9, .24, 1); }
+.hero-memoji-portrait.is-gazing .hero-memoji-pupil-window img { transition-duration: 160ms; transition-timing-function: cubic-bezier(.2, .86, .3, 1); }
 .hero-memoji-pupil-window.left { left: 38.4%; }
 .hero-memoji-pupil-window.right { left: 53.8%; }
 .hero-memoji-pupil-window.right img { left: -748%; }
@@ -265,16 +265,19 @@
   width: 5.25%;
   height: 2.35%;
   border-radius: 50%;
-  background: linear-gradient(125deg, transparent 0 25%, rgb(139 92 246 / .16) 34%, rgb(226 232 255 / .98) 50%, rgb(129 140 248 / .56) 64%, transparent 79%);
-  filter: blur(.2px);
+  background: linear-gradient(125deg, transparent 0 20%, rgb(191 219 254 / .1) 32%, rgb(255 255 255 / .94) 49%, rgb(196 181 253 / .42) 63%, transparent 82%);
+  filter: blur(.3px);
   mix-blend-mode: screen;
-  box-shadow: 0 0 5px rgb(167 139 250 / .56), 0 0 2px rgb(191 219 254 / .78);
-  opacity: .96;
+  box-shadow: 0 0 5px rgb(167 139 250 / .26), 0 0 2px rgb(226 232 255 / .46);
+  opacity: .34;
   transform: rotate(-24deg);
   transform-origin: center;
+  transition: opacity 180ms cubic-bezier(.16, .9, .28, 1), filter 180ms cubic-bezier(.16, .9, .28, 1), box-shadow 180ms var(--ease-out);
 }
 .hero-memoji-glasses-glint.left { left: 39.2%; }
-.hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .86; }
+.hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .28; }
+.hero-memoji-portrait.is-gazing .hero-memoji-glasses-glint { filter: blur(.12px); box-shadow: 0 0 7px rgb(167 139 250 / .46), 0 0 3px rgb(226 232 255 / .76); opacity: .92; }
+.hero-memoji-portrait.is-gazing .hero-memoji-glasses-glint.right { opacity: .78; }
 
 @keyframes smp-memoji-blink {
   0%, 12%, 72%, 100% { opacity: 0; transform: scaleY(.02); }
