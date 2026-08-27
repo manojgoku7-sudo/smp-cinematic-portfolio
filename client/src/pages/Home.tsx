@@ -846,6 +846,8 @@ export default function Home() {
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-x", `${(x * 3.15).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-glasses-y", `${(y * 1.55).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 10).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 7).toFixed(2)}px`);
   }
 
   function resetHeroMemojiGaze() {
@@ -860,6 +862,8 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-shadow-y");
     portrait.style.removeProperty("--hero-memoji-glasses-x");
     portrait.style.removeProperty("--hero-memoji-glasses-y");
+    portrait.style.removeProperty("--hero-memoji-backdrop-x");
+    portrait.style.removeProperty("--hero-memoji-backdrop-y");
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1127,6 +1131,7 @@ export default function Home() {
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
             <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
+              <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>

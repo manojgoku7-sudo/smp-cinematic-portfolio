@@ -333,3 +333,9 @@ Final 390 px verification confirms the mobile Memoji has one clean static pair o
 The reflection refinement brightens the diagonal glints, expands them modestly, and raises their possible cursor offset to 3.15 px horizontally and 1.55 px vertically. Entering hover uses a responsive 145 ms curve; clearing portrait hover leaves the longer 280 ms ease-out transition to return the glints gently to their natural centre.
 
 The direct lower-right hover test resolved to +3.12 px / +1.53 px reflection travel across both glints with the intended 145 ms response curve. The brighter highlights remain clean against the original single glasses pair. On portrait exit, the hover class is removed and the 280 ms ease-out return takes over, giving the reflections a smoother natural settle instead of a snap.
+
+The depth treatment adds violet-blue tinted lens glints and a low-opacity elliptical violet background glow directly behind the Memoji. At rest, both preserve the clean one-pair-of-glasses composition and do not introduce a rectangular stage. The backdrop is designed to shift only under direct desktop portrait hover, with all new layers absent in the compact mobile presentation.
+
+The upper-left direct-hover test produced a coordinated -3.11 px / -1.52 px tinted lens-reflection shift and -9.86 px / -6.87 px backdrop-glow shift. The glow remains soft and low opacity behind the avatar, supporting depth without obscuring the original portrait or Hero copy. All response variables clear when direct portrait hover ends.
+
+At 390 px, the tinted lens glints and responsive backdrop glow remain suppressed. The static compact Memoji retains its original single glasses pair and stays visually contained between the Hero actions and the mobile contact dock.

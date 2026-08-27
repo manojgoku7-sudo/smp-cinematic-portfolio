@@ -107,7 +107,24 @@
   transition: transform 220ms cubic-bezier(.16, .9, .28, 1), filter 220ms var(--ease-out);
   will-change: transform;
 }
-.hero-memoji-reference-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: brightness(.93) contrast(1.3); }
+.hero-memoji-backdrop {
+  position: absolute;
+  z-index: 0;
+  top: 49%;
+  left: 50%;
+  width: 74%;
+  height: 78%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 48%, rgb(139 92 246 / .26) 0%, rgb(100 85 210 / .16) 37%, rgb(18 13 53 / .04) 65%, transparent 78%);
+  filter: blur(6px);
+  opacity: .42;
+  transform: translate3d(calc(-50% + var(--hero-memoji-backdrop-x, 0px)), calc(-50% + var(--hero-memoji-backdrop-y, 0px)), 0);
+  transition: transform 300ms cubic-bezier(.22, 1, .36, 1), opacity 300ms var(--ease-out);
+  will-change: transform;
+}
+.hero-memoji-portrait.is-gazing .hero-memoji-backdrop { opacity: .58; transition-duration: 180ms; }
+.hero-memoji-reference-scene { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: brightness(.93) contrast(1.3); }
 .hero-memoji-portrait.is-gazing { filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.5rem + var(--hero-memoji-shadow-y, 0px)) 1.9rem rgb(0 0 0 / .68)) drop-shadow(0 0 1.1rem rgb(196 181 253 / .27)); }
 .hero-memoji-pupil-window {
   position: absolute;
@@ -182,16 +199,16 @@
   width: 5.25%;
   height: 2.35%;
   border-radius: 50%;
-  background: linear-gradient(125deg, transparent 0 27%, rgb(255 255 255 / .08) 34%, rgb(255 255 255 / .92) 51%, rgb(255 255 255 / .20) 67%, transparent 78%);
+  background: linear-gradient(125deg, transparent 0 25%, rgb(139 92 246 / .16) 34%, rgb(226 232 255 / .98) 50%, rgb(129 140 248 / .56) 64%, transparent 79%);
   filter: blur(.2px);
   mix-blend-mode: screen;
-  box-shadow: 0 0 4px rgb(255 255 255 / .28);
-  opacity: .9;
+  box-shadow: 0 0 5px rgb(167 139 250 / .56), 0 0 2px rgb(191 219 254 / .78);
+  opacity: .96;
   transform: rotate(-24deg);
   transform-origin: center;
 }
 .hero-memoji-glasses-glint.left { left: 39.2%; }
-.hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .76; }
+.hero-memoji-glasses-glint.right { left: 54.55%; transform: rotate(24deg); opacity: .86; }
 
 @keyframes smp-memoji-blink {
   0%, 45%, 50%, 100% { opacity: 0; transform: scaleY(.02); }
@@ -205,7 +222,7 @@
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .hero-visual { overflow: hidden; }
   .hero-memoji-portrait { width: min(19rem, 100%); transform: translate3d(-50%, 0, 0); transition: none; }
-  .hero-memoji-pupil-window, .hero-memoji-lid, .hero-memoji-glasses-layer { display: none; }
+  .hero-memoji-backdrop, .hero-memoji-pupil-window, .hero-memoji-lid, .hero-memoji-glasses-layer { display: none; }
 }
 footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 253 / .7); box-shadow: inset 0 0 18px rgb(139 92 246 / .26), 0 0 20px rgb(139 92 246 / .18); }
 
