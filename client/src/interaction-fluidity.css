@@ -145,11 +145,12 @@
   height: auto;
   max-width: none;
   filter: brightness(.93) contrast(1.3);
-  transform: translate3d(var(--hero-memoji-brow-x, 0px), var(--hero-memoji-brow-y, 0px), 0);
+  transform: translate3d(var(--hero-memoji-brow-x, 0px), calc(var(--hero-memoji-brow-y, 0px) + var(--hero-memoji-brow-lift, 0px)), 0);
   transition: transform 245ms cubic-bezier(.22, 1, .36, 1);
   will-change: transform;
 }
 .hero-memoji-portrait.is-gazing .hero-memoji-brow-window img { transition-duration: 170ms; transition-timing-function: cubic-bezier(.16, .9, .24, 1); }
+.hero-memoji-portrait.is-gazing .hero-memoji-brow-window img { --hero-memoji-brow-lift: -.48px; }
 .hero-memoji-brow-window.left { left: 36.7%; }
 .hero-memoji-brow-window.left img { left: -319.13%; }
 .hero-memoji-brow-window.right { left: 52.7%; }
@@ -207,10 +208,10 @@
   width: 82%;
   height: 29%;
   content: "";
-  border-top: 1.15px solid rgb(111 58 30 / .46);
+  border-top: 1px solid rgb(111 58 30 / .3);
   border-radius: 50% 50% 0 0;
-  box-shadow: 0 -1px 0 rgb(255 237 218 / .26);
-  opacity: .7;
+  box-shadow: 0 -1px 0 rgb(255 237 218 / .16);
+  opacity: .46;
   transform: translateY(-.3px) scaleX(.92);
   transform-origin: center;
 }
@@ -221,9 +222,9 @@
   width: 70%;
   height: 37%;
   content: "";
-  border-bottom: 1.35px solid rgb(88 45 24 / .7);
+  border-bottom: 1.2px solid rgb(88 45 24 / .52);
   border-radius: 0 0 50% 50%;
-  box-shadow: 0 1px 0 rgb(255 235 214 / .28);
+  box-shadow: 0 1px 0 rgb(255 235 214 / .18);
   transform: translateY(.2px) scaleX(.94);
   transform-origin: center;
 }
@@ -276,8 +277,8 @@
 @keyframes smp-memoji-eye-edge {
   0%, 12%, 72%, 100% { opacity: 0; transform: translateY(-.6px) scaleX(.82); }
   24% { opacity: .28; transform: translateY(-.25px) scaleX(.9); }
-  36%, 45% { opacity: .86; transform: translateY(0) scaleX(1); }
-  57% { opacity: .42; transform: translateY(.1px) scaleX(.94); }
+  36%, 45% { opacity: .64; transform: translateY(0) scaleX(1); }
+  57% { opacity: .32; transform: translateY(.1px) scaleX(.94); }
   66% { opacity: .08; transform: translateY(.2px) scaleX(.87); }
 }
 
@@ -292,6 +293,13 @@
   .hero-visual { overflow: hidden; }
   .hero-memoji-portrait { width: min(19rem, 100%); transform: translate3d(-50%, 0, 0); transition: none; }
   .hero-memoji-backdrop, .hero-memoji-brow-window, .hero-memoji-pupil-window, .hero-memoji-lid, .hero-memoji-glasses-layer { display: none; }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait { touch-action: pan-y; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid { display: block; animation: smp-memoji-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid::before,
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge .46s cubic-bezier(.2, .8, .28, 1) both; }
 }
 footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 253 / .7); box-shadow: inset 0 0 18px rgb(139 92 246 / .26), 0 0 20px rgb(139 92 246 / .18); }
 

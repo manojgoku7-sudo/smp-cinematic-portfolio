@@ -640,6 +640,8 @@ export default function Home() {
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroMemojiRef = useRef<HTMLDivElement>(null);
+  const heroMemojiTapReleaseTimer = useRef<number | null>(null);
+  const heroMemojiTouchStart = useRef<{ x: number; y: number } | null>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -776,6 +778,10 @@ export default function Home() {
     };
   }, [lowDataMode, motionPaused, reduceMotion]);
 
+  useEffect(() => () => {
+    if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
+  }, []);
+
   useEffect(() => {
     if (motionPaused || reduceMotion || lowDataMode) return;
     const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
@@ -894,6 +900,26 @@ export default function Home() {
     portrait.style.removeProperty("--hero-memoji-glasses-y");
     portrait.style.removeProperty("--hero-memoji-backdrop-x");
     portrait.style.removeProperty("--hero-memoji-backdrop-y");
+  }
+
+  function noteHeroMemojiTouchStart(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType !== "touch" || window.innerWidth >= 768) return;
+    heroMemojiTouchStart.current = { x: event.clientX, y: event.clientY };
+  }
+
+  function triggerMobileMemojiBlink(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "touch" || window.innerWidth >= 768) return;
+    const touchStart = heroMemojiTouchStart.current;
+    heroMemojiTouchStart.current = null;
+    if (!touchStart || Math.hypot(event.clientX - touchStart.x, event.clientY - touchStart.y) > 12) return;
+    const portrait = heroMemojiRef.current;
+    if (!portrait || portrait.classList.contains("is-mobile-blinking")) return;
+    portrait.classList.add("is-mobile-blinking");
+    if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
+    heroMemojiTapReleaseTimer.current = window.setTimeout(() => {
+      portrait.classList.remove("is-mobile-blinking");
+      heroMemojiTapReleaseTimer.current = null;
+    }, 460);
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1160,7 +1186,7 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
+            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={triggerMobileMemojiBlink}>
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
