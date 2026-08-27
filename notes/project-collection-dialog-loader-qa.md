@@ -165,3 +165,9 @@ Smart Aroma still opened its unchanged detail dialog with the expected final-car
 The Smart Aroma selection pulse was sampled 24 ms after a live Card 04 selection: its `is-opening` trigger was present, the dedicated sensor-ring animation reported `smart-aroma-sensor-ring-pulse` for 0.46 s, pointer events remained disabled, and the existing detail dialog had already mounted.
 
 With Motion paused, Smart Aroma opened its existing direct dialog without the `is-opening` trigger or sensor-ring animation. After the safeguard check, the dialog cleared, focus returned to “Open details for Smart Aroma Diffuser,” and Motion was restored live.
+
+Initial desktop hover review of Card 04 retained the protected Smart Aroma title and category label while the temperature readout was prepared as a brief hover-only status cue. Its pseudo-element layering and Motion-control behavior are being verified directly.
+
+The temperature readout has the expected `SENSOR · 22.4°C` content, remains in the title rail at z-index 4, and its shimmer has pointer events disabled. Keyboard focus reached the Card 04 focus-visible state and started the 0.52 s shimmer without opening a dialog; a settled-frame measurement and Motion safeguard remain to be recorded.
+
+After the focus transition settled, the readout reached its intended 0.86 opacity. The global Motion control paused the shimmer successfully and returned to live state afterward; no dialog was opened during either check.
