@@ -112,14 +112,14 @@
   z-index: 0;
   left: 50%;
   bottom: 5.2%;
-  width: 49%;
-  height: 8%;
+  width: 54%;
+  height: 9.5%;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, rgb(0 0 0 / .42) 0%, rgb(5 3 12 / .2) 42%, transparent 76%);
-  filter: blur(6px);
-  opacity: .12;
-  transform: translate3d(calc(-50% + var(--hero-memoji-ground-shadow-x, 0px) + var(--hero-memoji-ground-shadow-settle-x, 0px)), calc(var(--hero-memoji-ground-shadow-y, 0px) + var(--hero-memoji-ground-shadow-settle-y, 0px)), 0) scale(.86);
+  background: radial-gradient(ellipse at center, rgb(0 0 0 / .33) 0%, rgb(5 3 12 / .14) 46%, transparent 80%);
+  filter: blur(9px);
+  opacity: .1;
+  transform: translate3d(calc(-50% + var(--hero-memoji-ground-shadow-x, 0px) + var(--hero-memoji-ground-shadow-settle-x, 0px)), calc(var(--hero-memoji-ground-shadow-y, 0px) + var(--hero-memoji-ground-shadow-settle-y, 0px)), 0) scale(.92);
   transition: transform 280ms cubic-bezier(.22, 1, .36, 1), opacity 240ms var(--ease-out);
   will-change: transform, opacity;
 }
@@ -143,7 +143,7 @@
 .hero-memoji-reference-scene { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: brightness(.93) contrast(1.3); }
 .hero-memoji-portrait.is-gazing { filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.5rem + var(--hero-memoji-shadow-y, 0px)) 1.9rem rgb(0 0 0 / .68)) drop-shadow(0 0 1.1rem rgb(196 181 253 / .27)); }
 .hero-memoji-portrait.is-gazing { --hero-memoji-scale: 1.035; }
-.hero-memoji-portrait.is-gazing .hero-memoji-ground-shadow { opacity: .2; transform: translate3d(calc(-50% + var(--hero-memoji-ground-shadow-x, 0px) + var(--hero-memoji-ground-shadow-settle-x, 0px)), calc(var(--hero-memoji-ground-shadow-y, 0px) + var(--hero-memoji-ground-shadow-settle-y, 0px)), 0) scale(1); transition-duration: 175ms; }
+.hero-memoji-portrait.is-gazing .hero-memoji-ground-shadow { opacity: .17; transform: translate3d(calc(-50% + var(--hero-memoji-ground-shadow-x, 0px) + var(--hero-memoji-ground-shadow-settle-x, 0px)), calc(var(--hero-memoji-ground-shadow-y, 0px) + var(--hero-memoji-ground-shadow-settle-y, 0px)), 0) scale(1.03); transition-duration: 175ms; }
 .hero-memoji-brow-window {
   position: absolute;
   z-index: 2;

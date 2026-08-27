@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Soften and diffuse the dynamic Hero Memoji under-shadow so it blends more naturally with the dark Hero background.
 - [x] Make the sustained Hero Memoji head tilt trigger sooner and add a restrained dynamic under-shadow that responds to the settled tilt.
 - [x] Add a delayed desktop hover head tilt, more noticeable eyebrow lift, and compact mobile tap glow to the Hero Memoji with motion-safe behavior.
 - [x] Add a hover-only eyebrow lift, mobile tap-triggered blink, and softer integrated Hero Memoji eyelid contours with motion-safe behavior.
