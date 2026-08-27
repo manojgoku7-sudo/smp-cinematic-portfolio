@@ -273,3 +273,11 @@ The Work Orbit pause rule is scoped to the same `.motion-paused` state used by t
 After allowing the Motion control state to settle, the Work Orbit inner ring and both halo rings paused under “Motion paused” and resumed under “Motion live,” confirming the living-spin enhancement follows the existing safeguard.
 
 Final desktop and 390 px phone visual reviews retained the readable Work Orbit label, connected project-node layout, and approved Obsidian Studio presentation. The desktop visual review found the overall design ready to ship.
+
+The third featured project’s first animated automation walkthrough has been replaced by an illustrated creator-avatar artifact. The avatar loaded inside the existing AI Content Studio card, while the supporting Reliability reel and Open project brief action remained available.
+
+Desktop and 390 px mobile views both preserved the AI Content Studio card’s reading order: outcome signal, creator-avatar artifact, concise process note, and the existing supporting reliability evidence.
+
+The generated avatar asset loaded in the third project’s creator panel at desktop and 390 px widths. The existing Open project brief trigger still opened the YouTube Auto-Uploader & Autonomous AI Content Studio dialog with its original title and content.
+
+Closing the third-project detail dialog returned to the AI Content Studio card cleanly, with the avatar artifact and original project controls still available.

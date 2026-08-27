@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Create an illustrated avatar and use it in place of the animated preview in the third featured project.
+- [x] Complete a recruiter-facing portfolio checklist review without modifying the website.
 - [x] Add and verify a calm living spin to the central Work Orbit visual with motion safeguards.
 - [x] Remove click-to-expand credential previews while retaining the compact credential card list.
 - [x] Remove the spinning animation from credential preview orbit artwork while preserving its static appearance.

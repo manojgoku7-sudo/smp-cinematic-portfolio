@@ -122,3 +122,139 @@ footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 2
   .project-orbit-core::after,
   .project-orbit-core i { animation: none !important; }
 }
+
+/* Obsidian Studio AI Content Studio: a clear, human-led creator portrait replaces the former first automation reel without competing with its evidence panels. */
+.studio-creator-portrait {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.65rem;
+  border: 1px solid rgb(221 210 255 / .18);
+  background: linear-gradient(140deg, rgb(21 16 37 / .9), rgb(9 8 15 / .96));
+  overflow: hidden;
+}
+
+.studio-creator-portrait-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem .9rem;
+  border-bottom: 1px solid rgb(221 210 255 / .13);
+  color: rgb(218 208 250 / .72);
+  font-family: Manrope, sans-serif;
+  font-size: .57rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.studio-creator-portrait-head p {
+  margin-top: .32rem;
+  color: rgb(212 204 227 / .75);
+  font-size: .69rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.studio-creator-stage {
+  position: relative;
+  display: grid;
+  min-height: 19rem;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 49% 36%, rgb(157 111 255 / .24), transparent 29%),
+    radial-gradient(circle at 68% 72%, rgb(116 72 201 / .15), transparent 38%),
+    linear-gradient(135deg, rgb(17 13 30), rgb(8 8 14));
+}
+
+.studio-creator-stage::before,
+.studio-creator-stage::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.studio-creator-stage::before {
+  inset: 1rem;
+  border: 1px solid rgb(214 195 255 / .14);
+  clip-path: polygon(0 0, 13% 0, 15% 2px, 85% 2px, 87% 0, 100% 0, 100% 100%, 87% 100%, 85% calc(100% - 2px), 15% calc(100% - 2px), 13% 100%, 0 100%);
+}
+
+.studio-creator-stage::after {
+  inset: 0;
+  opacity: .54;
+  background-image: linear-gradient(rgb(209 190 255 / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(209 190 255 / .06) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+  mask-image: radial-gradient(circle at 50% 45%, black, transparent 72%);
+}
+
+.studio-creator-stage img {
+  position: relative;
+  z-index: 1;
+  width: min(13.4rem, 58%);
+  align-self: end;
+  margin-top: 1.3rem;
+  filter: drop-shadow(0 1.2rem 1.7rem rgb(0 0 0 / .44)) drop-shadow(0 .1rem .8rem rgb(173 139 250 / .18));
+  object-fit: contain;
+}
+
+.studio-creator-radius,
+.studio-creator-thread {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.studio-creator-radius {
+  left: 50%;
+  top: 46%;
+  border: 1px solid rgb(218 198 255 / .28);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.studio-creator-radius.radius-one { width: 13.8rem; height: 13.8rem; border-right-color: rgb(185 145 255 / .74); }
+.studio-creator-radius.radius-two { width: 18rem; height: 8rem; border-color: rgb(222 208 255 / .2); transform: translate(-50%, -50%) rotate(-23deg); }
+
+.studio-creator-thread {
+  width: 72%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(221 204 255 / .52), transparent);
+}
+
+.studio-creator-thread.thread-one { top: 39%; left: -7%; transform: rotate(-20deg); }
+.studio-creator-thread.thread-two { top: 63%; right: -12%; transform: rotate(18deg); }
+
+.studio-creator-caption {
+  position: absolute;
+  z-index: 2;
+  right: .9rem;
+  bottom: .9rem;
+  display: grid;
+  gap: .18rem;
+  max-width: min(16rem, 58%);
+  padding: .62rem .7rem;
+  border: 1px solid rgb(232 221 255 / .2);
+  background: rgb(10 8 17 / .78);
+  backdrop-filter: blur(8px);
+}
+
+.studio-creator-caption span,
+.studio-creator-caption em { color: rgb(205 193 231 / .78); font-family: Manrope, sans-serif; font-size: .58rem; font-style: normal; line-height: 1.45; }
+.studio-creator-caption span { color: rgb(211 190 255 / .84); font-size: .5rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.studio-creator-caption b { color: white; font-family: "Space Grotesk", sans-serif; font-size: .88rem; font-weight: 600; }
+
+.studio-creator-note { margin-top: .72rem; color: rgb(193 184 212 / .72); font-size: .72rem; line-height: 1.55; }
+
+@media (max-width: 640px) {
+  .studio-creator-stage { min-height: 16.5rem; }
+  .studio-creator-stage img { width: min(12rem, 65%); }
+  .studio-creator-radius.radius-one { width: 11.8rem; height: 11.8rem; }
+  .studio-creator-radius.radius-two { width: 15rem; height: 6.6rem; }
+  .studio-creator-caption { max-width: 68%; }
+}
