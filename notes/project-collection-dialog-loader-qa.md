@@ -281,3 +281,5 @@ Desktop and 390 px mobile views both preserved the AI Content Studio card’s re
 The generated avatar asset loaded in the third project’s creator panel at desktop and 390 px widths. The existing Open project brief trigger still opened the YouTube Auto-Uploader & Autonomous AI Content Studio dialog with its original title and content.
 
 Closing the third-project detail dialog returned to the AI Content Studio card cleanly, with the avatar artifact and original project controls still available.
+
+The requested creator-avatar artifact was subsequently removed. The third project now returns directly from its outcome marker to the existing Reliability reel and Open project brief action, with no avatar asset or creator-panel copy rendered. Desktop visual review retained the approved project composition.

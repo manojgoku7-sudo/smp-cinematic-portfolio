@@ -405,9 +405,7 @@ function AttackModelWalkthrough({ motionPaused, lowDataMode }: { motionPaused: b
 }
 
 function AutomationStudioWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
-  void motionPaused;
-  void lowDataMode;
-  return <><section className="studio-creator-portrait" aria-label="AI Content Studio creator portrait"><div className="studio-creator-portrait-head"><div><span className="label">Creator signal</span><p>Automate → review → release</p></div><span>Studio / 03</span></div><div className="studio-creator-stage"><span className="studio-creator-radius radius-one" aria-hidden="true" /><span className="studio-creator-radius radius-two" aria-hidden="true" /><span className="studio-creator-thread thread-one" aria-hidden="true" /><span className="studio-creator-thread thread-two" aria-hidden="true" /><img src="/manus-storage/manoj-ai-studio-memoji_6ff81b72.png" alt="Illustrated developer avatar holding a laptop" /><div className="studio-creator-caption"><span>Python · AI workflows · publishing</span><b>Human-led automation</b><em>Built to keep each release deliberate.</em></div></div><p className="studio-creator-note">A studio-avatar portrait replaces the previous animated preview while the project’s automation evidence remains below.</p></section><AutomationReliabilityReel motionPaused={motionPaused} lowDataMode={lowDataMode} /></>;
+  return <AutomationReliabilityReel motionPaused={motionPaused} lowDataMode={lowDataMode} />;
 }
 
 function AutomationReliabilityReel({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
