@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Remove the spinning animation from credential preview orbit artwork while preserving its static appearance.
 - [x] Refine card, navigation, and dialog timing so high-frequency interactions feel more fluid without weakening motion safeguards.
 - [x] Audit and refine responsive layout and high-frequency interaction smoothness across desktop, tablet, and phone.
 - [x] Add a single restrained white glint that traces the active Project Collection card edge.

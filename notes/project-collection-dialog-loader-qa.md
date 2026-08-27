@@ -251,3 +251,11 @@ MyJob AI Radar continued to open directly with the calibrated dialog timing and 
 Final desktop and 390 px phone presentations retained the established Obsidian Studio hierarchy, card composition, readable single-column mobile flow, and fixed mobile contact action. The final visual pass also confirmed the stronger SMP geometry and lower decorative signal density preserve the project-led reading order.
 
 The final live preview remained available from the portfolio root and the browser console reported no errors after the interaction-fluidity calibration.
+
+Credential-section verification confirmed the requested static orbit treatment loaded with the credential row still available for interaction; the focused record preview was then checked separately.
+
+The Introduction to IoT credential trigger remained enabled and retained its intended button semantics after the static-orbit override.
+
+The open Introduction to IoT credential preview retained its orbit artwork as a static composition: both orbit rings, the accretion detail, and the central pulse reported no animation, while orbital spark elements were hidden. The credential dialog remained open and usable.
+
+The credential preview also closed normally and restored focus to the Introduction to IoT record trigger.

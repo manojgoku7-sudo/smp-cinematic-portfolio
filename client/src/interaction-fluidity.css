@@ -53,3 +53,18 @@ footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 2
 @media (prefers-reduced-motion: reduce) {
   .hero-visual::before { opacity: .22; }
 }
+
+/* Obsidian Studio credential preview: retain the event-horizon composition as a quiet static artifact rather than a rotating display. */
+.credential-preview-reel .credential-preview-orbit.one,
+.credential-preview-reel .credential-preview-orbit.two,
+.credential-preview-reel .credential-preview-accretion,
+.credential-preview-reel .credential-preview-radius.radius-three,
+.credential-preview-reel .credential-preview-inner-currents i,
+.credential-preview-reel .credential-preview-pulse-ring,
+.credential-preview-reel .credential-preview-scan {
+  animation: none !important;
+}
+
+.credential-preview-reel .credential-preview-spark-field {
+  display: none;
+}
