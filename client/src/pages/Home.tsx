@@ -1090,13 +1090,8 @@ export default function Home() {
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerDown={createNebulaBurst} onPointerMove={extendConstellation} onPointerLeave={() => setConstellationTrail([])}>
-            <div className="hero-memoji-stage"><img className="hero-memoji" src="/manus-storage/manoj-hero-memoji-peek-clean_e49568be.png" alt="Illustrated developer avatar peeking over a laptop" /></div>
-            <div className="hero-grid" />
-            <div className="nebula-starfield" aria-hidden="true">{nebulaStars.map((star) => <span key={star.id} className={`nebula-star ${star.tone}`} style={{ left: `${star.left}%`, top: `${star.top}%`, "--star-size": `${star.size}px`, "--star-opacity": star.opacity, "--star-delay": `${star.delay}s`, "--star-speed": `${star.speed}s` } as React.CSSProperties} />)}{starBursts.map((burst) => <span key={burst.id} className="nebula-burst" style={{ left: `${burst.x}%`, top: `${burst.y}%` }} />)}</div>
-            <div className="constellation-trail" aria-hidden="true">{constellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{constellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
-            <div className="absolute left-5 top-5 z-10 flex items-center gap-2 border border-white/10 bg-[#0b0a12]/50 px-3 py-2 backdrop-blur-md"><Sparkles size={13} className="text-violet-300" /><span className="label text-[0.55rem] text-white/80">SMP portrait, in focus</span></div>
-            <div className="absolute bottom-5 left-5 z-10 max-w-[13rem] border-l border-violet-300/60 pl-3"><p className="label text-[0.57rem] text-violet-200">Based in</p><p className="mt-1 text-sm font-semibold text-white">Polur, Tamil Nadu</p></div>
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
+            <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-memoji-reference-scene_4cb72ab2.png" alt="Illustrated developer avatar peeking over a light-gray laptop" />
           </motion.div>
         </div>
       </section>
