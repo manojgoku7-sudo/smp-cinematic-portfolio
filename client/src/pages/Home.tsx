@@ -838,8 +838,10 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 4.35).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 5.15).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 2.3).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-brow-x", `${(x * 1.35).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-brow-y", `${(y * .85).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.1).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
@@ -856,6 +858,8 @@ export default function Home() {
     portrait.classList.remove("is-gazing");
     portrait.style.removeProperty("--hero-memoji-eye-x");
     portrait.style.removeProperty("--hero-memoji-eye-y");
+    portrait.style.removeProperty("--hero-memoji-brow-x");
+    portrait.style.removeProperty("--hero-memoji-brow-y");
     portrait.style.removeProperty("--hero-memoji-tilt-x");
     portrait.style.removeProperty("--hero-memoji-tilt-y");
     portrait.style.removeProperty("--hero-memoji-shadow-x");
@@ -1133,6 +1137,8 @@ export default function Home() {
             <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
+              <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
+              <span className="hero-memoji-brow-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />

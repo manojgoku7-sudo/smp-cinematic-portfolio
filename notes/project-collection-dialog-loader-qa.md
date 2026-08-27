@@ -353,3 +353,9 @@ Live lower-left validation confirms both pupils receive the same -4.27 px / +2.2
 The explicit closed-eye preview confirms both eyelids use matching top-edge origins, full-width warm eyelid coverage, and the same curved crease geometry inside the original round glasses. The added intermediate frames make the blink compress and release smoothly rather than appearing as an abrupt cover.
 
 After the closed-eye inspection, the live preview was restored to the normal 9.2-second blink cadence and neutral gaze. Both pupil variables are clear and no temporary hover state remains.
+
+The expression refinement introduces source-matched eyebrow windows positioned over the original brow artwork, so their resting state stays visually indistinguishable from the single base portrait. The pupil horizontal range is extended moderately from 4.35 px to 5.15 px while preserving the same vertical limit and synchronized baseline.
+
+The far-right desktop test produced a wider +5.08 px pupil offset, with both eyebrow crops following at +1.33 px / -0.26 px through matching 220 ms ease-out transitions. The brows remain source-matched, aligned with the original artwork, and gain only a 1.2 px downward acknowledgement during the already-established blink-close frame. The mobile CSS continues to suppress both nonessential layers.
+
+Final 390 px confirmation shows the compact Memoji remains static with its original eye and brow artwork, preserving clear spacing around the Hero controls, reel, and mobile contact dock.
