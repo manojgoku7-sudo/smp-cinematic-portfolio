@@ -34,7 +34,8 @@
   .project-card, .project-art, .collection-dialog-visual img, .collection-dialog-loader-image { transition: none !important; }
 }
 
-/* Obsidian Studio hierarchy: the SMP three-stroke orbit is the recurring studio geometry; ultraviolet remains a functional signal rather than ambient decoration. */
+/* Obsidian Studio hierarchy: the SMP three-stroke orbit is the recurring studio geometry; ultraviolet remains a functional signal rather than ambient decoration.
+   Hero portrait rule: transparent, freestanding Memoji with a quiet fine-pointer gaze response; no stage rectangle or surrounding HUD decoration. */
 .hero-memoji-stage {
   position: absolute;
   z-index: 0;
@@ -88,9 +89,31 @@
   .hero-memoji-stage::before { width: min(22rem, 90%); }
 }
 
-.hero-visual { background: #17071f; }
+.hero-visual { overflow: visible; border: 0; background: transparent; box-shadow: none; perspective: 900px; }
 .hero-visual::before, .hero-visual::after { content: none; }
-.hero-memoji-reference-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.hero-memoji-portrait {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  width: min(27rem, 100%);
+  aspect-ratio: 4 / 3;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
+  mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
+  transform: translate3d(calc(-50% + var(--hero-memoji-gaze-x, 0px)), var(--hero-memoji-gaze-y, 0px), 0) rotateX(var(--hero-memoji-gaze-rotate-x, 0deg)) rotateY(var(--hero-memoji-gaze-rotate-y, 0deg));
+  transform-origin: 50% 78%;
+  filter: drop-shadow(0 1.35rem 1.65rem rgb(0 0 0 / .5)) drop-shadow(0 0 .9rem rgb(167 139 250 / .18));
+  transition: transform 220ms cubic-bezier(.16, .9, .28, 1), filter 220ms var(--ease-out);
+  will-change: transform;
+}
+.hero-memoji-reference-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; filter: brightness(.93) contrast(1.3); }
+.hero-memoji-portrait.is-gazing { filter: drop-shadow(0 1.5rem 1.8rem rgb(0 0 0 / .54)) drop-shadow(0 0 1.1rem rgb(196 181 253 / .27)); }
+
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .hero-visual { overflow: hidden; }
+  .hero-memoji-portrait { width: min(19rem, 100%); transform: translate3d(-50%, 0, 0); transition: none; }
+}
 footer .seal-wrap { width: 2.65rem; height: 2.65rem; border-color: rgb(196 181 253 / .7); box-shadow: inset 0 0 18px rgb(139 92 246 / .26), 0 0 20px rgb(139 92 246 / .18); }
 
 .project-atmosphere { opacity: .74; }

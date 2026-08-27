@@ -1,5 +1,6 @@
 /**
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
+ * Hero portrait rule: the freestanding glasses-wearing Memoji remains compact, transparent, and cursor-responsive only on fine-pointer desktop devices.
  */
 import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -638,6 +639,7 @@ export default function Home() {
   const [mobileCollectionSnap, setMobileCollectionSnap] = useState(0);
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const heroMemojiRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -825,6 +827,31 @@ export default function Home() {
 
   function resetProjectTilt(event: MouseEvent<HTMLElement>) {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
+  }
+
+  // Hero Memoji gaze: update its visual element directly so cursor movement never causes page-level renders.
+  function followHeroMemojiGaze(event: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
+    const portrait = heroMemojiRef.current;
+    if (!portrait) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
+    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
+    portrait.classList.add("is-gazing");
+    portrait.style.setProperty("--hero-memoji-gaze-x", `${(x * 8).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-gaze-y", `${(y * 4).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-gaze-rotate-x", `${(y * -1.6).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-gaze-rotate-y", `${(x * 2.5).toFixed(2)}deg`);
+  }
+
+  function resetHeroMemojiGaze() {
+    const portrait = heroMemojiRef.current;
+    if (!portrait) return;
+    portrait.classList.remove("is-gazing");
+    portrait.style.removeProperty("--hero-memoji-gaze-x");
+    portrait.style.removeProperty("--hero-memoji-gaze-y");
+    portrait.style.removeProperty("--hero-memoji-gaze-rotate-x");
+    portrait.style.removeProperty("--hero-memoji-gaze-rotate-y");
   }
 
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
@@ -1090,8 +1117,10 @@ export default function Home() {
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-stylized-memoji-scene-a_1451ece7.png" alt="Stylized 3D Memoji-like developer avatar peeking over a light-gray laptop" />
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze}>
+            <div ref={heroMemojiRef} className="hero-memoji-portrait">
+              <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
+            </div>
           </motion.div>
         </div>
       </section>
