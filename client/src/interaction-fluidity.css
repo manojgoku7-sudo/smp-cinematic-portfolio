@@ -213,7 +213,7 @@
   object-fit: contain;
   object-position: center bottom;
   filter: brightness(.93) contrast(1.3);
-  transform: translate3d(var(--hero-memoji-eye-x, 0px), var(--hero-memoji-eye-y, 0px), 0);
+  transform: translate3d(0, 0, 0);
   transform-origin: 50% 50%;
   transition: transform 230ms cubic-bezier(.22, 1, .36, 1);
   will-change: transform;

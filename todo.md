@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Review, diagnose, and present the Hero Memoji eye-tracking code; repair the direct pupil transform only if a fault remains.
 - [x] Repair direct Hero Memoji pupil targeting and transforms so the actual irises visibly follow the cursor within the eye sockets.
 - [x] Restore clearly visible, bounded cursor-following gaze for the Hero Memoji pupils.
 - [x] Push the current Photofolio portfolio source, including the latest Hero Memoji updates, to GitHub.

@@ -640,6 +640,7 @@ export default function Home() {
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroMemojiRef = useRef<HTMLDivElement>(null);
+  const heroMemojiPupilRefs = useRef<[HTMLImageElement | null, HTMLImageElement | null]>([null, null]);
   const heroMemojiTapReleaseTimer = useRef<number | null>(null);
   const heroMemojiHoverTimer = useRef<number | null>(null);
   const heroMemojiSmileTimer = useRef<number | null>(null);
@@ -874,8 +875,11 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 3.25).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 1.35).toFixed(2)}px`);
+    const pupilOffsetX = (x * 3.65).toFixed(2);
+    const pupilOffsetY = (y * 1.5).toFixed(2);
+    heroMemojiPupilRefs.current.forEach((pupil) => {
+      if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
+    });
     portrait.style.setProperty("--hero-memoji-brow-x", `${(x * 1.5).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-brow-y", `${(y * .9).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.1).toFixed(2)}deg`);
@@ -897,8 +901,7 @@ export default function Home() {
     heroMemojiHoverTimer.current = null;
     portrait.classList.remove("is-gazing");
     portrait.classList.remove("is-settled");
-    portrait.style.removeProperty("--hero-memoji-eye-x");
-    portrait.style.removeProperty("--hero-memoji-eye-y");
+    heroMemojiPupilRefs.current.forEach((pupil) => pupil?.style.removeProperty("transform"));
     portrait.style.removeProperty("--hero-memoji-brow-x");
     portrait.style.removeProperty("--hero-memoji-brow-y");
     portrait.style.removeProperty("--hero-memoji-tilt-x");
@@ -1231,8 +1234,8 @@ export default function Home() {
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
               <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-brow-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
-              <span className="hero-memoji-pupil-window left" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
-              <span className="hero-memoji-pupil-window right" aria-hidden="true"><img src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
+              <span className="hero-memoji-pupil-window left" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[0] = node; }} data-memoji-pupil="left" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
+              <span className="hero-memoji-pupil-window right" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[1] = node; }} data-memoji-pupil="right" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
               <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-glint left" /><i className="hero-memoji-glasses-glint right" /></span>
             </div>
