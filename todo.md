@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [ ] Provide exact pupil JSX/CSS, live inline/computed styles, DevTools-equivalent override proof, and complete eye-layer order; repair any confirmed visual blocker.
 - [x] Diagnose the live DOM pupil rendering path; verify the binding and rendered transform with live DOM and A/B screenshot probes.
 - [x] Diagnose and repair the Hero Memoji pupil layer so direct cursor transforms produce visibly moving irises above the base face artwork.
 - [x] Review, diagnose, and present the Hero Memoji eye-tracking code; repair the direct pupil transform only if a fault remains.

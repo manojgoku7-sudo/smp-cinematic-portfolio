@@ -199,7 +199,8 @@
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  background: radial-gradient(ellipse 3.92% 4.18% at var(--hero-memoji-iris-x) 49.2%, #fffaf1 0%, #fff7ed 76%, rgb(255 239 221 / .92) 89%, transparent 100%);
+  /* Obsidian Studio eye-socket repair: fully cover the baked-in iris inside each aperture before the translated source iris is composited above it. */
+  background: radial-gradient(ellipse 3.92% 4.18% at var(--hero-memoji-iris-x) 49.2%, #fffaf1 0%, #fff7ed 76%, rgb(255 239 221 / .96) 89%, #fff0df 100%);
   -webkit-clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 49.2%);
   clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 49.2%);
   -webkit-mask-image: radial-gradient(ellipse 4.18% 4.48% at var(--hero-memoji-iris-x) 49.2%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
