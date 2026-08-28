@@ -875,8 +875,8 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    const pupilOffsetX = (x * 3.65).toFixed(2);
-    const pupilOffsetY = (y * 1.5).toFixed(2);
+    const pupilOffsetX = (x * 5.85).toFixed(2);
+    const pupilOffsetY = (y * 2.35).toFixed(2);
     heroMemojiPupilRefs.current.forEach((pupil) => {
       if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
     });
