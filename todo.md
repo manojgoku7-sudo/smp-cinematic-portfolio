@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Place the existing black-hole video on the right side of the About section and verify responsive fallbacks.
+- [ ] Retry the authorized GitHub push and verify the remote commit and branch.
 - [ ] Commit and push the latest verified portfolio changes to the existing private GitHub repository, then verify the remote commit.
 - [x] Add a calmer eased pupil transition and constrain maximum iris travel within the white eye area.
 - [x] Add a subtle randomized eyelid blink cadence while preserving mobile and motion-safety safeguards.
