@@ -98,6 +98,11 @@ const certifications = [
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
 const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
+// Obsidian Studio gaze calibration: keep the iris comfortably inside the white socket while easing each pointer update.
+const HERO_MEMOJI_PUPIL_MAX_X = 3.35;
+const HERO_MEMOJI_PUPIL_MAX_Y = 1.45;
+const HERO_MEMOJI_BLINK_MIN_MS = 420;
+const HERO_MEMOJI_BLINK_MAX_MS = 500;
 const orbitProjects = [
   { id: "attack-study", index: "01", title: "Attack model", discipline: "ML / security", signal: "85% accuracy" },
   { id: "delivery-study", index: "02", title: "Delivery flow", discipline: "UX / mobile", signal: "15+ screens" },
@@ -765,12 +770,15 @@ export default function Home() {
     let releaseTimer: number | undefined;
     const scheduleBlink = () => {
       const naturalDelay = 7600 + Math.round(Math.random() * 3200);
+      const blinkDuration = HERO_MEMOJI_BLINK_MIN_MS + Math.round(Math.random() * (HERO_MEMOJI_BLINK_MAX_MS - HERO_MEMOJI_BLINK_MIN_MS));
       blinkTimer = window.setTimeout(() => {
+        portrait.style.setProperty("--hero-memoji-blink-duration", `${blinkDuration}ms`);
         portrait.classList.add("is-blinking");
         releaseTimer = window.setTimeout(() => {
           portrait.classList.remove("is-blinking");
+          portrait.style.removeProperty("--hero-memoji-blink-duration");
           scheduleBlink();
-        }, 460);
+        }, blinkDuration);
       }, naturalDelay);
     };
     scheduleBlink();
@@ -778,6 +786,7 @@ export default function Home() {
       if (blinkTimer !== undefined) window.clearTimeout(blinkTimer);
       if (releaseTimer !== undefined) window.clearTimeout(releaseTimer);
       portrait.classList.remove("is-blinking");
+      portrait.style.removeProperty("--hero-memoji-blink-duration");
     };
   }, [lowDataMode, motionPaused, reduceMotion]);
 
@@ -875,8 +884,8 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    const pupilOffsetX = (x * 5.85).toFixed(2);
-    const pupilOffsetY = (y * 2.35).toFixed(2);
+    const pupilOffsetX = (x * HERO_MEMOJI_PUPIL_MAX_X).toFixed(2);
+    const pupilOffsetY = (y * HERO_MEMOJI_PUPIL_MAX_Y).toFixed(2);
     heroMemojiPupilRefs.current.forEach((pupil) => {
       if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
     });

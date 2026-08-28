@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [x] Add a calmer eased pupil transition and constrain maximum iris travel within the white eye area.
+- [x] Add a subtle randomized eyelid blink cadence while preserving mobile and motion-safety safeguards.
+- [x] Verify gaze easing, socket containment, blink timing, and responsive fallbacks.
 - [ ] Provide exact pupil JSX/CSS, live inline/computed styles, DevTools-equivalent override proof, and complete eye-layer order; repair any confirmed visual blocker.
 - [x] Diagnose the live DOM pupil rendering path; verify the binding and rendered transform with live DOM and A/B screenshot probes.
 - [x] Diagnose and repair the Hero Memoji pupil layer so direct cursor transforms produce visibly moving irises above the base face artwork.

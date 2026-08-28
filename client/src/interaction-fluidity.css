@@ -217,10 +217,12 @@
   filter: brightness(.93) contrast(1.3);
   transform: translate3d(0, 0, 0);
   transform-origin: 50% 50%;
-  transition: transform 230ms cubic-bezier(.22, 1, .36, 1);
+  /* Obsidian Studio gaze motion: interruptible ease-out keeps the iris soft rather than snapping between cursor samples. */
+  transition: transform 270ms cubic-bezier(.16, .9, .28, 1);
   will-change: transform;
 }
-.hero-memoji-portrait.is-gazing .hero-memoji-pupil-window img { transition-duration: 185ms; transition-timing-function: cubic-bezier(.22, .88, .32, 1); }
+  .hero-memoji-portrait.is-gazing .hero-memoji-pupil-window img { transition-duration: 245ms; transition-timing-function: cubic-bezier(.16, .9, .28, 1); }
+
 .hero-memoji-pupil-window.left { --hero-memoji-iris-x: 42.0%; }
 .hero-memoji-pupil-window.right { --hero-memoji-iris-x: 57.4%; }
 .hero-memoji-lid {
@@ -326,10 +328,10 @@
 @media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
   .page-shell:not(.motion-paused):not(.low-data) .hero-visual:has(.hero-memoji-portrait:hover) .hero-memoji-greeting { opacity: 1; transform: translate3d(0, 0, 0); transition-duration: 180ms; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-settled { --hero-memoji-settle-tilt-x: .42deg; --hero-memoji-settle-tilt-y: -.54deg; --hero-memoji-ground-shadow-settle-x: .34rem; --hero-memoji-ground-shadow-settle-y: .08rem; transition-duration: 400ms; }
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid { animation: smp-memoji-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid { animation: smp-memoji-blink var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::before,
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge .46s cubic-bezier(.2, .8, .28, 1) both; }
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-brow-window { animation: smp-memoji-brow-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-brow-window { animation: smp-memoji-brow-blink var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
 }
 
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
@@ -341,9 +343,9 @@
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait { touch-action: pan-y; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-backdrop { display: block; animation: smp-memoji-mobile-tap-glow .46s cubic-bezier(.2, .8, .28, 1) both; }
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid { display: block; animation: smp-memoji-blink .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid { display: block; animation: smp-memoji-blink var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid::before,
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge .46s cubic-bezier(.2, .8, .28, 1) both; }
+  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
 }
 
 @keyframes smp-memoji-mobile-tap-glow {
