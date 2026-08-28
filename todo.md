@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [ ] Commit and push the latest verified portfolio changes to the existing private GitHub repository, then verify the remote commit.
 - [x] Add a calmer eased pupil transition and constrain maximum iris travel within the white eye area.
 - [x] Add a subtle randomized eyelid blink cadence while preserving mobile and motion-safety safeguards.
 - [x] Verify gaze easing, socket containment, blink timing, and responsive fallbacks.
