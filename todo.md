@@ -1,4 +1,5 @@
 # Enhancement Checklist
+- [x] Repair direct Hero Memoji pupil targeting and transforms so the actual irises visibly follow the cursor within the eye sockets.
 - [x] Restore clearly visible, bounded cursor-following gaze for the Hero Memoji pupils.
 - [x] Push the current Photofolio portfolio source, including the latest Hero Memoji updates, to GitHub.
 - [x] Replace the remaining unstable Hero Memoji pupil crop behavior with a stable, integrated gaze treatment that preserves the original eye shapes.
