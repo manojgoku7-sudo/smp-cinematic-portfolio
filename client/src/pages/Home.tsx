@@ -292,11 +292,11 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
-      className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 26, scale: 0.985 }}
+      className={className ? `section-reveal ${className}` : "section-reveal"}
+      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.988 }}
       whileInView={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.17 }}
-      transition={{ duration: 0.62, delay, ease: [0.23, 1, 0.32, 1] }}
+      viewport={{ once: true, amount: 0.12, margin: "0px 0px -8% 0px" }}
+      transition={{ duration: 0.52, delay, ease: [0.23, 1, 0.32, 1] }}
     >
       {children}
     </motion.div>

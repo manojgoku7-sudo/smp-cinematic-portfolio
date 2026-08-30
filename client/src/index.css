@@ -828,3 +828,11 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
   .mobile-contact-dock { position: static; margin: .7rem .55rem 0; }
   body { padding-bottom: .75rem; }
 }
+
+/* Obsidian Studio scroll reveal: low-amplitude section entrances that preserve the page's quiet, editorial rhythm. */
+@media (prefers-reduced-motion: no-preference) {
+  .section-reveal { will-change: transform, opacity; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-reveal { transform: none !important; opacity: 1 !important; }
+}
