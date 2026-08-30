@@ -90,8 +90,7 @@
 }
 
 .hero-visual { overflow: visible; border: 0; background: transparent; box-shadow: none; perspective: 900px; }
-.hero-visual::before, .hero-visual::after { content: none; }
-.hero-memoji-portrait {
+.hero-visual::before, .hero-visual::after { content: none; }.hero-memoji-portrait {
   position: absolute;
   z-index: 1;
   left: 50%;
@@ -99,8 +98,6 @@
   width: min(27rem, 100%);
   aspect-ratio: 4 / 3;
   pointer-events: auto;
-  -webkit-mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
-  mask-image: radial-gradient(ellipse 47% 63% at 50% 57%, #000 58%, rgb(0 0 0 / .96) 66%, rgb(0 0 0 / .52) 80%, transparent 100%);
   transform: translate3d(-50%, 0, 0) rotateX(calc(var(--hero-memoji-tilt-x, 0deg) + var(--hero-memoji-settle-tilt-x, 0deg) + var(--hero-memoji-smile-tilt-x, 0deg))) rotateY(calc(var(--hero-memoji-tilt-y, 0deg) + var(--hero-memoji-settle-tilt-y, 0deg) + var(--hero-memoji-smile-tilt-y, 0deg))) scale(var(--hero-memoji-scale, 1));
   transform-origin: 50% 78%;
   filter: drop-shadow(var(--hero-memoji-shadow-x, 0px) calc(1.35rem + var(--hero-memoji-shadow-y, 0px)) 1.75rem rgb(0 0 0 / .62)) drop-shadow(0 0 .9rem rgb(167 139 250 / .18));
