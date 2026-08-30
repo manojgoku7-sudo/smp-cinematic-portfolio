@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Add a smooth initial loading animation with reduced-motion and fast-loading safeguards.
+- [x] Audit and optimize mobile responsiveness at representative phone and tablet widths before deployment.
 - [x] Place the existing black-hole video on the right side of the About section and verify responsive fallbacks.
 - [ ] Retry the authorized GitHub push and verify the remote commit and branch.
 - [ ] Commit and push the latest verified portfolio changes to the existing private GitHub repository, then verify the remote commit.
