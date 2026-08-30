@@ -886,22 +886,22 @@ export default function Home() {
     if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
     const portrait = heroMemojiRef.current;
     if (!portrait) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
+    const bounds = portrait.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 2.65).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 1.1).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-brow-x", `${(x * 1.5).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-brow-y", `${(y * .9).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.1).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-eye-x", `${(x * 3.6).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-eye-y", `${(y * 1.7).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-brow-x", `${(x * 2).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-brow-y", `${(y * 1.1).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.5).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 2.1).toFixed(2)}deg`);
     portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-ground-shadow-x", `${(x * -3.35).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-ground-shadow-y", `${(y * 1.45).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glint-x", `${(x * 1.75).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glint-y", `${(y * .85).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glint-x", `${(x * 2.4).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-glint-y", `${(y * 1.1).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 14).toFixed(2)}px`);
     portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 9).toFixed(2)}px`);
   }
@@ -1240,9 +1240,9 @@ export default function Home() {
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual" onPointerMove={followHeroMemojiGaze} onPointerEnter={beginHeroMemojiHover} onPointerLeave={resetHeroMemojiGaze}>
             {heroVideoUrl ? <video ref={heroVideoRef} className="hero-video" poster={heroVideoFallbackPoster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source src={heroVideoMp4} type="video/mp4" /><source src={heroVideoWebm} type="video/webm" /></video> : null}
-            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={handleHeroMemojiPointerUp}>
+            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerDown={noteHeroMemojiTouchStart} onPointerUp={handleHeroMemojiPointerUp}>
               <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/manus-storage/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
