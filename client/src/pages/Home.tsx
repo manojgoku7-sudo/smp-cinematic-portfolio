@@ -43,6 +43,8 @@ const navItems = [
 ] as const;
 
 const resumeUpdated = "August 2026";
+const heroVideoUrl = (import.meta.env.VITE_HERO_VIDEO_URL as string | undefined)?.trim() || "";
+const heroVideoFallbackPoster = "/manus-storage/smp-ambient-texture_4dec6a68.jpg";
 const education = {
   degree: "B.Tech, Information Technology",
   school: "Saveetha School of Engineering, Chennai",
@@ -1237,6 +1239,7 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
+            {heroVideoUrl ? <video ref={heroVideoRef} className="hero-video" src={heroVideoUrl} poster={heroVideoFallbackPoster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" /> : null}
             <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={handleHeroMemojiPointerUp}>
               <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
