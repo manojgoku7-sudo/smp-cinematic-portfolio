@@ -303,8 +303,8 @@
 - [x] Verify recruiter and contrast-preset features across desktop and mobile.
 - [ ] Add a case-study detail drawer for both portfolio projects.
 - [ ] Add outcome and impact proof to project cards.
-- [ ] Create and add a downloadable recruiter-ready PDF résumé.
-- [ ] Persist low-data preference across future visits.
+- [x] Create and add a downloadable recruiter-ready PDF résumé.
+- [x] Persist low-data preference across future visits.
 - [ ] Add a mobile résumé action and an honest availability indicator.
 - [ ] Verify the complete proof and conversion enhancement set across desktop and mobile.
 - [x] Build compact project navigation for mobile visitors.

@@ -4,7 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <meta name="theme-color" content="#09090f" />
-    <meta name="description" content="S Manoj Prabhu — Frontend Developer, UI/UX Designer and Java Developer." />
+    <meta name="description" content="S Manoj Prabhu — Frontend Developer, UI/UX Designer and Java Developer. Accessible React interfaces, Figma systems, Java/Spring Boot services, and applied machine learning." />
+    <meta name="author" content="S Manoj Prabhu" />
+    <meta name="keywords" content="S Manoj Prabhu, Frontend Developer, UI/UX Designer, Java Developer, React, TypeScript, Figma, Spring Boot, Machine Learning" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="S Manoj Prabhu — Cinematic Portfolio" />
+    <meta property="og:title" content="S Manoj Prabhu — Cinematic Portfolio" />
+    <meta property="og:description" content="Frontend Developer, UI/UX Designer and Java Developer. Production-minded interfaces, design systems, and applied machine learning." />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:image" content="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" />
+    <meta property="og:image:alt" content="SMP monogram mark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="S Manoj Prabhu — Cinematic Portfolio" />
+    <meta name="twitter:description" content="Frontend Developer, UI/UX Designer and Java Developer. Production-minded interfaces, design systems, and applied machine learning." />
+    <meta name="twitter:image" content="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" />
+    <meta name="twitter:image:alt" content="SMP monogram mark" />
+    <meta name="robots" content="index, follow" />
     <link rel="icon" type="image/png" href="/manus-storage/smp-mj-monogram-clear-j_24fbf37a.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,6 +29,17 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <script type="module">
+      // Analytics is only loaded when both build-time values are configured.
+      const analyticsEndpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT;
+      const analyticsWebsiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID;
+      if (analyticsEndpoint && analyticsWebsiteId) {
+        const script = document.createElement("script");
+        script.src = `${String(analyticsEndpoint).replace(/\/$/, "")}/umami`;
+        script.dataset.websiteId = String(analyticsWebsiteId);
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    </script>
   </body>
 </html>
