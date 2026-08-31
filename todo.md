@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Remove the duplicate static-and-animated pupil appearance so only one visible iris remains per eye.
+- [x] Verify single-glasses composition, tracking, blinking, and mobile fallback after the pupil-layer cleanup.
 - [x] Make the actual iris/pupil layer visibly track the cursor independently from the lens reflections and glints.
 - [x] Verify both pupils visibly move together, stay inside their lenses, and preserve blink/mobile safeguards.
 - [x] Recheck the supplied Memoji eye reference against live pupil geometry and repair any visible gaze alignment problem.
