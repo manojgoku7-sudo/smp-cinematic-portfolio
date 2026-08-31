@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Make the actual iris/pupil layer visibly track the cursor independently from the lens reflections and glints.
+- [x] Verify both pupils visibly move together, stay inside their lenses, and preserve blink/mobile safeguards.
 - [x] Recheck the supplied Memoji eye reference against live pupil geometry and repair any visible gaze alignment problem.
 - [x] Verify both pupils move together, remain inside the white eye area, and preserve blink/mobile safeguards.
 - [x] Add smooth viewport-triggered section reveals with subtle fade and lift motion.

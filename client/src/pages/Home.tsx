@@ -98,9 +98,9 @@ const certifications = [
 
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
 const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
-// Obsidian Studio gaze calibration: keep the iris comfortably inside the white socket while easing each pointer update.
-const HERO_MEMOJI_PUPIL_MAX_X = 3.35;
-const HERO_MEMOJI_PUPIL_MAX_Y = 1.45;
+// Obsidian Studio gaze calibration: make the iris visibly responsive while keeping a safety margin inside each white socket.
+const HERO_MEMOJI_PUPIL_MAX_X = 6.2;
+const HERO_MEMOJI_PUPIL_MAX_Y = 2.5;
 const HERO_MEMOJI_BLINK_MIN_MS = 420;
 const HERO_MEMOJI_BLINK_MAX_MS = 500;
 const orbitProjects = [

@@ -1,5 +1,6 @@
 /* Obsidian Studio entry transition: a brief, quiet prelude before the field reel. */
-.entry-loader { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 48%, rgb(100 58 210 / 0.16), transparent 18rem), #09090f; transform-origin: center; }
+/* Obsidian Studio loader: visual-only entrance layer; it must never intercept portrait pointer tracking. */
+.entry-loader { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; overflow: hidden; pointer-events: none; background: radial-gradient(circle at 50% 48%, rgb(100 58 210 / 0.16), transparent 18rem), #09090f; transform-origin: center; }
 .entry-loader::before, .entry-loader::after { content: ""; position: absolute; width: min(34rem, 70vw); aspect-ratio: 1; border: 1px solid rgb(196 181 253 / 0.2); border-radius: 50%; }
 .entry-loader::before { transform: rotate(-20deg); box-shadow: inset 0 0 60px rgb(139 92 246 / 0.16), 0 0 70px rgb(139 92 246 / 0.1); }
 .entry-loader::after { width: min(23rem, 48vw); transform: rotate(32deg); border-color: rgb(244 184 232 / 0.24); }
