@@ -1,4 +1,6 @@
 # Enhancement Checklist
+- [x] Recheck the supplied Memoji eye reference against live pupil geometry and repair any visible gaze alignment problem.
+- [x] Verify both pupils move together, remain inside the white eye area, and preserve blink/mobile safeguards.
 - [x] Add smooth viewport-triggered section reveals with subtle fade and lift motion.
 - [x] Verify scroll reveals preserve reduced-motion, mobile performance, and layout stability.
 - [x] Add a smooth initial loading animation with reduced-motion and fast-loading safeguards.

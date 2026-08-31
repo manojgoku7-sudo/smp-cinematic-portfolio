@@ -200,11 +200,11 @@
   pointer-events: none;
   overflow: hidden;
   /* Obsidian Studio eye-socket repair: fully cover the baked-in iris inside each aperture before the translated source iris is composited above it. */
-  background: radial-gradient(ellipse 3.92% 4.18% at var(--hero-memoji-iris-x) 49.2%, #fffaf1 0%, #fff7ed 76%, rgb(255 239 221 / .96) 89%, #fff0df 100%);
-  -webkit-clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 49.2%);
-  clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 49.2%);
-  -webkit-mask-image: radial-gradient(ellipse 4.18% 4.48% at var(--hero-memoji-iris-x) 49.2%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
-  mask-image: radial-gradient(ellipse 4.18% 4.48% at var(--hero-memoji-iris-x) 49.2%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
+  background: radial-gradient(ellipse 3.92% 4.18% at var(--hero-memoji-iris-x) 51.7%, #fffaf1 0%, #fff7ed 76%, rgb(255 239 221 / .96) 89%, #fff0df 100%);
+  -webkit-clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 51.7%);
+  clip-path: ellipse(4.02% 4.3% at var(--hero-memoji-iris-x) 51.7%);
+  -webkit-mask-image: radial-gradient(ellipse 4.18% 4.48% at var(--hero-memoji-iris-x) 51.7%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
+  mask-image: radial-gradient(ellipse 4.18% 4.48% at var(--hero-memoji-iris-x) 51.7%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
 }
 .hero-memoji-pupil-window img {
   position: absolute;
@@ -223,12 +223,12 @@
 }
   .hero-memoji-portrait.is-gazing .hero-memoji-pupil-window img { transition-duration: 245ms; transition-timing-function: cubic-bezier(.16, .9, .28, 1); }
 
-.hero-memoji-pupil-window.left { --hero-memoji-iris-x: 42.0%; }
-.hero-memoji-pupil-window.right { --hero-memoji-iris-x: 57.4%; }
+.hero-memoji-pupil-window.left { --hero-memoji-iris-x: 41.85%; }
+.hero-memoji-pupil-window.right { --hero-memoji-iris-x: 58.15%; }
 .hero-memoji-lid {
   position: absolute;
   z-index: 3;
-  top: 49.2%;
+  top: 48.1%;
   display: block;
   width: 7.2%;
   aspect-ratio: 1 / 1;
@@ -241,8 +241,8 @@
   transform: scaleY(.02);
   transform-origin: center top;
 }
-.hero-memoji-lid.left { left: 38.4%; }
-.hero-memoji-lid.right { left: 53.8%; }
+.hero-memoji-lid.left { left: 38.25%; }
+.hero-memoji-lid.right { left: 54.55%; }
 .hero-memoji-lid::before {
   position: absolute;
   top: 13%;
