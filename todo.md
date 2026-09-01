@@ -1,4 +1,7 @@
 # Enhancement Checklist
+- [ ] Audit generated media, asset references, file sizes, and ignore rules for clone-safe deployment.
+- [ ] Move required permanent assets into a Git-trackable project structure and repair references.
+- [ ] Build, verify asset paths, commit, push the current branch, and confirm the remote state.
 - [x] Repair the root cause so only individually bounded pupils receive cursor transforms; glasses, eyebrows, and face remain fixed.
 - [x] Verify all nine cursor directions, rapid movement, reset behavior, and mobile fallback.
 - [x] Match the Memoji reference with one visible iris per eye, one glasses frame, and separate controlled lens reflections.
