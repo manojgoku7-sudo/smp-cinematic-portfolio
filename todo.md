@@ -1,7 +1,7 @@
 # Enhancement Checklist
-- [ ] Copy all GitHub-compatible generated binaries into tracked public image/video folders.
-- [ ] Replace external asset references with repository-local paths and validate every asset.
-- [ ] Commit, push main without force, and verify every binary exists on GitHub.
+- [x] Copy all GitHub-compatible generated binaries into tracked public image/video folders.
+- [x] Replace external asset references with repository-local paths and validate every asset.
+- [x] Commit, push main without force, and verify every binary exists on GitHub.
 - [x] Audit generated media, asset references, file sizes, and ignore rules for clone-safe deployment.
 - [x] Move required permanent assets into a Git-trackable project structure and repair references.
 - [x] Build, verify asset paths, commit, push the current branch, and confirm the remote state.
