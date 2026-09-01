@@ -203,8 +203,9 @@
   background: radial-gradient(ellipse 5.1% 5.15% at var(--hero-memoji-iris-x) 51.7%, #fffaf1 0%, #fff7ed 76%, rgb(255 239 221 / .96) 89%, #fff0df 100%);
   -webkit-clip-path: ellipse(5.35% 5.55% at var(--hero-memoji-iris-x) 51.7%);
   clip-path: ellipse(5.35% 5.55% at var(--hero-memoji-iris-x) 51.7%);
-  -webkit-mask-image: radial-gradient(ellipse 5.55% 5.75% at var(--hero-memoji-iris-x) 51.7%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
-  mask-image: radial-gradient(ellipse 5.55% 5.75% at var(--hero-memoji-iris-x) 51.7%, #000 73%, rgb(0 0 0 / .82) 89%, transparent 100%);
+  /* Hard socket edge prevents the static iris in the base portrait from ghosting around the animated iris. */
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .hero-memoji-pupil-window img {
   position: absolute;
@@ -328,7 +329,6 @@
 
 @media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
   .page-shell:not(.motion-paused):not(.low-data) .hero-visual:has(.hero-memoji-portrait:hover) .hero-memoji-greeting { opacity: 1; transform: translate3d(0, 0, 0); transition-duration: 180ms; }
-  .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-settled { --hero-memoji-settle-tilt-x: .42deg; --hero-memoji-settle-tilt-y: -.54deg; --hero-memoji-ground-shadow-settle-x: .34rem; --hero-memoji-ground-shadow-settle-y: .08rem; transition-duration: 400ms; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid { animation: smp-memoji-blink var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::before,
   .page-shell:not(.motion-paused):not(.low-data) .hero-memoji-portrait.is-blinking .hero-memoji-lid::after { animation: smp-memoji-eye-edge var(--hero-memoji-blink-duration, 460ms) cubic-bezier(.2, .8, .28, 1) both; }

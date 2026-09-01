@@ -1,4 +1,8 @@
 # Enhancement Checklist
+- [x] Repair the root cause so only individually bounded pupils receive cursor transforms; glasses, eyebrows, and face remain fixed.
+- [x] Verify all nine cursor directions, rapid movement, reset behavior, and mobile fallback.
+- [x] Match the Memoji reference with one visible iris per eye, one glasses frame, and separate controlled lens reflections.
+- [x] Verify the corrected eye treatment on the restored preview at desktop and mobile widths.
 - [x] Remove the duplicate static-and-animated pupil appearance so only one visible iris remains per eye.
 - [x] Verify single-glasses composition, tracking, blinking, and mobile fallback after the pupil-layer cleanup.
 - [x] Make the actual iris/pupil layer visibly track the cursor independently from the lens reflections and glints.

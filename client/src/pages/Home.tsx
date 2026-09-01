@@ -889,18 +889,8 @@ export default function Home() {
     heroMemojiPupilRefs.current.forEach((pupil) => {
       if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
     });
-    portrait.style.setProperty("--hero-memoji-brow-x", `${(x * 1.5).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-brow-y", `${(y * .9).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-tilt-x", `${(y * -1.1).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-tilt-y", `${(x * 1.65).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-shadow-x", `${(x * -4.6).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-shadow-y", `${(y * 2.8).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-ground-shadow-x", `${(x * -3.35).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-ground-shadow-y", `${(y * 1.45).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glint-x", `${(x * 1.75).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-glint-y", `${(y * .85).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-backdrop-x", `${(x * 14).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-backdrop-y", `${(y * 9).toFixed(2)}px`);
+    // Pupil-only tracking: glasses, brows, face, backdrop, and reflections stay fixed.
+    // The pupil images are the only DOM nodes that receive the pointer transform.
   }
 
   function resetHeroMemojiGaze() {
@@ -926,14 +916,9 @@ export default function Home() {
   }
 
   function beginHeroMemojiHover(event: ReactPointerEvent<HTMLDivElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
+    if (event.pointerType !== "mouse" || window.innerWidth < 768) return;
     if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
-    const portrait = heroMemojiRef.current;
-    if (!portrait) return;
-    heroMemojiHoverTimer.current = window.setTimeout(() => {
-      portrait.classList.add("is-settled");
-      heroMemojiHoverTimer.current = null;
-    }, 980);
+    heroMemojiHoverTimer.current = null;
   }
 
   function noteHeroMemojiTouchStart(event: ReactPointerEvent<HTMLDivElement>) {
