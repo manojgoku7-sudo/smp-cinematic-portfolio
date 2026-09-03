@@ -1250,7 +1250,7 @@ export default function Home() {
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         {/* Obsidian Studio About visual: restore the original black-hole reel as a quiet right-side signal, with the copy kept in the foreground. */}
-        <div className="about-blackhole-video" aria-hidden="true"><video ref={heroVideoRef} className="about-blackhole-video-media" autoPlay={!reduceMotion && !motionPaused && !lowDataMode} loop muted playsInline preload="metadata" poster="/images/smp-hero-orbit_86f3fd46.jpg"><source src="/videos/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" /></video><span className="about-blackhole-video-vignette" /></div><span className="signal-thread about-thread" aria-hidden="true" />
+        <div className="about-blackhole-video" aria-hidden="true"><video ref={heroVideoRef} className="about-blackhole-video-media" autoPlay={!reduceMotion && !motionPaused && !lowDataMode} loop muted playsInline preload="metadata" poster="/images/smp-hero-orbit_86f3fd46.jpg"><source src="/manus-storage/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" /></video><span className="about-blackhole-video-vignette" /></div><span className="signal-thread about-thread" aria-hidden="true" />
         <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer with experience in Java, Spring Boot, and applied machine learning." motionPaused={motionPaused} /></Reveal>
         <div className="about-proof mt-14 grid gap-5 lg:grid-cols-[1.28fr_.72fr]">
           <Reveal delay={0.06} className="panel relative overflow-hidden p-7 md:p-10">

@@ -1,4 +1,14 @@
 # Enhancement Checklist
+- [x] Read-only clone GitHub main into a fresh directory, build it, and verify all 13 local image/video asset paths.
+- [x] Add four subtle single hair strands near the Memoji eye/head area while preserving the existing face, glasses, pupil tracking, and responsive composition.
+- [x] Remove the current Memoji hair-strand treatment and replace it with a cleaner 3–4 single-strand detail close to the eye and hairline.
+- [x] Restore the original Memoji artwork and original background, removing the newer hair-strand treatment while preserving eye tracking.
+- [x] Enhance the Memoji background and laptop design while preserving the original artwork, glasses, eye tracking, and composition.
+- [x] Optimize the new Memoji artwork, update all synchronized hero layers, and verify the live hero preview and production build.
+- [x] Locate the uploaded File Storage MP4 and switch the deployed video reference without deleting the GitHub copy.
+- [x] Complete the File Storage MP4 handoff, verify deployed playback, and retry the pending checkpoint without removing the GitHub binary.
+- [ ] Remove only the oversized MP4 from the Manus project bundle after explicit user confirmation; preserve GitHub and File Storage copies and save the checkpoint.
+- [x] Verify File Storage playback, GitHub binary preservation, and retry the Manus checkpoint.
 - [x] Copy all GitHub-compatible generated binaries into tracked public image/video folders.
 - [x] Replace external asset references with repository-local paths and validate every asset.
 - [x] Commit, push main without force, and verify every binary exists on GitHub.
@@ -20,7 +30,11 @@
 - [x] Add a smooth initial loading animation with reduced-motion and fast-loading safeguards.
 - [x] Audit and optimize mobile responsiveness at representative phone and tablet widths before deployment.
 - [x] Place the existing black-hole video on the right side of the About section and verify responsive fallbacks.
-- [ ] Retry the authorized GitHub push and verify the remote commit and branch.
+- [x] Retry the authorized GitHub push and verify the remote commit and branch.
+- [x] Export every currently available File Storage/generated JPG, PNG, MP4, and other binary into the existing repository without deleting files.
+- [x] Update website references to local repository assets and validate paths.
+- [x] Check binary sizes, avoid secrets, use Git LFS only when required, and verify tracked remote binaries.
+- [x] Commit and push the asset export safely to the existing main branch without force-push.
 - [ ] Commit and push the latest verified portfolio changes to the existing private GitHub repository, then verify the remote commit.
 - [x] Add a calmer eased pupil transition and constrain maximum iris travel within the white eye area.
 - [x] Add a subtle randomized eyelid blink cadence while preserving mobile and motion-safety safeguards.

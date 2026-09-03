@@ -1,0 +1,3 @@
+# Clean Memoji Hair-Strand QA
+
+The previous hair-strand treatment was replaced with a fresh generated artwork containing three short, separated strands emerging from the temple hairline near the outer eye. The compact local asset is `client/public/images/manoj-hero-transparent-memoji-glasses-clean-strands.webp` (238,492 bytes). All five synchronized hero layers in `Home.tsx` reference this new asset. TypeScript, Vitest, and the production build passed. A live 1280x720 preview confirmed the revised Memoji renders in the hero with the existing glasses, pupil layers, laptop, and cinematic layout intact.

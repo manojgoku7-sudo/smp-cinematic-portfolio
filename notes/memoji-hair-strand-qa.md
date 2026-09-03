@@ -1,0 +1,3 @@
+# Memoji Hair Strand QA
+
+The refined Memoji artwork was generated with four thin, separated black strands falling naturally from the front hairline near the outer edge of the right eye/temple. The five synchronized hero layers now reference `/images/manoj-hero-transparent-memoji-glasses-hairstrands-v2.webp`, preserving the existing base artwork, brow windows, pupil windows, and glasses interaction structure. The optimized local WebP is 269,298 bytes. A 1280x720 live preview screenshot confirmed the revised hair detail is visible in the hero and the overall cinematic composition remains intact.
