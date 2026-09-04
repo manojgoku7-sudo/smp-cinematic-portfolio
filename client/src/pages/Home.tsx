@@ -646,6 +646,9 @@ export default function Home() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroMemojiRef = useRef<HTMLDivElement>(null);
   const heroMemojiPupilRefs = useRef<[HTMLImageElement | null, HTMLImageElement | null]>([null, null]);
+  const heroMemojiGazeTarget = useRef({ x: 0, y: 0 });
+  const heroMemojiGazeCurrent = useRef({ x: 0, y: 0 });
+  const heroMemojiGazeFrame = useRef<number | null>(null);
   const heroMemojiTapReleaseTimer = useRef<number | null>(null);
   const heroMemojiHoverTimer = useRef<number | null>(null);
   const heroMemojiSmileTimer = useRef<number | null>(null);
@@ -794,6 +797,7 @@ export default function Home() {
     if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
     if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
     if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
+    if (heroMemojiGazeFrame.current !== null) window.cancelAnimationFrame(heroMemojiGazeFrame.current);
   }, []);
 
   useEffect(() => {
@@ -875,7 +879,28 @@ export default function Home() {
     event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
   }
 
-  // Hero Memoji gaze: update its visual element directly so cursor movement never causes page-level renders.
+  function animateHeroMemojiGaze() {
+    const target = heroMemojiGazeTarget.current;
+    const current = heroMemojiGazeCurrent.current;
+    const ease = 0.18;
+    current.x += (target.x - current.x) * ease;
+    current.y += (target.y - current.y) * ease;
+    const pupilOffsetX = current.x.toFixed(2);
+    const pupilOffsetY = current.y.toFixed(2);
+    heroMemojiPupilRefs.current.forEach((pupil) => {
+      if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
+    });
+    const settling = Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.02;
+    if (settling) {
+      heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
+    } else {
+      current.x = target.x;
+      current.y = target.y;
+      heroMemojiGazeFrame.current = null;
+    }
+  }
+
+  // Hero Memoji gaze: update a target directly, then ease the actual pupil nodes toward it.
   function followHeroMemojiGaze(event: ReactPointerEvent<HTMLDivElement>) {
     if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
     const portrait = heroMemojiRef.current;
@@ -884,13 +909,9 @@ export default function Home() {
     const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     portrait.classList.add("is-gazing");
-    const pupilOffsetX = (x * HERO_MEMOJI_PUPIL_MAX_X).toFixed(2);
-    const pupilOffsetY = (y * HERO_MEMOJI_PUPIL_MAX_Y).toFixed(2);
-    heroMemojiPupilRefs.current.forEach((pupil) => {
-      if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
-    });
+    heroMemojiGazeTarget.current = { x: x * HERO_MEMOJI_PUPIL_MAX_X, y: y * HERO_MEMOJI_PUPIL_MAX_Y };
+    if (heroMemojiGazeFrame.current === null) heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
     // Pupil-only tracking: glasses, brows, face, backdrop, and reflections stay fixed.
-    // The pupil images are the only DOM nodes that receive the pointer transform.
   }
 
   function resetHeroMemojiGaze() {
@@ -900,7 +921,15 @@ export default function Home() {
     heroMemojiHoverTimer.current = null;
     portrait.classList.remove("is-gazing");
     portrait.classList.remove("is-settled");
-    heroMemojiPupilRefs.current.forEach((pupil) => pupil?.style.removeProperty("transform"));
+    heroMemojiGazeTarget.current = { x: 0, y: 0 };
+    if (reduceMotion || motionPaused || lowDataMode) {
+      if (heroMemojiGazeFrame.current !== null) window.cancelAnimationFrame(heroMemojiGazeFrame.current);
+      heroMemojiGazeFrame.current = null;
+      heroMemojiGazeCurrent.current = { x: 0, y: 0 };
+      heroMemojiPupilRefs.current.forEach((pupil) => pupil?.style.removeProperty("transform"));
+    } else if (heroMemojiGazeFrame.current === null) {
+      heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
+    }
     portrait.style.removeProperty("--hero-memoji-brow-x");
     portrait.style.removeProperty("--hero-memoji-brow-y");
     portrait.style.removeProperty("--hero-memoji-tilt-x");
