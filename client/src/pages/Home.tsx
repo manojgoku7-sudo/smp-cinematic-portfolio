@@ -1226,12 +1226,9 @@ export default function Home() {
               <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
               <img className="hero-memoji-reference-scene" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
-              <span className="hero-memoji-brow-window left" aria-hidden="true"><img src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
-              <span className="hero-memoji-brow-window right" aria-hidden="true"><img src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window left" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[0] = node; }} data-memoji-pupil="left" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-pupil-window right" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[1] = node; }} data-memoji-pupil="right" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
               <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
-              <span className="hero-memoji-glasses-layer" aria-hidden="true"><i className="hero-memoji-glasses-glint left" /><i className="hero-memoji-glasses-glint right" /></span>
             </div>
             <span className="hero-memoji-greeting" aria-hidden="true">Hi, I’m Manoj</span>
           </motion.div>

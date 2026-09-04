@@ -7,7 +7,7 @@
 - [x] Optimize the new Memoji artwork, update all synchronized hero layers, and verify the live hero preview and production build.
 - [x] Locate the uploaded File Storage MP4 and switch the deployed video reference without deleting the GitHub copy.
 - [x] Complete the File Storage MP4 handoff, verify deployed playback, and retry the pending checkpoint without removing the GitHub binary.
-- [ ] Remove only the oversized MP4 from the Manus project bundle after explicit user confirmation; preserve GitHub and File Storage copies and save the checkpoint.
+- [x] Remove only the oversized MP4 from the Manus project bundle after explicit user confirmation; preserve GitHub and File Storage copies and save the checkpoint.
 - [x] Verify File Storage playback, GitHub binary preservation, and retry the Manus checkpoint.
 - [x] Copy all GitHub-compatible generated binaries into tracked public image/video folders.
 - [x] Replace external asset references with repository-local paths and validate every asset.
@@ -40,6 +40,7 @@
 - [x] Add a subtle randomized eyelid blink cadence while preserving mobile and motion-safety safeguards.
 - [x] Verify gaze easing, socket containment, blink timing, and responsive fallbacks.
 - [ ] Provide exact pupil JSX/CSS, live inline/computed styles, DevTools-equivalent override proof, and complete eye-layer order; repair any confirmed visual blocker.
+- [x] Remove duplicate moving eye, glasses, and eyebrow layers so the Memoji shows one clean facial set with pupil-only tracking.
 - [x] Diagnose the live DOM pupil rendering path; verify the binding and rendered transform with live DOM and A/B screenshot probes.
 - [x] Diagnose and repair the Hero Memoji pupil layer so direct cursor transforms produce visibly moving irises above the base face artwork.
 - [x] Review, diagnose, and present the Hero Memoji eye-tracking code; repair the direct pupil transform only if a fault remains.
