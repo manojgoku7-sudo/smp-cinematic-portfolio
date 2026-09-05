@@ -1,6 +1,8 @@
 /**
  * Obsidian Studio design system: a cinematic, editorial portfolio with ultraviolet signals on obsidian.
  */
+import "./eye-pupil-only.css";
+import "./hero-memoji-pupil-only";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
