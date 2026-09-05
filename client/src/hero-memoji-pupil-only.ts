@@ -1,5 +1,6 @@
-/* Hero Memoji eye fix: keep the portrait, glasses, eyebrows, eyelids and eyeballs fixed.
- * Only the pupils move inside fixed iris/sclera windows.
+/* Hero Memoji gaze controller.
+ * The base portrait, eyes, eyebrows and glasses stay fixed.
+ * Only the pupil dots move, and they track the mouse across the entire page.
  */
 
 type EyeOverlay = {
@@ -34,56 +35,99 @@ function initHeroMemojiPupilOnly() {
   ).slice(0, 2);
   if (windows.length !== 2) return false;
 
-  const overlays = windows.map(buildOverlay);
+  const overlays: EyeOverlay[] = windows.map(buildOverlay);
   const target = { x: 0, y: 0 };
   const current = { x: 0, y: 0 };
   let frame: number | null = null;
   let repairing = false;
 
   const tick = () => {
-    current.x += (target.x - current.x) * 0.16;
-    current.y += (target.y - current.y) * 0.16;
+    current.x += (target.x - current.x) * 0.2;
+    current.y += (target.y - current.y) * 0.2;
+
     const x = `${current.x.toFixed(2)}px`;
     const y = `${current.y.toFixed(2)}px`;
     overlays.forEach(({ pupil }) => {
-      pupil.style.transform = `translate3d(${x}, ${y}, 0)`;
+      pupil.style.setProperty("--hero-pupil-x", x);
+      pupil.style.setProperty("--hero-pupil-y", y);
     });
-    const settling = Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.02;
-    if (settling) frame = window.requestAnimationFrame(tick);
-    else frame = null;
+
+    const settling = Math.max(
+      Math.abs(target.x - current.x),
+      Math.abs(target.y - current.y),
+    ) > 0.03;
+    if (settling) {
+      frame = window.requestAnimationFrame(tick);
+    } else {
+      current.x = target.x;
+      current.y = target.y;
+      const finalX = `${current.x.toFixed(2)}px`;
+      const finalY = `${current.y.toFixed(2)}px`;
+      overlays.forEach(({ pupil }) => {
+        pupil.style.setProperty("--hero-pupil-x", finalX);
+        pupil.style.setProperty("--hero-pupil-y", finalY);
+      });
+      frame = null;
+    }
   };
 
-  const moveEyes = (event: PointerEvent) => {
-    if (event.pointerType !== "mouse" || window.innerWidth < 768) return;
-    const bounds = portrait.getBoundingClientRect();
-    const px = ((event.clientX - bounds.left) / Math.max(bounds.width, 1) - 0.5) * 2;
-    const py = ((event.clientY - bounds.top) / Math.max(bounds.height, 1) - 0.5) * 2;
-    target.x = clamp(px * 4.8, -4.8, 4.8);
-    target.y = clamp(py * 2.2, -2.2, 2.2);
+  const queueTick = () => {
     if (frame === null) frame = window.requestAnimationFrame(tick);
   };
 
-  const resetEyes = () => {
-    target.x = 0;
-    target.y = 0;
-    if (frame === null) frame = window.requestAnimationFrame(tick);
+  const updateFromPointer = (clientX: number, clientY: number) => {
+    if (window.innerWidth < 768) return;
+
+    const firstWindow = windows[0].getBoundingClientRect();
+    const secondWindow = windows[1].getBoundingClientRect();
+    const centerX = (
+      firstWindow.left + firstWindow.width / 2 +
+      secondWindow.left + secondWindow.width / 2
+    ) / 2;
+    const centerY = (
+      firstWindow.top + firstWindow.height / 2 +
+      secondWindow.top + secondWindow.height / 2
+    ) / 2;
+    const eyeWidth = Math.max((firstWindow.width + secondWindow.width) / 2, 1);
+    const eyeHeight = Math.max((firstWindow.height + secondWindow.height) / 2, 1);
+
+    // The cursor can be anywhere on the viewport. The response saturates smoothly
+    // so distant cursor positions still produce a strong but eye-safe gaze.
+    const horizontal = clamp((clientX - centerX) / (eyeWidth * 2.25), -1, 1);
+    const vertical = clamp((clientY - centerY) / (eyeHeight * 1.75), -1, 1);
+
+    target.x = horizontal * eyeWidth * 0.36;
+    target.y = vertical * eyeHeight * 0.27;
+    queueTick();
   };
 
-  portrait.addEventListener("pointermove", moveEyes, { passive: true });
-  portrait.addEventListener("pointerleave", resetEyes, { passive: true });
+  // Global listener: tracking works even when the mouse is far outside the portrait.
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType !== "mouse") return;
+    updateFromPointer(event.clientX, event.clientY);
+  };
+
+  const onResize = () => updateFromPointer(window.innerWidth / 2, window.innerHeight / 2);
+
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("resize", onResize, { passive: true });
+  onResize();
+
   portrait.dataset.pupilOnlyInitialized = "true";
 
-  // React can reconcile the original <img> children back into these windows.
-  // Repair only the window contents; never touch the base portrait itself.
+  // React can reconcile its original children back into these windows.
+  // Repair only the overlay contents; never touch the base portrait itself.
   const observer = new MutationObserver(() => {
     if (repairing) return;
     const stillValid = windows.every((entry) => entry.querySelector(".hero-memoji-iris"));
     if (stillValid) return;
+
     repairing = true;
     windows.forEach((entry, index) => {
       const replacement = buildOverlay(entry);
       overlays[index] = replacement;
-      replacement.pupil.style.transform = `translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
+      replacement.pupil.style.setProperty("--hero-pupil-x", `${current.x.toFixed(2)}px`);
+      replacement.pupil.style.setProperty("--hero-pupil-y", `${current.y.toFixed(2)}px`);
     });
     repairing = false;
   });
@@ -97,7 +141,7 @@ const boot = () => {
   const retry = () => {
     if (initHeroMemojiPupilOnly()) return;
     attempts += 1;
-    if (attempts < 40) window.setTimeout(retry, 100);
+    if (attempts < 50) window.setTimeout(retry, 100);
   };
   retry();
 };
