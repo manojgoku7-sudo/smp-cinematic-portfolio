@@ -1,6 +1,6 @@
 /* Hero Memoji gaze controller.
  * The base portrait, eyes, eyebrows and glasses stay fixed.
- * Only the pupil dots move, and they track the mouse across the entire page.
+ * Only the pupil dots move, and they track the mouse across the entire viewport.
  */
 
 type EyeOverlay = {
@@ -42,8 +42,8 @@ function initHeroMemojiPupilOnly() {
   let repairing = false;
 
   const tick = () => {
-    current.x += (target.x - current.x) * 0.2;
-    current.y += (target.y - current.y) * 0.2;
+    current.x += (target.x - current.x) * 0.22;
+    current.y += (target.y - current.y) * 0.22;
 
     const x = `${current.x.toFixed(2)}px`;
     const y = `${current.y.toFixed(2)}px`;
@@ -55,7 +55,7 @@ function initHeroMemojiPupilOnly() {
     const settling = Math.max(
       Math.abs(target.x - current.x),
       Math.abs(target.y - current.y),
-    ) > 0.03;
+    ) > 0.02;
     if (settling) {
       frame = window.requestAnimationFrame(tick);
     } else {
@@ -75,48 +75,44 @@ function initHeroMemojiPupilOnly() {
     if (frame === null) frame = window.requestAnimationFrame(tick);
   };
 
-  const updateFromPointer = (clientX: number, clientY: number) => {
+  const updateFromMouse = (clientX: number, clientY: number) => {
     if (window.innerWidth < 768) return;
 
-    const firstWindow = windows[0].getBoundingClientRect();
-    const secondWindow = windows[1].getBoundingClientRect();
-    const centerX = (
-      firstWindow.left + firstWindow.width / 2 +
-      secondWindow.left + secondWindow.width / 2
-    ) / 2;
-    const centerY = (
-      firstWindow.top + firstWindow.height / 2 +
-      secondWindow.top + secondWindow.height / 2
-    ) / 2;
-    const eyeWidth = Math.max((firstWindow.width + secondWindow.width) / 2, 1);
-    const eyeHeight = Math.max((firstWindow.height + secondWindow.height) / 2, 1);
+    const first = windows[0].getBoundingClientRect();
+    const second = windows[1].getBoundingClientRect();
+    const centerX = ((first.left + first.width / 2) + (second.left + second.width / 2)) / 2;
+    const centerY = ((first.top + first.height / 2) + (second.top + second.height / 2)) / 2;
+    const eyeWidth = Math.max((first.width + second.width) / 2, 1);
+    const eyeHeight = Math.max((first.height + second.height) / 2, 1);
 
-    // The cursor can be anywhere on the viewport. The response saturates smoothly
-    // so distant cursor positions still produce a strong but eye-safe gaze.
-    const horizontal = clamp((clientX - centerX) / (eyeWidth * 2.25), -1, 1);
-    const vertical = clamp((clientY - centerY) / (eyeHeight * 1.75), -1, 1);
+    // Normalize against the actual eye position. This makes the gaze respond
+    // strongly to the mouse even when it is far away from the portrait.
+    const horizontal = clamp((clientX - centerX) / (eyeWidth * 2.0), -1, 1);
+    const vertical = clamp((clientY - centerY) / (eyeHeight * 1.5), -1, 1);
 
-    target.x = horizontal * eyeWidth * 0.36;
-    target.y = vertical * eyeHeight * 0.27;
+    target.x = horizontal * eyeWidth * 0.42;
+    target.y = vertical * eyeHeight * 0.31;
     queueTick();
   };
 
-  // Global listener: tracking works even when the mouse is far outside the portrait.
-  const onPointerMove = (event: PointerEvent) => {
-    if (event.pointerType !== "mouse") return;
-    updateFromPointer(event.clientX, event.clientY);
+  // Use mousemove on the document rather than relying only on PointerEvent.
+  // This is intentionally global so the pupils continue tracking anywhere on the page.
+  const onMouseMove = (event: MouseEvent) => {
+    updateFromMouse(event.clientX, event.clientY);
   };
 
-  const onResize = () => updateFromPointer(window.innerWidth / 2, window.innerHeight / 2);
+  const onResize = () => {
+    updateFromMouse(window.innerWidth / 2, window.innerHeight / 2);
+  };
 
-  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  document.addEventListener("mousemove", onMouseMove, { passive: true, capture: true });
   window.addEventListener("resize", onResize, { passive: true });
   onResize();
 
   portrait.dataset.pupilOnlyInitialized = "true";
 
-  // React can reconcile its original children back into these windows.
-  // Repair only the overlay contents; never touch the base portrait itself.
+  // React may reconcile the original children back into these windows.
+  // Repair only the two overlay windows; never touch the base portrait.
   const observer = new MutationObserver(() => {
     if (repairing) return;
     const stillValid = windows.every((entry) => entry.querySelector(".hero-memoji-iris"));
@@ -141,7 +137,7 @@ const boot = () => {
   const retry = () => {
     if (initHeroMemojiPupilOnly()) return;
     attempts += 1;
-    if (attempts < 50) window.setTimeout(retry, 100);
+    if (attempts < 60) window.setTimeout(retry, 100);
   };
   retry();
 };
