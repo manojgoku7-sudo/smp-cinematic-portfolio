@@ -1,9 +1,80 @@
-/* Only the pupil moves; glasses, eyebrows, eyelids and eyeballs remain fixed. */
+/* Pupil-only Memoji layer: the original portrait remains fixed. */
 .hero-memoji-pupil-window:not(.hero-memoji-pupil-only-window) { display: none !important; }
 .hero-memoji-lid { display: none !important; }
-.hero-memoji-pupil-only-window { position:absolute!important; z-index:8!important; display:block!important; overflow:hidden!important; pointer-events:none!important; border-radius:50%!important; background:#fff!important; box-shadow:none!important; }
-.hero-memoji-pupil-only-window.left { left:30.4%!important; top:40.1%!important; width:9.2%!important; height:10.8%!important; }
-.hero-memoji-pupil-only-window.right { left:53%!important; top:40.1%!important; width:9.2%!important; height:10.8%!important; }
-.hero-memoji-iris { position:absolute; left:50%; top:50%; width:62%; height:68%; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle at 50% 50%,#070707 0 30%,transparent 31%),radial-gradient(circle at 50% 50%,#17100a 0 46%,#5a3216 47% 61%,#9a6938 62% 72%,#d6b48c 73% 78%,transparent 79%); }
-.hero-memoji-iris::after { content:""; position:absolute; left:29%; top:18%; width:17%; height:17%; border-radius:50%; background:#fff; opacity:.95; }
-.hero-memoji-pupil-dot { position:absolute; left:50%; top:50%; width:31%; aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%); background:#050505; box-shadow:0 0 0 1px rgb(0 0 0 / .35); }
+
+.hero-memoji-pupil-only-window {
+  position: absolute !important;
+  z-index: 8 !important;
+  display: block !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+/* These windows cover the static eye detail while the controller paints only
+   a replacement iris + pupil on top. */
+.hero-memoji-pupil-only-window.left {
+  left: 33.1% !important;
+  top: 39.2% !important;
+  width: 11.9% !important;
+  height: 15.2% !important;
+}
+
+.hero-memoji-pupil-only-window.right {
+  left: 54.9% !important;
+  top: 39.2% !important;
+  width: 11.9% !important;
+  height: 15.2% !important;
+}
+
+.hero-memoji-iris {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 68%;
+  height: 72%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #090909 0 29%, transparent 30%),
+    radial-gradient(circle at 50% 50%, #17100a 0 43%, #4d2b14 44% 58%, #8d5e34 59% 69%, #c7a178 70% 77%, transparent 78%);
+  box-shadow: 0 0 0 1px rgb(53 28 12 / .12);
+}
+
+.hero-memoji-iris::after {
+  content: "";
+  position: absolute;
+  left: 27%;
+  top: 15%;
+  width: 18%;
+  height: 18%;
+  border-radius: 50%;
+  background: #fff;
+  opacity: .96;
+  box-shadow: 0 0 3px rgb(255 255 255 / .35);
+}
+
+.hero-memoji-pupil-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 33%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(
+    calc(-50% + var(--hero-pupil-x, 0px)),
+    calc(-50% + var(--hero-pupil-y, 0px))
+  );
+  background: #030303;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / .45), 0 0 4px rgb(0 0 0 / .22);
+  transition: none;
+  will-change: transform;
+}
+
+/* Keep the eye overlays visible even though the old compatibility stylesheet
+   also knows about the original pupil-window class. */
+.hero-memoji-portrait .hero-memoji-pupil-only-window {
+  display: block !important;
+}
