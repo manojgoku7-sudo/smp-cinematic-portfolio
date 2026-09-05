@@ -1,6 +1,6 @@
 /* Hero Memoji gaze controller.
  * The base portrait, eyes, eyebrows and glasses stay fixed.
- * Only the pupil dots move, and they track the mouse across the entire viewport.
+ * Only the black pupil dots move inside the fixed eye windows.
  */
 
 type EyeOverlay = {
@@ -20,6 +20,7 @@ function buildOverlay(sourceWindow: HTMLSpanElement): EyeOverlay {
 
   const pupil = document.createElement("span");
   pupil.className = "hero-memoji-pupil-dot";
+  pupil.style.transform = "translate(-50%, -50%) translate3d(0px, 0px, 0px)";
 
   iris.appendChild(pupil);
   sourceWindow.appendChild(iris);
@@ -41,78 +42,66 @@ function initHeroMemojiPupilOnly() {
   let frame: number | null = null;
   let repairing = false;
 
-  const tick = () => {
-    current.x += (target.x - current.x) * 0.22;
-    current.y += (target.y - current.y) * 0.22;
+  const render = () => {
+    current.x += (target.x - current.x) * 0.24;
+    current.y += (target.y - current.y) * 0.24;
 
-    const x = `${current.x.toFixed(2)}px`;
-    const y = `${current.y.toFixed(2)}px`;
     overlays.forEach(({ pupil }) => {
-      pupil.style.setProperty("--hero-pupil-x", x);
-      pupil.style.setProperty("--hero-pupil-y", y);
+      pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
     });
 
-    const settling = Math.max(
-      Math.abs(target.x - current.x),
-      Math.abs(target.y - current.y),
-    ) > 0.02;
-    if (settling) {
-      frame = window.requestAnimationFrame(tick);
+    if (Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.02) {
+      frame = window.requestAnimationFrame(render);
     } else {
       current.x = target.x;
       current.y = target.y;
-      const finalX = `${current.x.toFixed(2)}px`;
-      const finalY = `${current.y.toFixed(2)}px`;
       overlays.forEach(({ pupil }) => {
-        pupil.style.setProperty("--hero-pupil-x", finalX);
-        pupil.style.setProperty("--hero-pupil-y", finalY);
+        pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
       });
       frame = null;
     }
   };
 
-  const queueTick = () => {
-    if (frame === null) frame = window.requestAnimationFrame(tick);
+  const queueRender = () => {
+    if (frame === null) frame = window.requestAnimationFrame(render);
   };
 
   const updateFromMouse = (clientX: number, clientY: number) => {
     if (window.innerWidth < 768) return;
 
-    const first = windows[0].getBoundingClientRect();
-    const second = windows[1].getBoundingClientRect();
-    const centerX = ((first.left + first.width / 2) + (second.left + second.width / 2)) / 2;
-    const centerY = ((first.top + first.height / 2) + (second.top + second.height / 2)) / 2;
-    const eyeWidth = Math.max((first.width + second.width) / 2, 1);
-    const eyeHeight = Math.max((first.height + second.height) / 2, 1);
+    // Map the full browser viewport to a predictable pupil range.
+    // The face itself never moves; only the pupil dots receive these offsets.
+    const viewportX = clamp((clientX / Math.max(window.innerWidth, 1) - 0.5) * 2, -1, 1);
+    const viewportY = clamp((clientY / Math.max(window.innerHeight, 1) - 0.5) * 2, -1, 1);
 
-    // Normalize against the actual eye position. This makes the gaze respond
-    // strongly to the mouse even when it is far away from the portrait.
-    const horizontal = clamp((clientX - centerX) / (eyeWidth * 2.0), -1, 1);
-    const vertical = clamp((clientY - centerY) / (eyeHeight * 1.5), -1, 1);
-
-    target.x = horizontal * eyeWidth * 0.42;
-    target.y = vertical * eyeHeight * 0.31;
-    queueTick();
+    target.x = viewportX * 8.5;
+    target.y = viewportY * 5.2;
+    queueRender();
   };
 
-  // Use mousemove on the document rather than relying only on PointerEvent.
-  // This is intentionally global so the pupils continue tracking anywhere on the page.
-  const onMouseMove = (event: MouseEvent) => {
+  const onMouseMove = (event: MouseEvent) => updateFromMouse(event.clientX, event.clientY);
+  const onPointerMove = (event: PointerEvent) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
     updateFromMouse(event.clientX, event.clientY);
   };
-
-  const onResize = () => {
-    updateFromMouse(window.innerWidth / 2, window.innerHeight / 2);
+  const onMouseLeaveWindow = () => {
+    // Keep the final gaze position rather than snapping the eyes back when the cursor
+    // leaves the browser content area. A browser blur resets them to center instead.
+  };
+  const onWindowBlur = () => {
+    target.x = 0;
+    target.y = 0;
+    queueRender();
   };
 
   document.addEventListener("mousemove", onMouseMove, { passive: true, capture: true });
-  window.addEventListener("resize", onResize, { passive: true });
-  onResize();
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("blur", onWindowBlur, { passive: true });
+  void onMouseLeaveWindow;
 
   portrait.dataset.pupilOnlyInitialized = "true";
 
   // React may reconcile the original children back into these windows.
-  // Repair only the two overlay windows; never touch the base portrait.
   const observer = new MutationObserver(() => {
     if (repairing) return;
     const stillValid = windows.every((entry) => entry.querySelector(".hero-memoji-iris"));
@@ -122,8 +111,7 @@ function initHeroMemojiPupilOnly() {
     windows.forEach((entry, index) => {
       const replacement = buildOverlay(entry);
       overlays[index] = replacement;
-      replacement.pupil.style.setProperty("--hero-pupil-x", `${current.x.toFixed(2)}px`);
-      replacement.pupil.style.setProperty("--hero-pupil-y", `${current.y.toFixed(2)}px`);
+      replacement.pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
     });
     repairing = false;
   });
@@ -137,7 +125,7 @@ const boot = () => {
   const retry = () => {
     if (initHeroMemojiPupilOnly()) return;
     attempts += 1;
-    if (attempts < 60) window.setTimeout(retry, 100);
+    if (attempts < 100) window.setTimeout(retry, 100);
   };
   retry();
 };
