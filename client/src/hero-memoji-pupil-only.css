@@ -1,0 +1,53 @@
+/* Hero Memoji: only the pupils move. The base portrait remains completely fixed. */
+.hero-memoji-pupil-window {
+  position: absolute;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.hero-memoji-pupil-window.left {
+  left: 33.1%;
+  top: 39.2%;
+  width: 11.9%;
+  height: 15.2%;
+}
+
+.hero-memoji-pupil-window.right {
+  left: 54.9%;
+  top: 39.2%;
+  width: 11.9%;
+  height: 15.2%;
+}
+
+.hero-memoji-pupil-window img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 48%;
+  transform: translate3d(0, 0, 0);
+  transform-origin: center;
+}
+
+/* The duplicated source image is clipped to the iris/pupil window, while the
+   white base keeps the original iris from ghosting underneath it. */
+.hero-memoji-pupil-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.03);
+}
+
+.hero-memoji-portrait .hero-memoji-pupil-window {
+  display: block !important;
+}
+
+.hero-memoji-portrait .hero-memoji-lid {
+  display: none !important;
+}
