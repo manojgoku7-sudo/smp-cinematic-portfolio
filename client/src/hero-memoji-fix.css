@@ -1,0 +1,15 @@
+/* Keep the hero Memoji's original eyes, glasses, eyebrows, and face as one perfectly aligned image.
+ * The previous implementation duplicated the entire portrait into clipped pupil layers.
+ * Those duplicate layers drifted against the glasses/eyes during gaze and blink motion.
+ */
+.hero-memoji-pupil-window,
+.hero-memoji-lid {
+  display: none !important;
+}
+
+/* Disable only the eye-overlay motion. The surrounding hero motion remains unchanged. */
+.hero-memoji-portrait.is-gazing .hero-memoji-pupil-window,
+.hero-memoji-portrait.is-blinking .hero-memoji-lid,
+.hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid {
+  display: none !important;
+}
