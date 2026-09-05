@@ -1,6 +1,6 @@
 /* Hero Memoji gaze controller.
- * The base portrait, eyes, eyebrows and glasses stay fixed.
- * Only the black pupil dots move inside the fixed eye windows.
+ * The portrait, eye whites, eyebrows and glasses stay fixed.
+ * Only the black pupil dots move inside each eye.
  */
 
 type EyeOverlay = {
@@ -20,7 +20,9 @@ function buildOverlay(sourceWindow: HTMLSpanElement): EyeOverlay {
 
   const pupil = document.createElement("span");
   pupil.className = "hero-memoji-pupil-dot";
-  pupil.style.transform = "translate(-50%, -50%) translate3d(0px, 0px, 0px)";
+  pupil.style.transform = "translate(-50%, -50%)";
+  pupil.style.left = "50%";
+  pupil.style.top = "50%";
 
   iris.appendChild(pupil);
   sourceWindow.appendChild(iris);
@@ -37,26 +39,39 @@ function initHeroMemojiPupilOnly() {
   if (windows.length !== 2) return false;
 
   const overlays: EyeOverlay[] = windows.map(buildOverlay);
-  const target = { x: 0, y: 0 };
-  const current = { x: 0, y: 0 };
+  const target = overlays.map(() => ({ x: 0, y: 0 }));
+  const current = overlays.map(() => ({ x: 0, y: 0 }));
   let frame: number | null = null;
   let repairing = false;
 
   const render = () => {
-    current.x += (target.x - current.x) * 0.24;
-    current.y += (target.y - current.y) * 0.24;
+    let settling = false;
 
-    overlays.forEach(({ pupil }) => {
-      pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
+    overlays.forEach(({ pupil }, index) => {
+      current[index].x += (target[index].x - current[index].x) * 0.28;
+      current[index].y += (target[index].y - current[index].y) * 0.28;
+
+      pupil.style.left = `calc(50% + ${current[index].x.toFixed(2)}px)`;
+      pupil.style.top = `calc(50% + ${current[index].y.toFixed(2)}px)`;
+
+      if (
+        Math.max(
+          Math.abs(target[index].x - current[index].x),
+          Math.abs(target[index].y - current[index].y),
+        ) > 0.03
+      ) {
+        settling = true;
+      }
     });
 
-    if (Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.02) {
+    if (settling) {
       frame = window.requestAnimationFrame(render);
     } else {
-      current.x = target.x;
-      current.y = target.y;
-      overlays.forEach(({ pupil }) => {
-        pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
+      overlays.forEach(({ pupil }, index) => {
+        current[index].x = target[index].x;
+        current[index].y = target[index].y;
+        pupil.style.left = `calc(50% + ${current[index].x.toFixed(2)}px)`;
+        pupil.style.top = `calc(50% + ${current[index].y.toFixed(2)}px)`;
       });
       frame = null;
     }
@@ -69,13 +84,21 @@ function initHeroMemojiPupilOnly() {
   const updateFromMouse = (clientX: number, clientY: number) => {
     if (window.innerWidth < 768) return;
 
-    // Map the full browser viewport to a predictable pupil range.
-    // The face itself never moves; only the pupil dots receive these offsets.
-    const viewportX = clamp((clientX / Math.max(window.innerWidth, 1) - 0.5) * 2, -1, 1);
-    const viewportY = clamp((clientY / Math.max(window.innerHeight, 1) - 0.5) * 2, -1, 1);
+    overlays.forEach(({ window: eyeWindow }, index) => {
+      const rect = eyeWindow.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
 
-    target.x = viewportX * 8.5;
-    target.y = viewportY * 5.2;
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const nx = clamp((clientX - centerX) / (rect.width * 0.72), -1, 1);
+      const ny = clamp((clientY - centerY) / (rect.height * 0.72), -1, 1);
+
+      // Keep the pupil comfortably inside the iris while making movement obvious.
+      target[index].x = nx * rect.width * 0.22;
+      target[index].y = ny * rect.height * 0.18;
+    });
+
     queueRender();
   };
 
@@ -84,24 +107,22 @@ function initHeroMemojiPupilOnly() {
     if (event.pointerType && event.pointerType !== "mouse") return;
     updateFromMouse(event.clientX, event.clientY);
   };
-  const onMouseLeaveWindow = () => {
-    // Keep the final gaze position rather than snapping the eyes back when the cursor
-    // leaves the browser content area. A browser blur resets them to center instead.
-  };
   const onWindowBlur = () => {
-    target.x = 0;
-    target.y = 0;
+    target.forEach((point) => {
+      point.x = 0;
+      point.y = 0;
+    });
     queueRender();
   };
 
-  document.addEventListener("mousemove", onMouseMove, { passive: true, capture: true });
+  window.addEventListener("mousemove", onMouseMove, { passive: true });
   window.addEventListener("pointermove", onPointerMove, { passive: true });
   window.addEventListener("blur", onWindowBlur, { passive: true });
-  void onMouseLeaveWindow;
 
   portrait.dataset.pupilOnlyInitialized = "true";
 
-  // React may reconcile the original children back into these windows.
+  // React can reconcile the original children back into these windows. Rebuild only
+  // the pupil overlays and preserve the current tracked position.
   const observer = new MutationObserver(() => {
     if (repairing) return;
     const stillValid = windows.every((entry) => entry.querySelector(".hero-memoji-iris"));
@@ -111,27 +132,31 @@ function initHeroMemojiPupilOnly() {
     windows.forEach((entry, index) => {
       const replacement = buildOverlay(entry);
       overlays[index] = replacement;
-      replacement.pupil.style.transform = `translate(-50%, -50%) translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
+      replacement.pupil.style.left = `calc(50% + ${current[index].x.toFixed(2)}px)`;
+      replacement.pupil.style.top = `calc(50% + ${current[index].y.toFixed(2)}px)`;
     });
     repairing = false;
   });
   observer.observe(portrait, { subtree: true, childList: true });
 
+  // Capture the current pointer position immediately after initialization.
+  updateFromMouse(window.innerWidth / 2, window.innerHeight / 2);
   return true;
 }
 
-const boot = () => {
-  let attempts = 0;
-  const retry = () => {
-    if (initHeroMemojiPupilOnly()) return;
-    attempts += 1;
-    if (attempts < 100) window.setTimeout(retry, 100);
-  };
-  retry();
+const waitForPortrait = () => {
+  if (initHeroMemojiPupilOnly()) return;
+
+  const observer = new MutationObserver(() => {
+    if (initHeroMemojiPupilOnly()) observer.disconnect();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  window.setTimeout(() => observer.disconnect(), 15000);
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", boot, { once: true });
+  document.addEventListener("DOMContentLoaded", waitForPortrait, { once: true });
 } else {
-  boot();
+  waitForPortrait();
 }
