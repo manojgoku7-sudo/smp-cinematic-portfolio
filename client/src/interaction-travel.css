@@ -1,0 +1,163 @@
+/* =============================================================================
+   Obsidian Studio — scroll & travel layer
+   Animations that read the scroll position and the user's place in a flow:
+     1. Experience "reading beam" — a charge that fills the role timeline as the
+        reading band travels down it, with a comet head on the leading edge.
+     2. Role arrival shimmer — a single light pass across a timeline row the
+        moment it becomes the active / map-aligned role.
+     3. Form-field live state — violet caret and a slow data-glow while a field
+        is focused, so the form reads as an active channel.
+     4. Credential sheen — one soft light pass across a credential card on hover.
+   Decoration is transform/opacity/background only, never layout; each effect is
+   gated behind the site's accessibility switches (reduced motion, the manual
+   motion-pause control, and low-data mode).
+   ========================================================================== */
+
+/* ---- 1 · Experience reading beam + comet head ----------------------------- */
+.timeline-list::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: -0.5px;
+  width: 2px;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(139 92 246 / 0.95), rgb(216 180 254 / 0.95) 58%, rgb(250 246 255 / 0.98));
+  box-shadow: 0 0 14px rgb(139 92 246 / 0.5), 0 0 4px rgb(216 180 254 / 0.85);
+  transform: scaleY(var(--timeline-progress, 0));
+  transform-origin: top center;
+  will-change: transform;
+}
+.timeline-list::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--timeline-progress, 0) * 100%);
+  left: -5px;
+  width: 0.68rem;
+  height: 0.68rem;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: var(--timeline-progress, 0);
+  transform: translateY(-50%);
+  background: radial-gradient(circle, #fff 0 18%, rgb(224 210 255 / 0.9) 42%, rgb(139 92 246 / 0.35) 72%, transparent 100%);
+  box-shadow: 0 0 8px rgb(216 180 254 / 0.9), 0 0 18px rgb(139 92 246 / 0.5);
+  will-change: top;
+}
+
+/* ---- 2 · Role arrival shimmer --------------------------------------------- */
+.timeline-row.is-map-active::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 0 16%, rgb(196 181 253 / 0.14) 32%, rgb(250 248 255 / 0.24) 50%, rgb(196 181 253 / 0.12) 68%, transparent 84%);
+  background-repeat: no-repeat;
+  background-size: 45% 100%;
+}
+@keyframes timeline-row-arrival {
+  0% {
+    opacity: 0;
+    background-position: 200% 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.9;
+    background-position: -45% 0;
+  }
+  100% {
+    opacity: 0;
+    background-position: -45% 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .timeline-row.is-map-active::after {
+    animation: timeline-row-arrival 950ms var(--ease-out) both;
+  }
+}
+
+/* ---- 3 · Form-field live state -------------------------------------------- */
+.form-field {
+  caret-color: #c4b5fd;
+}
+.form-field::selection {
+  background: rgb(139 92 246 / 0.4);
+  color: #fff;
+}
+@keyframes form-field-data-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgb(139 92 246 / 0.13), 0 0 28px rgb(139 92 246 / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgb(139 92 246 / 0.22), 0 0 34px rgb(139 92 246 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.05);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .form-field:focus {
+    animation: form-field-data-glow 2.4s ease-in-out infinite;
+  }
+}
+
+/* ---- 4 · Credential card sheen -------------------------------------------- */
+.credential-card {
+  isolation: isolate;
+}
+.credential-card::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-64%) rotate(9deg);
+  background: linear-gradient(90deg, transparent 30%, rgb(240 233 255 / 0.09) 44%, rgb(250 248 255 / 0.3) 50%, rgb(196 181 253 / 0.13) 56%, transparent 70%);
+}
+@keyframes credential-card-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-64%) rotate(9deg);
+  }
+  16% {
+    opacity: 0.9;
+  }
+  64% {
+    opacity: 0.42;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(64%) rotate(9deg);
+  }
+}
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .credential-card:hover::after {
+    animation: credential-card-sheen 0.9s var(--ease-out) both;
+  }
+}
+
+/* ---- Accessibility switches ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .timeline-row.is-map-active::after,
+  .credential-card::after {
+    display: none !important;
+  }
+  .form-field:focus {
+    animation: none !important;
+  }
+}
+.page-shell.motion-paused .timeline-row.is-map-active::after,
+.page-shell.motion-paused .credential-card::after,
+.page-shell.low-data .timeline-row.is-map-active::after,
+.page-shell.low-data .credential-card::after {
+  animation: none !important;
+  opacity: 0 !important;
+}
+.page-shell.motion-paused .form-field:focus,
+.page-shell.low-data .form-field:focus {
+  animation: none !important;
+}

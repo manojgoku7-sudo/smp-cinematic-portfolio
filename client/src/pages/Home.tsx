@@ -6,6 +6,7 @@ import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, R
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { Dialog, Dialog as DialogRoot, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { RevealMetric } from "@/components/RevealMetric";
 import { Spinner } from "@/components/ui/spinner";
 import {
   ArrowDownRight,
@@ -286,6 +287,13 @@ function downloadResume() {
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(url);
+}
+
+function releaseSignalButtonMagnet(button: HTMLElement | null) {
+  if (!button) return;
+  button.classList.remove("is-magnetized");
+  button.style.removeProperty("--magnet-x");
+  button.style.removeProperty("--magnet-y");
 }
 
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -658,6 +666,17 @@ export default function Home() {
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastActiveSection = useRef(active);
+  const experiencePointerActive = useRef(false);
+  const magneticEnabledRef = useRef(true);
+
+  // A hovered or focused role row pins the map; scroll-follow stands down until released.
+  const pinExperienceRow = (index: number) => {
+    experiencePointerActive.current = true;
+    setActiveExperience(index);
+  };
+  const releaseExperienceRow = () => {
+    experiencePointerActive.current = false;
+  };
   const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const collectionDialogTriggerIndex = useRef<number | null>(null);
   const collectionOpeningTimer = useRef<number | null>(null);
@@ -842,6 +861,30 @@ export default function Home() {
       const node = document.getElementById(id);
       if (node) observer.observe(node);
     });
+    // Experience scroll-spy: keep the skills map aligned to the role nearest the reading band,
+    // so the role map also follows on touch devices where hover/focus is unavailable.
+    const experienceRows = Array.from(document.querySelectorAll<HTMLElement>("#experience .timeline-row"));
+    const experienceVisibility = experienceRows.map(() => 0);
+    const experienceObserver = new IntersectionObserver(
+      (entries) => {
+        if (experiencePointerActive.current) return; // Hover/focus owns the highlight.
+        for (const entry of entries) {
+          const index = experienceRows.indexOf(entry.target as HTMLElement);
+          if (index >= 0) experienceVisibility[index] = entry.isIntersecting ? entry.intersectionRatio : 0;
+        }
+        let bestIndex = -1;
+        let bestRatio = 0;
+        experienceVisibility.forEach((ratio, index) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestIndex = index;
+          }
+        });
+        if (bestIndex >= 0) setActiveExperience(bestIndex);
+      },
+      { rootMargin: "-34% 0px -46% 0px", threshold: [0.08, 0.18, 0.3, 0.45] },
+    );
+    experienceRows.forEach((row) => experienceObserver.observe(row));
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
@@ -851,6 +894,92 @@ export default function Home() {
         element.removeEventListener("pointerleave", onLeave);
       });
       observer.disconnect();
+      experienceObserver.disconnect();
+    };
+  }, []);
+
+  // Keep the magnetic-pull guard in sync with the accessibility switches, and
+  // release any active pull the moment motion is paused or data mode drops.
+  useEffect(() => {
+    const enabled = !(Boolean(reduceMotion) || motionPaused || lowDataMode);
+    magneticEnabledRef.current = enabled;
+    if (!enabled) {
+      document.querySelectorAll<HTMLElement>(".signal-button.is-magnetized").forEach(releaseSignalButtonMagnet);
+    }
+  });
+
+  // Magnetic pull on signal buttons: a soft follow-light that nudges the button
+  // toward the cursor while it is inside, then springs back on release.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const finePointer = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!finePointer()) return;
+    let current: HTMLElement | null = null;
+
+    const releaseCurrent = () => {
+      if (current) {
+        releaseSignalButtonMagnet(current);
+        current = null;
+      }
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || !magneticEnabledRef.current) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const button = (event.target as Element | null)?.closest?.<HTMLElement>(".signal-button") ?? null;
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        const dx = event.clientX - (rect.left + rect.width / 2);
+        const dy = event.clientY - (rect.top + rect.height / 2);
+        const pullX = Math.sign(dx) * Math.min(Math.abs(dx) * 0.28, rect.width * 0.09 + 6);
+        const pullY = Math.sign(dy) * Math.min(Math.abs(dy) * 0.28, rect.height * 0.16 + 5);
+        if (current && current !== button) releaseSignalButtonMagnet(current);
+        current = button;
+        button.classList.add("is-magnetized");
+        button.style.setProperty("--magnet-x", `${pullX.toFixed(2)}px`);
+        button.style.setProperty("--magnet-y", `${pullY.toFixed(2)}px`);
+      } else {
+        releaseCurrent();
+      }
+    };
+    const onPointerOut = (event: PointerEvent) => {
+      if (!current) return;
+      const related = event.relatedTarget as Node | null;
+      if (related && current.contains(related)) return; // Still inside the button.
+      releaseCurrent();
+    };
+    const onLeaveWindow = () => releaseCurrent();
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerout", onPointerOut, { passive: true });
+    window.addEventListener("pointerleave", onLeaveWindow, { passive: true });
+    window.addEventListener("blur", onLeaveWindow);
+    window.addEventListener("pointercancel", onLeaveWindow);
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerout", onPointerOut);
+      window.removeEventListener("pointerleave", onLeaveWindow);
+      window.removeEventListener("blur", onLeaveWindow);
+      window.removeEventListener("pointercancel", onLeaveWindow);
+      releaseCurrent();
+    };
+  }, []);
+
+  // Experience reading beam: fills the role timeline as the reading band scrolls down it.
+  useEffect(() => {
+    const updateTimelineBeam = () => {
+      const list = document.querySelector<HTMLElement>("#experience .timeline-list");
+      if (!list) return;
+      const rect = list.getBoundingClientRect();
+      const readingLine = window.innerHeight * 0.44;
+      const progress = rect.height > 0 ? Math.min(1, Math.max(0, (readingLine - rect.top) / rect.height)) : 0;
+      list.style.setProperty("--timeline-progress", progress.toFixed(4));
+    };
+    updateTimelineBeam();
+    window.addEventListener("scroll", updateTimelineBeam, { passive: true });
+    window.addEventListener("resize", updateTimelineBeam);
+    return () => {
+      window.removeEventListener("scroll", updateTimelineBeam);
+      window.removeEventListener("resize", updateTimelineBeam);
     };
   }, []);
 
@@ -867,16 +996,37 @@ export default function Home() {
   }
 
   function handleProjectTilt(event: MouseEvent<HTMLElement>) {
-    if (reduceMotion) return;
+    if (reduceMotion || motionPaused || lowDataMode) return;
     const card = event.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
     card.style.transform = `perspective(900px) rotateX(${y * -3.5}deg) rotateY(${x * 3.5}deg) translateY(-5px)`;
+    // Pointer light on the artwork: paint-free CSS variables consumed by the scrim overlay.
+    card.style.setProperty("--card-light-x", `${((x + 0.5) * 100).toFixed(2)}%`);
+    card.style.setProperty("--card-light-y", `${((y + 0.5) * 100).toFixed(2)}%`);
   }
 
   function resetProjectTilt(event: MouseEvent<HTMLElement>) {
-    event.currentTarget.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
+    const card = event.currentTarget;
+    card.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
+    card.style.removeProperty("--card-light-x");
+    card.style.removeProperty("--card-light-y");
+  }
+
+  // Capability tile glow: a soft ultraviolet follow-light beneath the tile content.
+  function handleCapabilityGlow(event: ReactPointerEvent<HTMLElement>) {
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
+    const tile = event.currentTarget;
+    const rect = tile.getBoundingClientRect();
+    tile.style.setProperty("--cell-glow-x", `${(((event.clientX - rect.left) / rect.width) * 100).toFixed(2)}%`);
+    tile.style.setProperty("--cell-glow-y", `${(((event.clientY - rect.top) / rect.height) * 100).toFixed(2)}%`);
+  }
+
+  function clearCapabilityGlow(event: ReactPointerEvent<HTMLElement>) {
+    const tile = event.currentTarget;
+    tile.style.removeProperty("--cell-glow-x");
+    tile.style.removeProperty("--cell-glow-y");
   }
 
   function animateHeroMemojiGaze() {
@@ -1283,9 +1433,9 @@ export default function Home() {
             <div className="absolute right-0 top-0 h-32 w-32 bg-violet-500/15 blur-3xl" />
             <p className="display max-w-[20ch] text-2xl leading-tight text-[#eeeaff] md:text-[2rem]">I create <span className="text-violet-300">clear, responsive interfaces</span> and practical user flows—from Figma design to implementation.</p>
             <div className="mt-12 grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-3">
-              <div><p className="display text-3xl text-white">20<span className="text-violet-300">+</span></p><p className="label mt-2 text-[0.57rem]">Reusable React components</p></div>
-              <div><p className="display text-3xl text-white">10<span className="text-violet-300">+</span></p><p className="label mt-2 text-[0.57rem]">High-fidelity Figma screens</p></div>
-              <div><p className="display text-3xl text-white">85<span className="text-violet-300">%</span></p><p className="label mt-2 text-[0.57rem]">Best ML classification accuracy</p></div>
+              <RevealMetric value={20} suffix="+" label="Reusable React components" motionPaused={motionPaused} lowDataMode={lowDataMode} />
+              <RevealMetric value={10} suffix="+" label="High-fidelity Figma screens" motionPaused={motionPaused} lowDataMode={lowDataMode} />
+              <RevealMetric value={85} suffix="%" label="Best ML classification accuracy" motionPaused={motionPaused} lowDataMode={lowDataMode} />
             </div>
           </Reveal>
           <Reveal delay={0.14} className="panel p-7 md:p-8">
@@ -1338,8 +1488,8 @@ export default function Home() {
       <section id="experience" className="editorial-band container py-28 md:py-40">
         <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." motionPaused={motionPaused} /></Reveal>
         <div className="experience-layout mt-14 grid gap-12 lg:grid-cols-[1.28fr_.72fr] lg:gap-20">
-          <div className="timeline-list"><Reveal><div className={`timeline-row ${activeExperience === 0 ? "is-map-active" : ""}`} tabIndex={0} aria-label="Project Intern. Focus to highlight related skills." onMouseEnter={() => setActiveExperience(0)} onFocus={() => setActiveExperience(0)}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
-            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className={`timeline-row ${activeExperience === index + 1 ? "is-map-active" : ""}`} tabIndex={0} aria-label={`${item.role}. Focus to highlight related skills.`} onMouseEnter={() => setActiveExperience(index + 1)} onFocus={() => setActiveExperience(index + 1)}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
+          <div className="timeline-list"><Reveal><div className={`timeline-row ${activeExperience === 0 ? "is-map-active" : ""}`} tabIndex={0} aria-label="Project Intern. Focus to highlight related skills." onMouseEnter={() => pinExperienceRow(0)} onFocus={() => pinExperienceRow(0)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
+            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className={`timeline-row ${activeExperience === index + 1 ? "is-map-active" : ""}`} tabIndex={0} aria-label={`${item.role}. Focus to highlight related skills.`} onMouseEnter={() => pinExperienceRow(index + 1)} onFocus={() => pinExperienceRow(index + 1)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
           </div>
           <Reveal delay={0.1} className="experience-aside-stack self-start"><ExperienceConnectionMap activeExperience={activeExperience} motionPaused={motionPaused} /><div className="panel p-7 md:p-8"><div className="flex items-center gap-3"><GraduationCap className="text-violet-300" size={20} /><p className="label">Education</p></div><div className="mt-7"><p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p><p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p><p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p></div><div className="mt-8 space-y-3 border-t border-white/10 pt-6"><div className="flex justify-between text-sm text-[#aaa4b7]"><span>HSC</span><span className="text-white">80%</span></div><div className="flex justify-between text-sm text-[#aaa4b7]"><span>SSLC</span><span className="text-white">79%</span></div></div></div></Reveal>
         </div>
@@ -1351,7 +1501,7 @@ export default function Home() {
           <Reveal delay={0.08}><div className="skill-legend" aria-label="Four-point star-map proficiency scale"><span className="skill-legend-title">Star map / four-point scale</span>{[[1, "Exploring"], [2, "Foundation"], [3, "Working"], [4, "Applied"]].map(([stars, label]) => <span className="skill-legend-item" key={label as string}><span className="skill-legend-stars" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <b key={star} className={star < Number(stars) ? "is-lit" : ""} />)}</span>{label}</span>)}</div></Reveal>
           <div className={`skill-gravity-status ${gravityProject ? "is-active" : ""}`} aria-live="polite"><span className="skill-gravity-core" aria-hidden="true"><i /></span><div><p className="label">Project gravity</p><p>{gravityProject ? <><b>{projectSkillGravity[gravityProject].label}</b> draws in {projectSkillGravity[gravityProject].note}.</> : "Hover or focus a featured project to align its relevant skills."}</p></div><div className="skill-gravity-controls" aria-label="Choose a project skill alignment">{orbitProjects.map((project) => <button type="button" key={project.id} className={gravityProject === project.id ? "is-active" : ""} onClick={() => setGravityProject(project.id)} aria-pressed={gravityProject === project.id}>{project.index}</button>)}<button type="button" className="skill-gravity-reset" onClick={() => setGravityProject(null)} disabled={!gravityProject}>Reset</button></div></div>
           <div className="capability-grid mt-10 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className={`min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126] ${gravityProject && skill.items.some((item) => projectSkillGravity[gravityProject].skills.includes(item as never)) ? "is-gravity-group" : ""}`}><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => { const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 }; const isGravityActive = Boolean(gravityProject && projectSkillGravity[gravityProject].skills.includes(item as never)); const vector = skillGravityVectors[item] ?? { x: "0px", y: "0px" }; return <span className={`skill-chip ${isGravityActive ? "is-gravity-active" : ""}`} key={item} tabIndex={0} aria-label={`${item}: ${proficiency.level} proficiency${isGravityActive ? ". Related to the active project." : ""}`} style={{ "--gravity-x": vector.x, "--gravity-y": vector.y } as React.CSSProperties}><span>{item}</span><span className="skill-tooltip" role="tooltip"><span className="skill-star-map" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />)}</span><span className="skill-tooltip-copy">{proficiency.level} proficiency</span></span></span>; })}</div></div></Reveal>)}
+            {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className={`capability-cell min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126] ${gravityProject && skill.items.some((item) => projectSkillGravity[gravityProject].skills.includes(item as never)) ? "is-gravity-group" : ""}`} onPointerMove={handleCapabilityGlow} onPointerLeave={clearCapabilityGlow}><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => { const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 }; const isGravityActive = Boolean(gravityProject && projectSkillGravity[gravityProject].skills.includes(item as never)); const vector = skillGravityVectors[item] ?? { x: "0px", y: "0px" }; return <span className={`skill-chip ${isGravityActive ? "is-gravity-active" : ""}`} key={item} tabIndex={0} aria-label={`${item}: ${proficiency.level} proficiency${isGravityActive ? ". Related to the active project." : ""}`} style={{ "--gravity-x": vector.x, "--gravity-y": vector.y } as React.CSSProperties}><span>{item}</span><span className="skill-tooltip" role="tooltip"><span className="skill-star-map" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />)}</span><span className="skill-tooltip-copy">{proficiency.level} proficiency</span></span></span>; })}</div></div></Reveal>)}
           </div>
         </div>
       </section>
