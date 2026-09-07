@@ -10,9 +10,6 @@ import "./index.css";
 import "./interaction-fluidity.css";
 import "./interaction-signals.css";
 import "./interaction-travel.css";
-import "./hero-memoji-fix.css";
-import "./eye-pupil-only.css";
-import "./hero-memoji-pupil-only";
 
 const queryClient = new QueryClient();
 
