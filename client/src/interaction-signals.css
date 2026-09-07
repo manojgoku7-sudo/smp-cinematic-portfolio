@@ -1,0 +1,188 @@
+/* =============================================================================
+   Obsidian Studio — interactive signal layer
+   A restrained second layer of pointer-driven micro-interaction that extends the
+   existing motion vocabulary without competing with it:
+     1. Pointer light that glides over case-study artwork (project cards).
+     2. Pointer glow inside each capability tile.
+     3. Marquee "reel" that pauses and focuses on hover.
+     4. A single light-sheen sweep across signal buttons on hover / focus.
+     5. Magnetic pull that follows the cursor on signal buttons + icon travel.
+   Every effect is contained to its own stacking context, ignores pointer input,
+   and is gated behind the site's accessibility switches (reduced motion, the
+   manual motion-pause control, and low-data mode).
+   ========================================================================== */
+
+/* ---- 1 · Case-study artwork pointer light -------------------------------- */
+.project-scrim {
+  isolation: isolate;
+}
+.project-scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.34s var(--ease-out);
+  background:
+    radial-gradient(clamp(11rem, 26vw, 30rem) circle at var(--card-light-x, 50%) var(--card-light-y, 50%), rgb(255 255 255 / 0.12), rgb(196 181 253 / 0.07) 34%, transparent 68%),
+    radial-gradient(clamp(6rem, 13vw, 15rem) circle at var(--card-light-x, 50%) var(--card-light-y, 50%), rgb(250 246 255 / 0.2), transparent 62%);
+}
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .project-card:hover .project-scrim::after,
+  .page-shell:not(.motion-paused):not(.low-data) .project-card:focus-visible .project-scrim::after {
+    opacity: 1;
+  }
+}
+
+/* ---- 2 · Capability tile pointer glow ------------------------------------ */
+.capability-cell {
+  position: relative;
+  isolation: isolate;
+}
+.capability-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+  background: radial-gradient(15rem circle at var(--cell-glow-x, 50%) var(--cell-glow-y, 50%), rgb(196 181 253 / 0.19), rgb(139 92 246 / 0.06) 44%, transparent 70%);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .capability-cell:hover::after {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .capability-cell:focus-within::after {
+    opacity: 1;
+  }
+}
+
+/* ---- 3 · Marquee reel focus behaviour ------------------------------------ */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .reel:hover .reel-track {
+    animation-play-state: paused;
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .reel-item {
+    transition: color 0.22s var(--ease-out), opacity 0.26s var(--ease-out), text-shadow 0.22s var(--ease-out), transform 0.22s var(--ease-out);
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .reel-item .signal-dot {
+    transition: scale 0.24s var(--ease-out), background 0.24s var(--ease-out), box-shadow 0.24s var(--ease-out);
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .reel:hover .reel-item {
+    opacity: 0.48;
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .reel:hover .reel-item:hover {
+    opacity: 1;
+    color: #fff;
+    text-shadow: 0 0 1.1rem rgb(167 139 250 / 0.85);
+    transform: translateY(-2px);
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .reel:hover .reel-item:hover .signal-dot {
+    background: #fff;
+    scale: 1.12;
+    box-shadow: 0 0 0 4px rgb(196 181 253 / 0.2), 0 0 1.15rem rgb(196 181 253 / 0.95);
+  }
+}
+
+/* ---- 4 · Signal-button light sweep ---------------------------------------- */
+.signal-button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .signal-button::before {
+    content: "";
+    position: absolute;
+    top: -0.15rem;
+    bottom: -0.15rem;
+    left: 0;
+    z-index: -1;
+    width: 46%;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0.16) 42%, rgb(248 242 255 / 0.5) 50%, rgb(255 255 255 / 0.2) 58%, transparent 100%);
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  .page-shell:not(.motion-paused):not(.low-data) .signal-button:hover::before,
+  .page-shell:not(.motion-paused):not(.low-data) .signal-button:focus-visible::before {
+    animation: signal-button-sheen 1s var(--ease-out) both;
+  }
+}
+@keyframes signal-button-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  14% {
+    opacity: 0.9;
+  }
+  58% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(300%) skewX(-18deg);
+  }
+}
+
+/* ---- 5 · Magnetic pull + icon travel on signal buttons -------------------- */
+.signal-button svg {
+  transition: transform 240ms var(--ease-out), filter 240ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .page-shell:not(.motion-paused):not(.low-data) .signal-button:hover svg,
+  .page-shell:not(.motion-paused):not(.low-data) .signal-button:focus-visible svg {
+    transform: translateX(3px);
+    filter: drop-shadow(0 0 6px rgb(196 181 253 / 0.6));
+  }
+}
+.signal-button.is-magnetized {
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  transition: transform 80ms linear, border-color 180ms var(--ease-out), background 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+  will-change: transform;
+}
+.signal-button.is-magnetized:hover {
+  transform: translate(var(--magnet-x, 0px), calc(var(--magnet-y, 0px) - 3px));
+}
+.signal-button.is-magnetized:active {
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px)) scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .signal-button.is-magnetized {
+    transform: none !important;
+  }
+  .signal-button svg {
+    transition: none !important;
+  }
+}
+.page-shell.motion-paused .signal-button.is-magnetized,
+.page-shell.low-data .signal-button.is-magnetized {
+  transform: none !important;
+}
+.page-shell.motion-paused .signal-button svg,
+.page-shell.low-data .signal-button svg {
+  transition: none !important;
+}
+
+/* ---- Accessibility switches ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .project-scrim::after,
+  .capability-cell::after,
+  .signal-button::before {
+    display: none !important;
+  }
+}
+.motion-paused .project-scrim::after,
+.motion-paused .capability-cell::after,
+.motion-paused .signal-button::before,
+.low-data .project-scrim::after,
+.low-data .capability-cell::after,
+.low-data .signal-button::before {
+  animation: none !important;
+  opacity: 0 !important;
+}
