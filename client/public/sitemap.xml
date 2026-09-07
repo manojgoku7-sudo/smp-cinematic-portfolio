@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SMP Cinematic Portfolio — single-page site. If a custom domain is
+     connected later, replace the loc hostnames below. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://smp-cinematic-portfolio.vercel.app/</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

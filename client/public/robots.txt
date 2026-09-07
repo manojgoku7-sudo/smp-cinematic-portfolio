@@ -1,0 +1,6 @@
+# SMP Cinematic Portfolio — S Manoj Prabhu
+# If a custom domain is connected later, update the sitemap URL below.
+User-agent: *
+Allow: /
+
+Sitemap: https://smp-cinematic-portfolio.vercel.app/sitemap.xml

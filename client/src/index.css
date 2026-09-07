@@ -70,6 +70,13 @@
 
 * { border-color: var(--border); }
 html { scroll-behavior: smooth; background: #09090f; }
+/* Phase 2 accessibility foundations. Component-level :focus-visible rules
+   (higher specificity) keep winning where they exist; this is the fallback. */
+:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 2px; }
+/* Fixed 5rem nav-shell would cover hash-link targets without this offset. */
+section[id], article[id] { scroll-margin-top: 5.5rem; }
+.skip-link { position: fixed; left: 1rem; top: -4.5rem; z-index: 100; border: 1px solid rgb(196 181 253 / .5); background: rgb(11 9 18 / .97); padding: .65rem 1rem; color: #f4f1ff; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 12px 32px rgb(0 0 0 / .5); transition: top 160ms var(--ease-out); }
+.skip-link:focus-visible { top: 1rem; outline: 2px solid #fff; }
 body {
   margin: 0;
   min-width: 320px;

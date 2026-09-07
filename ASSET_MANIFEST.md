@@ -25,10 +25,14 @@ All website media is stored as actual binary files in the repository and referen
 | `smp-mj-monogram-clear-j_24fbf37a.webp` | WebP | 325,722 bytes | `client/public/images/smp-mj-monogram-clear-j_24fbf37a.webp` |
 | `smp-project-food_c1b44933.webp` | WebP | 99,318 bytes | `client/public/images/smp-project-food_c1b44933.webp` |
 | `smp-project-security_4a7c2847.webp` | WebP | 202,166 bytes | `client/public/images/smp-project-security_4a7c2847.webp` |
+| `smp-social-card.jpg` | JPEG 1200×630 | 60,394 bytes | `client/public/images/smp-social-card.jpg` |
+| `smp-icon-192.png` | PNG 192×192 | 38,802 bytes | `client/public/images/smp-icon-192.png` |
+| `smp-icon-512.png` | PNG 512×512 | 61,465 bytes | `client/public/images/smp-icon-512.png` |
+| `smp-icon-maskable-512.png` | PNG 512×512 | 38,330 bytes | `client/public/images/smp-icon-maskable-512.png` |
 
 ## Audit result
 
-- **Total assets:** 15 (12 WebP images, 2 PNG icons, 1 MP4 video).
+- **Total assets:** 19 (12 WebP images, 1 JPEG social card, 5 PNG icons, 1 MP4 video).
 - **Images:** all under `client/public/images/`.
 - **Video:** 1, under `client/public/videos/`.
 - **Largest file:** `smp-anime-black-hole_fe55ef2a.mp4` at 2,033,613 bytes (approximately 1.94 MiB), below GitHub's 100 MB regular-file limit.
