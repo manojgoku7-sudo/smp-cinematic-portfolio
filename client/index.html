@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <meta name="theme-color" content="#09090f" />
-    <meta name="description" content="S Manoj Prabhu — Frontend Developer, UI/UX Designer and Java Developer." />
+    <meta name="description" content="S Manoj Prabhu — Frontend Developer, UI/UX Designer and Java Developer. Explore cinematic portfolio featuring machine learning, mobile design, and full-stack automation projects." />
+    <meta name="keywords" content="Frontend Developer, UI/UX Designer, Java Developer, React, TypeScript, Full-Stack" />
+    <meta name="author" content="S Manoj Prabhu" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="S Manoj Prabhu — Cinematic Portfolio" />
+    <meta property="og:description" content="Frontend Developer, UI/UX Designer and Java Developer. Featured projects in ML, mobile design, and automation." />
+    <meta property="og:image" content="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
+    <meta property="og:site_name" content="S Manoj Prabhu Portfolio" />
+    
+    <!-- Twitter/X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="S Manoj Prabhu — Cinematic Portfolio" />
+    <meta name="twitter:description" content="Frontend Developer, UI/UX Designer and Java Developer. Explore featured projects." />
+    <meta name="twitter:image" content="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
+    
     <link rel="icon" type="image/png" href="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,9 +30,11 @@
     <style>
       .mouse-pupil-tracker { position:absolute; z-index:30; pointer-events:none; border-radius:50%; display:block; }
       .mouse-pupil-tracker::before { content:""; position:absolute; inset:-42%; border-radius:50%; background:radial-gradient(circle, #6c3b1c 0 46%, #8a5a32 60%, rgba(138,90,50,0) 78%); }
-      .mouse-pupil-tracker::after { content:""; position:absolute; left:50%; top:50%; width:46%; height:46%; transform:translate(-50%,-50%); border-radius:50%; background:#050505; box-shadow:0 0 1px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.3); }
+      .mouse-pupil-tracker::after { content:""; position:absolute; left:50%; top:50%; width:46%; height:46%; transform:translate(-50%,-50%); border-radius:50%; background:#050505; box-shadow:0 0 1[...]
       .mouse-pupil-tracker.left { width:5.2%; height:5.2%; left:36.45%; top:44.05%; }
       .mouse-pupil-tracker.right { width:5.2%; height:5.2%; left:58.25%; top:44.05%; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+      .focus\:not-sr-only:focus { position: static; width: auto; height: auto; padding: inherit; margin: inherit; overflow: visible; clip: auto; white-space: normal; }
     </style>
   </head>
   <body>
@@ -62,7 +81,9 @@
           leftPupil = document.createElement('span');
           rightPupil = document.createElement('span');
           leftPupil.className = 'mouse-pupil-tracker left';
+          leftPupil.setAttribute('aria-hidden', 'true');
           rightPupil.className = 'mouse-pupil-tracker right';
+          rightPupil.setAttribute('aria-hidden', 'true');
           portrait.append(leftPupil, rightPupil);
 
           const follow = (event) => {
