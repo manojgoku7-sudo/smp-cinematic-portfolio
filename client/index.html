@@ -27,15 +27,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>S Manoj Prabhu — Cinematic Portfolio</title>
-    <style>
-      .mouse-pupil-tracker { position:absolute; z-index:30; pointer-events:none; border-radius:50%; display:block; }
-      .mouse-pupil-tracker::before { content:""; position:absolute; inset:-42%; border-radius:50%; background:radial-gradient(circle, #6c3b1c 0 46%, #8a5a32 60%, rgba(138,90,50,0) 78%); }
-      .mouse-pupil-tracker::after { content:""; position:absolute; left:50%; top:50%; width:46%; height:46%; transform:translate(-50%,-50%); border-radius:50%; background:#050505; box-shadow:0 0 1[...]
-      .mouse-pupil-tracker.left { width:5.2%; height:5.2%; left:36.45%; top:44.05%; }
-      .mouse-pupil-tracker.right { width:5.2%; height:5.2%; left:58.25%; top:44.05%; }
-      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-      .focus\:not-sr-only:focus { position: static; width: auto; height: auto; padding: inherit; margin: inherit; overflow: visible; clip: auto; white-space: normal; }
-    </style>
   </head>
   <body>
     <div id="root"></div>
@@ -125,6 +116,5 @@
         }
       })();
     </script>
-    <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
 </html>
