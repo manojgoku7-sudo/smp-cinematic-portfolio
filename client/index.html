@@ -2,12 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#09090f" />
     <meta name="description" content="S Manoj Prabhu — Frontend Developer, UI/UX Designer and Java Developer. Explore cinematic portfolio featuring machine learning, mobile design, and full-stack automation projects." />
-    <meta name="keywords" content="Frontend Developer, UI/UX Designer, Java Developer, React, TypeScript, Full-Stack" />
+    <meta name="keywords" content="Frontend Developer, UI/UX Designer, Java Developer, React, TypeScript, Full-Stack, S Manoj Prabhu" />
     <meta name="author" content="S Manoj Prabhu" />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://manojprabhu.dev/" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -22,99 +23,75 @@
     <meta name="twitter:description" content="Frontend Developer, UI/UX Designer and Java Developer. Explore featured projects." />
     <meta name="twitter:image" content="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
     
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://manojprabhu.dev/#person",
+          "name": "S Manoj Prabhu",
+          "jobTitle": "Frontend Developer, UI/UX Designer, Java Developer",
+          "email": "mailto:manojprabhu0707@gmail.com",
+          "telephone": "+919677518268",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Polur",
+            "addressRegion": "Tamil Nadu",
+            "addressCountry": "IN"
+          },
+          "alumniOf": {
+            "@type": "CollegeOrUniversity",
+            "name": "Saveetha School of Engineering",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Chennai",
+              "addressRegion": "Tamil Nadu",
+              "addressCountry": "IN"
+            }
+          },
+          "sameAs": [
+            "https://github.com/manojprabhu07",
+            "https://www.linkedin.com/in/manojprabhu07"
+          ],
+          "knowsAbout": [
+            "React",
+            "JavaScript",
+            "TypeScript",
+            "Java",
+            "Spring Boot",
+            "REST APIs",
+            "UI/UX Design",
+            "Figma",
+            "Machine Learning",
+            "Python"
+          ]
+        },
+        {
+          "@type": "ProfilePage",
+          "@id": "https://manojprabhu.dev/#webpage",
+          "url": "https://manojprabhu.dev/",
+          "name": "S Manoj Prabhu — Cinematic Portfolio",
+          "about": { "@id": "https://manojprabhu.dev/#person" },
+          "description": "Cinematic editorial portfolio of S Manoj Prabhu showcasing full-stack automation, machine learning, and interactive UI/UX engineering."
+        }
+      ]
+    }
+    </script>
+    
     <link rel="icon" type="image/png" href="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
+    <link rel="preload" as="image" href="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/smp-mj-monogram-clear-j_24fbf37a.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>S Manoj Prabhu — Cinematic Portfolio</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      (() => {
-        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-        let initialized = false;
-        let raf = 0;
-        let leftPupil = null;
-        let rightPupil = null;
-        let portrait = null;
-        const target = { x: 0, y: 0 };
-        const current = { x: 0, y: 0 };
-
-        const render = () => {
-          current.x += (target.x - current.x) * 0.3;
-          current.y += (target.y - current.y) * 0.3;
-          const transform = `translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
-          if (leftPupil) leftPupil.style.transform = transform;
-          if (rightPupil) rightPupil.style.transform = transform;
-          if (Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.03) {
-            raf = requestAnimationFrame(render);
-          } else {
-            current.x = target.x;
-            current.y = target.y;
-            raf = 0;
-          }
-        };
-
-        const queue = () => { if (!raf) raf = requestAnimationFrame(render); };
-
-        const attach = () => {
-          if (initialized) return true;
-          portrait = document.querySelector('.hero-memoji-portrait');
-          if (!portrait) return false;
-
-          /* Hide all previous experimental pupil/eyelid layers. */
-          portrait.querySelectorAll('.hero-memoji-pupil-window, .hero-memoji-pupil-only-window, .hero-memoji-lid').forEach((node) => {
-            node.style.setProperty('display', 'none', 'important');
-          });
-
-          leftPupil = document.createElement('span');
-          rightPupil = document.createElement('span');
-          leftPupil.className = 'mouse-pupil-tracker left';
-          leftPupil.setAttribute('aria-hidden', 'true');
-          rightPupil.className = 'mouse-pupil-tracker right';
-          rightPupil.setAttribute('aria-hidden', 'true');
-          portrait.append(leftPupil, rightPupil);
-
-          const follow = (event) => {
-            if (window.innerWidth < 768) return;
-            const bounds = portrait.getBoundingClientRect();
-            if (!bounds.width || !bounds.height) return;
-
-            /* Use each eye's real center, so gaze follows the actual cursor direction. */
-            const eyeCenterX = bounds.left + bounds.width * 0.5;
-            const eyeCenterY = bounds.top + bounds.height * 0.468;
-            const dx = event.clientX - eyeCenterX;
-            const dy = event.clientY - eyeCenterY;
-
-            /* Larger travel than before; still safely inside the iris. */
-            target.x = clamp(dx / 12, -12, 12);
-            target.y = clamp(dy / 12, -7, 7);
-            queue();
-          };
-
-          window.addEventListener('mousemove', follow, { passive: true });
-          initialized = true;
-          return true;
-        };
-
-        const boot = () => {
-          if (attach()) return;
-          let tries = 0;
-          const retry = () => {
-            if (attach()) return;
-            if (++tries < 100) setTimeout(retry, 100);
-          };
-          retry();
-        };
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', boot, { once: true });
-        } else {
-          boot();
-        }
-      })();
-    </script>
   </body>
 </html>

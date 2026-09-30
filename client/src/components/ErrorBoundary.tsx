@@ -35,7 +35,9 @@ class ErrorBoundary extends Component<Props, State> {
 
             <div className="p-4 w-full rounded bg-muted overflow-auto mb-6">
               <pre className="text-sm text-muted-foreground whitespace-break-spaces">
-                {this.state.error?.stack}
+                {process.env.NODE_ENV === "development"
+                  ? this.state.error?.stack
+                  : this.state.error?.message || "An unexpected error occurred."}
               </pre>
             </div>
 

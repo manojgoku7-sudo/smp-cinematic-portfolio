@@ -3,35 +3,61 @@
  * Hero portrait rule: the freestanding glasses-wearing Memoji remains compact, transparent, and cursor-responsive only on fine-pointer desktop devices.
  */
 import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
 import { Dialog, Dialog as DialogRoot, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { RevealMetric } from "@/components/RevealMetric";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
+import { CyberTypingDescription } from "@/components/CyberTypingDescription";
+import { ExperienceConnectionMap } from "@/components/ExperienceConnectionMap";
+import { MobileNavDrawer } from "@/components/MobileNavDrawer";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { MagneticNav } from "@/components/MagneticNav";
+import { ProjectOrbitSelector } from "@/components/ProjectOrbitSelector";
+import { DynamicIslandStatus } from "@/components/DynamicIslandStatus";
+import { InteractiveCoffeeMug } from "@/components/InteractiveCoffeeMug";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
+import { DeveloperTerminal } from "@/components/DeveloperTerminal";
+import { scrollToElement } from "@/hooks/useSmoothScroll";
 import {
   ArrowDownRight,
   ArrowUpRight,
   BriefcaseBusiness,
+  Check,
   CircleCheckBig,
+  Clock,
   ChevronLeft,
   ChevronRight,
+  Cloud,
   Code2,
+  Copy,
+  Cpu,
   Download,
   Github,
   GraduationCap,
+  Laptop,
   Layers3,
+  Layout,
   Linkedin,
   Mail,
   MapPin,
   Menu,
+  Orbit,
+  Palette,
   Pause,
   Phone,
   Play,
+  RotateCcw,
   Send,
+  Server,
   Sparkles,
-  Sun,
-  Moon,
+  Stars,
+  Terminal,
+  UserPlus,
   X,
+  Zap,
 } from "lucide-react";
 
 const navItems = [
@@ -46,8 +72,8 @@ const skills = [
   { title: "Frontend", code: "02", items: ["HTML5", "CSS3", "React (basic)"] },
   { title: "UI / UX", code: "03", items: ["Figma", "Wireframing", "Prototyping"] },
   { title: "Backend", code: "04", items: ["Spring Boot", "REST API", "MySQL"] },
-  { title: "Tools & Cloud", code: "05", items: ["Git", "GitHub", "VS Code", "Firebase", "Oracle APEX"] },
-  { title: "Applied ML", code: "06", items: ["XGBoost", "SVM", "Logistic Regression", "Agile", "Scrum"] },
+  { title: "Tools & Delivery", code: "05", items: ["Git", "GitHub", "VS Code", "Firebase", "Oracle APEX", "Agile", "Scrum"] },
+  { title: "Applied ML", code: "06", items: ["XGBoost", "SVM", "Logistic Regression"] },
 ];
 
 const experience = [
@@ -83,12 +109,6 @@ const experience = [
   },
 ];
 const experienceSignals = ["8+ APIs shipped", "3 review cycles", "20+ components"] as const;
-const experienceConnections = [
-  { role: "Project Intern", focus: "Java service delivery", skills: ["Java", "Spring Boot", "REST APIs", "MySQL"] },
-  { role: "UI/UX Design Intern", focus: "Research-led interface design", skills: ["Figma", "Usability", "Wireframes", "Prototypes"] },
-  { role: "UI/UX Design Intern", focus: "Reusable mobile systems", skills: ["Figma", "Components", "Material Design", "Mobile flows"] },
-] as const;
-const experienceSkillNodes = ["Java", "Spring Boot", "REST APIs", "MySQL", "Figma", "Usability", "Components", "Mobile flows"] as const;
 
 const certifications = [
   { issuer: "Oracle", title: "APEX Cloud Developer Professional", meta: "1Z0-771", theme: "Application development", focus: "Cloud delivery" },
@@ -105,10 +125,10 @@ const HERO_MEMOJI_PUPIL_MAX_Y = 2.5;
 const HERO_MEMOJI_BLINK_MIN_MS = 420;
 const HERO_MEMOJI_BLINK_MAX_MS = 500;
 const orbitProjects = [
-  { id: "attack-study", index: "01", title: "Attack model", discipline: "ML / security", signal: "85% accuracy" },
-  { id: "delivery-study", index: "02", title: "Delivery flow", discipline: "UX / mobile", signal: "15+ screens" },
-  { id: "ai-content-studio", index: "03", title: "AI content studio", discipline: "Automation / media", signal: "Auto pipeline" },
-  { id: "polur-charm", index: "04", title: "Polur Charm", discipline: "Travel / civic tech", signal: "24/7 discovery" },
+  { id: "attack-study", index: "01", title: "Attack Prediction Model", discipline: "Machine Learning · Python", signal: "85% Accuracy" },
+  { id: "delivery-study", index: "02", title: "Food Delivery App", discipline: "Mobile UI/UX · Figma", signal: "15+ Screens" },
+  { id: "ai-content-studio", index: "03", title: "Autonomous AI Studio", discipline: "Video Engineering · LLaMA", signal: "Auto Pipeline" },
+  { id: "polur-charm", index: "04", title: "Polur Charm Civic Hub", discipline: "Civic Web · React 19", signal: "24/7 Transit" },
 ] as const;
 type OrbitProjectId = (typeof orbitProjects)[number]["id"];
 const projectSkillGravity = {
@@ -191,6 +211,7 @@ const projectCollection = [
     technologies: ["Python", "BeautifulSoup4", "Pillow", "Pinterest API v5", "Flask", "Requests", "Render"],
     tags: ["Python", "Automation", "Web Scraping", "REST APIs", "Image Processing", "Social Media Bot"],
     image: "/images/project-collection-pinterest-automation_0e75a634.jpg",
+    placeholder: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAlABwDASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAAAAMEBQYC/8QAJRAAAgIBBAEDBQAAAAAAAAAAAQIAAxEEEiExUQUGYRMkMkFS/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFREBAQAAAAAAAAAAAAAAAAAAAAH/2gAMAwEAAhEDEQA/AOPEq0elbU3Vp+IdtoY9AyaW6W96xT3tV901Btaj28ml0TXKzWMBkkgACc/dWaXCuRkjPE3vU/VbrTZ9M/bmtUGfPxOfvzvG5i3A5MLSQY+g4bBwQQeCYkAnqOVyqhSoOPIiIttRBpECWF8HO3+ZnvhmyuAI3fWSC1fnoyc9mKoB8cRy3nIBVT+usQhER4d8nrEVu+IQkH//2Q==",
     alt: "Original cinematic image automation visual with abstract creative image tiles and content-processing signals",
   },
   {
@@ -207,6 +228,7 @@ const projectCollection = [
     technologies: ["Python", "FFmpeg", "TeleBot", "Groq API", "YouTube Data API v3", "Meta Graph API", "Instagrapi", "SQLite", "Render"],
     tags: ["Python", "AI", "Automation", "FFmpeg", "Media Processing", "Groq LLM", "YouTube API", "Instagram API"],
     image: "/images/project-collection-social-publishing_227bb808.jpg",
+    placeholder: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAlABwDASIAAhEBAxEB/8QAGgAAAwADAQAAAAAAAAAAAAAAAAMEAQIFBv/EACcQAAICAQQABAcAAAAAAAAAAAECABEDBBIhMRNBUZEFIjJCYXGx/8QAFwEBAQEBAAAAAAAAAAAAAAAAAgABA//EABkRAQADAQEAAAAAAAAAAAAAAAABAhEhMf/aAAwDAQACEQMRAD8A8aJRpcSOzHKflVSaBomIEuwtiXSbPCY5nb6z1X4jpGyiBhOwmgSBwK9Yhl2tXmO50/iFIcSHFVKO1q+P5c5zgKdpXkDnmK0YxjYR2D7S7THNqPDwKu4XxQhjXM6hXVXP27zz73GY8yYQwKK22+RxzXl+o6Vz0vCNaT4rWNoBIEjJF9R+rzDKw2FtoFCzcmnO89CscbhyAT2fWYZ2bs3CEOyTWEIQp//Z",
     alt: "Original cinematic AI media publishing visual with abstract vertical video frames and automation signals",
   },
   {
@@ -223,6 +245,7 @@ const projectCollection = [
     tags: ["Python", "Telegram Bot", "Playwright", "Generative AI", "Google Gemini", "Groq", "Web Automation", "Flask", "Docker", "CI/CD"],
     liveUrl: "https://nm969989-cmd.github.io/myjob-ai-bot/",
     image: "/images/project-collection-myjob-radar_8cc39039.jpg",
+    placeholder: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAlABwDASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAAAAIDAQQG/8QAHxABAAMAAgIDAQAAAAAAAAAAAQACERIhAzETQWEi/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAIBA//EABcRAQEBAQAAAAAAAAAAAAAAAAARAQL/2gAMAwEAAhEDEQA/APInHgmdv3HQ4Jmon9HqSq/WbsrTCqa/pOuMJeoKCJvvIlgHCdXw0fFzfJWveZnc57gWcd/Y65gQYxZHSJNkUXPLtGvE97sivfcp4aPk5BvRvUk+5W2DIQhIaYs19OTIQgf/2Q==",
     alt: "Original cinematic AI career radar with abstract opportunity cards and scanning signals",
   },
   {
@@ -240,6 +263,7 @@ const projectCollection = [
     results: ["92.5% FLC mean accuracy", "85.2% FLC mean efficiency", "18–20% reported FLC battery consumption", "FLC outperformed the Time-Based Algorithm across reported performance measures"],
     tags: ["Fuzzy Logic", "IoT", "Sensors", "Smart Automation", "SPSS", "Data Analysis", "Research Prototype"],
     image: "/images/project-collection-aroma-diffuser_04698510.jpg",
+    placeholder: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAlABwDASIAAhEBAxEB/8QAGgAAAwADAQAAAAAAAAAAAAAAAIDAQQFBv/EACEQAAICAgIDAAMAAAAAAAAAAAECABEDIRIxBEFhUXGB/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAEC/8QAFxEBAQEBAAAAAAAAAAAAAAAAAAERAv/aAAwDAQACEQMRAD8A8fUooqIJZbIW64/ZqIucdYQWHYsTRYbnU8p+fj4yKs+5zuNy9TFTBlFLGlFn8CItGWwqwyK60aN9iZRXyVbDkXA5vguwPRPYkHNNRoTLcy7lhZPu4rLbWTv9xqpqaN6/scuCdqL+ahCAHQ0YhY33CED/2Q==",
     alt: "Original cinematic smart aroma diffuser research visual with sensor halos and fuzzy-logic light curves",
   },
 ] as const;
@@ -272,13 +296,143 @@ const skillProficiency: Record<string, { level: string; stars: number }> = {
   Java: { level: "Applied", stars: 4 }, JavaScript: { level: "Working", stars: 3 }, Python: { level: "Working", stars: 3 }, SQL: { level: "Working", stars: 3 }, HTML5: { level: "Applied", stars: 4 }, CSS3: { level: "Applied", stars: 4 }, "React (basic)": { level: "Foundation", stars: 2 }, Figma: { level: "Applied", stars: 4 }, Wireframing: { level: "Applied", stars: 4 }, Prototyping: { level: "Applied", stars: 4 }, "Spring Boot": { level: "Working", stars: 3 }, "REST API": { level: "Applied", stars: 4 }, MySQL: { level: "Working", stars: 3 }, Git: { level: "Working", stars: 3 }, GitHub: { level: "Working", stars: 3 }, "VS Code": { level: "Applied", stars: 4 }, Firebase: { level: "Working", stars: 3 }, "Oracle APEX": { level: "Foundation", stars: 2 }, XGBoost: { level: "Applied", stars: 4 }, SVM: { level: "Working", stars: 3 }, "Logistic Regression": { level: "Working", stars: 3 }, Agile: { level: "Working", stars: 3 }, Scrum: { level: "Working", stars: 3 },
 };
 
+const contactTopics = [
+  {
+    id: "hiring",
+    icon: "💼",
+    label: "Internship / Role",
+    template: "Hi Manoj, I reviewed your portfolio and would like to discuss an opportunity for a Frontend Developer / UI-UX role at...",
+  },
+  {
+    id: "frontend",
+    icon: "🎨",
+    label: "UI/UX & Frontend",
+    template: "Hi Manoj, I love your design and frontend work and want to collaborate on building a high-fidelity interface for...",
+  },
+  {
+    id: "stack",
+    icon: "⚡",
+    label: "Java & ML Systems",
+    template: "Hi Manoj, I am interested in your technical background with Java, Spring Boot, and machine learning models for...",
+  },
+  {
+    id: "chat",
+    icon: "☕",
+    label: "15-Min Intro Chat",
+    template: "Hi Manoj, I enjoyed reviewing your projects and would love to connect for a quick 15-minute informal coffee chat...",
+  },
+];
+
 function scrollToSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToElement(id, -84);
 }
 
-function downloadResume() {
-  const resume = `S MANOJ PRABHU\nFrontend Developer | UI/UX Designer | Java Developer\n\nCONTACT\nmanojprabhu0707@gmail.com | +91 9677518268\ngithub.com/manojprabhu07 | Polur, Tamil Nadu\n\nPROFILE\nFrontend Developer and UI/UX Designer specialising in React, Figma, Java/Spring Boot, and applied Machine Learning.\n\nEXPERIENCE\nProject Intern — Infosys Springboard (09/2025–11/2025)\nUI/UX Design Intern — Fluezen Technology (01/2024–03/2024)\nUI/UX Design Intern — Kaashiv Infotech (06/2023–08/2023)\n\nEDUCATION\nB.Tech, Information Technology — Saveetha School of Engineering, Chennai. CGPA: 8.0/10.0\n`;
-  const blob = new Blob([resume], { type: "text/plain" });
+async function downloadResume() {
+  const primaryPdf = "/S_Manoj_Prabhu_Resume.pdf";
+  try {
+    const res = await fetch(primaryPdf, { method: "HEAD" });
+    const contentType = res.headers.get("content-type") || "";
+    if (res.ok && !contentType.includes("text/html")) {
+      const anchor = document.createElement("a");
+      anchor.href = primaryPdf;
+      anchor.download = "S_Manoj_Prabhu_Resume.pdf";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      return;
+    }
+  } catch {
+    // Continue to other checks
+  }
+
+  const possiblePdfs = [
+    "/S_Manoj_Prabhu_Resume.pdf",
+    "/S-Manoj-Prabhu-Resume.pdf",
+    "/resume.pdf",
+  ];
+
+  for (const pdfPath of possiblePdfs) {
+    try {
+      const res = await fetch(pdfPath, { method: "HEAD" });
+      const contentType = res.headers.get("content-type") || "";
+      if (res.ok && !contentType.includes("text/html")) {
+        const anchor = document.createElement("a");
+        anchor.href = pdfPath;
+        anchor.download = pdfPath.replace(/^\//, "");
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        return;
+      }
+    } catch {
+      // Continue to next check
+    }
+  }
+
+  const resume = `S MANOJ PRABHU
+Frontend Developer | UI/UX Designer | Java Developer
+
+CONTACT
+Email: manojprabhu0707@gmail.com
+Phone: +91 9677518268
+Location: Polur, Tamil Nadu, India
+GitHub: https://github.com/manojprabhu07
+LinkedIn: https://www.linkedin.com/in/manojprabhu07
+
+PROFILE
+Frontend Developer and UI/UX Designer specialising in React, Figma, Java/Spring Boot, and applied Machine Learning. Engineering undergraduate with hands-on experience building production interfaces, RESTful microservices, and predictive ML models.
+
+EDUCATION
+B.Tech in Information Technology
+Saveetha School of Engineering, Chennai (09/2021 — Present)
+• Cumulative GPA: 8.0 / 10.0
+• Higher Secondary Certificate (HSC): 80%
+• Secondary School Leaving Certificate (SSLC): 79%
+
+EXPERIENCE & INTERNSHIPS
+1. Project Intern — Infosys Springboard · Internship 6.0 (09/2025 — 11/2025 | Remote)
+   • Built a full-stack Dynamic Ride Sharing and Carpooling Platform using Java, Spring Boot, and MySQL.
+   • Implemented 8+ RESTful APIs for user registration, trip matching, booking, and route tracking.
+
+2. UI/UX Design Intern — Fluezen Technology (01/2024 — 03/2024 | Chennai, Tamil Nadu)
+   • Designed and delivered 10+ mobile and web UI screens in Figma within a two-month sprint.
+   • Conducted usability testing across 3 iterative design cycles, reducing handoff time by approximately 25%.
+
+3. UI/UX Design Intern — Kaashiv Infotech (06/2023 — 08/2023 | Chennai, Tamil Nadu)
+   • Developed a Figma component library of 20+ UI elements, reducing screen design time by 30%.
+   • Designed mobile application screens applying Material Design principles and 8-point grid systems.
+
+TECHNICAL SKILLS
+• Languages: Java, JavaScript, Python, SQL
+• Frontend: HTML5, CSS3, React, Tailwind CSS
+• UI / UX: Figma, Wireframing, Prototyping, Design Systems
+• Backend: Spring Boot, REST API, MySQL
+• Tools & Delivery: Git, GitHub, VS Code, Firebase, Oracle APEX, Agile, Scrum
+• Applied ML: XGBoost, SVM, Logistic Regression
+
+FEATURED PROJECTS
+1. Prediction of Perpetration Attack (Machine Learning · Python)
+   • Evaluated supervised classifiers for network intrusion pattern detection; XGBoost achieved 85% accuracy.
+   • Repository: https://github.com/manojprabhu07/Research-Papers-Final-Year-Project
+
+2. Food Delivery Mobile App (Mobile UI/UX · Figma)
+   • Mapped multi-step mobile ordering journey across 15+ production-ready screens with 8-point grid system.
+
+3. YouTube Auto-Uploader & Autonomous AI Content Studio
+   • Autonomous cloud media automation engine built with Python, FFmpeg, and multi-tier API pipelines.
+
+4. Polur Charm Civic & Tourism Platform
+   • Bilingual regional discovery and 24/7 transit platform built with React 19, TypeScript, and Tailwind CSS.
+   • Live: https://polurcharm.com | Repository: https://github.com/gokuuchihatamil/polur-charm
+
+CERTIFICATIONS
+• Oracle APEX Cloud Developer Professional (1Z0-771) — Oracle
+• Artificial Intelligence Fundamentals (SkillsBuild) — IBM
+• Introduction to IoT — NPTEL
+• Springboard Internship 6.0 Certificate — Infosys
+`;
+
+  const blob = new Blob([resume], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -301,33 +455,168 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   return (
     <motion.div
       className={className ? `section-reveal ${className}` : "section-reveal"}
-      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.988 }}
-      whileInView={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.12, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: 0.52, delay, ease: [0.23, 1, 0.32, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+      whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: "some", margin: "0px 0px 80px 0px" }}
+      transition={{ duration: 0.32, delay: Math.min(delay, 0.12), ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
   );
 }
 
+const collectionFanVariants: Variants = {
+  hidden: (index: number) => {
+    const gatheredOffsets = [
+      { x: 18, y: 14, rotate: 1 },
+      { x: 6, y: 10, rotate: 0.5 },
+      { x: -6, y: 10, rotate: -0.5 },
+      { x: -18, y: 14, rotate: -1 },
+    ];
+    const offset = gatheredOffsets[index] || { x: 0, y: 12, rotate: 0 };
+    return {
+      opacity: 0,
+      x: offset.x,
+      y: offset.y,
+      rotate: offset.rotate,
+    };
+  },
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    y: 0,
+    rotate: 0,
+    transition: {
+      duration: 0.38,
+      delay: index * 0.05,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  }),
+};
+
 function GravityHeading({ title, motionPaused }: { title: string; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticType = reduceMotion || motionPaused;
-  return <h2 className="display section-heading gravity-heading" aria-label={title}>{title.split(" ").map((word, wordIndex) => <span className="gravity-word-shell" key={`${word}-${wordIndex}`}><span className="gravity-word">{word.split("").map((character, characterIndex) => { const index = wordIndex * 8 + characterIndex; return <motion.span key={`${character}-${characterIndex}`} className="gravity-letter" aria-hidden="true" initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: .6 }} whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }} viewport={{ once: true, amount: .55 }} transition={{ duration: .54, delay: .08 + (index % 8) * .035, ease: [0.23, 1, 0.32, 1] }}>{character}</motion.span>; })}</span>{wordIndex < title.split(" ").length - 1 ? <span className="gravity-space" aria-hidden="true" /> : null}</span>)}</h2>;
+  const containerRef = useRef<HTMLHeadingElement | null>(null);
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const rafId = useRef<number | null>(null);
+
+  const resetLensing = useCallback(() => {
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    letterRefs.current.forEach((letter) => {
+      if (letter) {
+        letter.style.transform = "";
+        letter.style.textShadow = "";
+        letter.style.color = "";
+      }
+    });
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLHeadingElement>) => {
+    if (staticType) return;
+
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+
+    rafId.current = requestAnimationFrame(() => {
+      const pullRadius = 220;
+
+      letterRefs.current.forEach((letter) => {
+        if (!letter) return;
+        const rect = letter.getBoundingClientRect();
+        const lx = rect.left + rect.width / 2;
+        const ly = rect.top + rect.height / 2;
+        const dx = clientX - lx;
+        const dy = clientY - ly;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < pullRadius) {
+          const norm = 1 - dist / pullRadius;
+          const force = Math.pow(norm, 1.5);
+          const dirX = dx / (dist || 1);
+          const dirY = dy / (dist || 1);
+
+          const tx = dirX * force * 16;
+          const ty = dirY * force * 12;
+          const rot = dirX * dirY * force * 18;
+          const scale = 1 + force * 0.12;
+          const chroma = (force * 3.6).toFixed(1);
+          const glow = (force * 0.65).toFixed(2);
+
+          letter.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+          letter.style.textShadow = force > 0.06
+            ? `-${chroma}px 0 4px rgba(244, 184, 232, 0.8), ${chroma}px 0 4px rgba(139, 92, 246, 0.85), 0 0 16px rgba(196, 181, 253, ${glow})`
+            : "";
+          letter.style.color = force > 0.1 ? "#ffffff" : "";
+        } else {
+          letter.style.transform = "";
+          letter.style.textShadow = "";
+          letter.style.color = "";
+        }
+      });
+    });
+  }, [staticType]);
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, []);
+
+  let letterCount = 0;
+
+  return (
+    <h2
+      ref={containerRef}
+      className="display section-heading gravity-heading"
+      aria-label={title}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetLensing}
+    >
+      {title.split(" ").map((word, wordIndex, wordsArr) => (
+        <span className="gravity-word-shell" key={`${word}-${wordIndex}`}>
+          <span className="gravity-word">
+            {word.split("").map((character, characterIndex) => {
+              const currentRefIdx = letterCount++;
+              const index = wordIndex * 8 + characterIndex;
+              return (
+                <motion.span
+                  key={`${character}-${characterIndex}`}
+                  ref={(el) => {
+                    letterRefs.current[currentRefIdx] = el;
+                  }}
+                  className="gravity-letter"
+                  aria-hidden="true"
+                  initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: 0.6 }}
+                  whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }}
+                  viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }}
+                  transition={{ duration: 0.54, delay: 0.08 + (index % 8) * 0.035, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  {character}
+                </motion.span>
+              );
+            })}
+          </span>
+          {wordIndex < wordsArr.length - 1 ? <span className="gravity-space" aria-hidden="true" /> : null}
+        </span>
+      ))}
+    </h2>
+  );
 }
 
 function SectionIntro({ index, eyebrow, title, detail, motionPaused = false }: { index: string; eyebrow: string; title: string; detail?: string; motionPaused?: boolean }) {
   return (
     <div className="grid gap-6 md:grid-cols-[9rem_1fr] md:gap-10">
       <div className="flex items-center gap-3 md:block">
-        <span className="label">{index}</span>
-        <span className="hidden h-px flex-1 bg-violet-300/25 md:mt-3 md:block" />
+        <span className="label font-mono text-[11px] text-violet-300 tracking-widest">{index}</span>
+        <span className="hidden h-px flex-1 bg-white/15 md:mt-3 md:block" />
       </div>
       <div>
-        <p className="label mb-4">{eyebrow}</p>
+        <p className="label mb-3 text-violet-200/90 tracking-widest">{eyebrow}</p>
         <GravityHeading title={title} motionPaused={motionPaused} />
-        {detail ? <p className="mt-6 max-w-xl text-[0.94rem] leading-7 text-[#b0aabc]">{detail}</p> : null}
+        {detail ? <p className="mt-5 max-w-2xl text-[0.96rem] leading-7 text-[#c2bbce] [text-wrap:balance]">{detail}</p> : null}
       </div>
     </div>
   );
@@ -387,11 +676,50 @@ function DeliveryDeviceRelay({ motionPaused, lowDataMode }: { motionPaused: bool
   const [entered, setEntered] = useState(false);
   const staticRelay = reduceMotion || motionPaused || lowDataMode;
   const devices = [
-    { name: "Phone", className: "is-phone", note: "Discovery" },
-    { name: "Tablet", className: "is-tablet", note: "Cart" },
-    { name: "Desktop", className: "is-desktop", note: "Tracking" },
+    { name: "Phone", className: "is-phone", note: "Discovery", flow: "Mobile flow" },
+    { name: "Tablet", className: "is-tablet", note: "Cart", flow: "Tablet flow" },
+    { name: "Desktop", className: "is-desktop", note: "Tracking", flow: "Desktop flow" },
   ];
-  return <section className={`delivery-device-relay ${entered && !staticRelay ? "is-active" : ""}`} aria-label="Responsive delivery interface relay"><div className="delivery-device-relay-head"><span className="label">Responsive relay</span><p>Phone → tablet → desktop</p></div><motion.div className="delivery-device-stage" initial={staticRelay ? false : { opacity: 0, y: 7 }} whileInView={staticRelay ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: .6 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .3, ease: [0.23, 1, 0.32, 1] }}>{devices.map((device, index) => <div key={device.name} className={`relay-frame ${device.className}`}><span className="relay-device-bar" /><div className="relay-screen"><i /><b>{device.note}</b><em>Mobile flow</em></div><small>{String(index + 1).padStart(2, "0")} / {device.name}</small></div>)}<span className="relay-flow" aria-hidden="true"><i /><i /><i /></span></motion.div><p className="delivery-device-relay-note">One flow, calibrated across the screen sizes where people browse, decide, and track.</p></section>;
+  return (
+    <section className={`delivery-device-relay ${entered && !staticRelay ? "is-active" : ""}`} aria-label="Responsive delivery interface relay">
+      <div className="delivery-device-relay-head">
+        <span className="label">Responsive relay</span>
+        <p>Phone → tablet → desktop</p>
+      </div>
+      <motion.div
+        className="delivery-device-stage"
+        initial={staticRelay ? false : { opacity: 0, y: 7 }}
+        whileInView={staticRelay ? {} : { opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }}
+        onViewportEnter={() => setEntered(true)}
+        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      >
+        <span className="relay-flow" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        {devices.map((device, index) => (
+          <div key={device.name} className="relay-column">
+            <div className={`relay-frame ${device.className}`}>
+              <span className="relay-device-bar" />
+              <div className="relay-screen">
+                <i />
+                <b>{device.note}</b>
+                <em>{device.flow}</em>
+              </div>
+            </div>
+            <span className="relay-device-caption">
+              {String(index + 1).padStart(2, "0")} / {device.name}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+      <p className="delivery-device-relay-note">
+        One flow, calibrated across the screen sizes where people browse, decide, and track.
+      </p>
+    </section>
+  );
 }
 
 function DeliveryInteractionLoop({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
@@ -435,7 +763,7 @@ function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone
   const offset = 251.2 * (1 - ringValue / 100);
   const staticMarker = reduceMotion || motionPaused;
   return (
-    <motion.div className={`project-proof-marker is-${tone} ${hasEntered && !staticMarker ? "is-visible" : ""}`} initial={staticMarker ? false : { opacity: 0, y: 9 }} whileInView={staticMarker ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.34, ease: [0.23, 1, 0.32, 1] }} onViewportEnter={() => setHasEntered(true)} aria-label={`${value}${suffix} ${label}. ${detail}`}>
+    <motion.div className={`project-proof-marker is-${tone} ${hasEntered && !staticMarker ? "is-visible" : ""}`} initial={staticMarker ? false : { opacity: 0, y: 9 }} whileInView={staticMarker ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: 0.34, ease: [0.23, 1, 0.32, 1] }} onViewportEnter={() => setHasEntered(true)} aria-label={`${value}${suffix} ${label}. ${detail}`}>
       <span className="proof-ring-wrap" style={{ "--proof-offset": `${offset}px` } as React.CSSProperties}><svg viewBox="0 0 96 96" aria-hidden="true"><circle className="proof-ring-track" cx="48" cy="48" r="40" /><circle className="proof-ring-progress" cx="48" cy="48" r="40" /></svg><span className="proof-value"><b>{value}</b><em>{suffix}</em></span></span>
       <span className="proof-copy"><span className="label">Outcome marker</span><b>{label}</b><em>{detail}</em></span>
     </motion.div>
@@ -445,63 +773,202 @@ function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone
 function ProjectSignalFocus({ tone, motionPaused }: { tone: "violet" | "cyan"; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className={`project-signal-focus is-${tone}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scaleX: 0 }} whileInView={staticMotion ? {} : { opacity: 0.78, scaleX: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.72, delay: 0.18, ease: [0.23, 1, 0.32, 1] }}><i /><i /></motion.span>;
+  return <motion.span className={`project-signal-focus is-${tone}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scaleX: 0 }} whileInView={staticMotion ? {} : { opacity: 0.78, scaleX: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: 0.72, delay: 0.18, ease: [0.23, 1, 0.32, 1] }}><i /><i /></motion.span>;
 }
 
 function BlueprintCrosshair({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className={`blueprint-crosshair ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.48 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .28, delay: .22, ease: [0.23, 1, 0.32, 1] }}><i className="blueprint-crosshair-h" /><i className="blueprint-crosshair-v" /><b /><em /></motion.span>;
+  return <motion.span className={`blueprint-crosshair ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .28, delay: .22, ease: [0.23, 1, 0.32, 1] }}><i className="blueprint-crosshair-h" /><i className="blueprint-crosshair-v" /><b /><em /></motion.span>;
 }
 
 function LensAperture({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className={`ml-lens-aperture ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: .72 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: .48 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .3, delay: .18, ease: [0.23, 1, 0.32, 1] }}><i className="lens-core" /><i className="lens-orbit one" /><i className="lens-orbit two" /><b /></motion.span>;
+  return <motion.span className={`ml-lens-aperture ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: .72 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .3, delay: .18, ease: [0.23, 1, 0.32, 1] }}><i className="lens-core" /><i className="lens-orbit one" /><i className="lens-orbit two" /><b /></motion.span>;
 }
 
 function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticPulse = reduceMotion || motionPaused;
-  return <motion.span className={`timeline-checkpoint ${entered && !staticPulse ? "is-active" : ""}`} aria-hidden="true" initial={false} whileInView={{}} viewport={{ once: true, amount: 0.55 }} onViewportEnter={() => setEntered(true)} />;
+  return <motion.span className={`timeline-checkpoint ${entered && !staticPulse ? "is-active" : ""}`} aria-hidden="true" initial={false} whileInView={{}} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} />;
 }
 
 function ExperienceEvidenceSignal({ label, motionPaused }: { label: string; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className="experience-evidence-signal" initial={staticMotion ? false : { opacity: 0, x: -8 }} whileInView={staticMotion ? {} : { opacity: 1, x: 0 }} viewport={{ once: true, amount: .56 }} transition={{ duration: .32, delay: .12, ease: [0.23, 1, 0.32, 1] }}><motion.i aria-hidden="true" initial={staticMotion ? false : { scaleX: 0 }} whileInView={staticMotion ? {} : { scaleX: 1 }} viewport={{ once: true, amount: .56 }} transition={{ duration: .46, delay: .16, ease: [0.23, 1, 0.32, 1] }} /><b>{label}</b><em>evidence signal</em></motion.span>;
+  return <motion.span className="experience-evidence-signal" initial={staticMotion ? false : { opacity: 0, x: -8 }} whileInView={staticMotion ? {} : { opacity: 1, x: 0 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: .32, delay: .12, ease: [0.23, 1, 0.32, 1] }}><motion.i aria-hidden="true" initial={staticMotion ? false : { scaleX: 0 }} whileInView={staticMotion ? {} : { scaleX: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: .46, delay: .16, ease: [0.23, 1, 0.32, 1] }} /><b>{label}</b><em>evidence signal</em></motion.span>;
 }
 
-function ExperienceConnectionMap({ activeExperience, motionPaused }: { activeExperience: number; motionPaused: boolean }) {
-  const reduceMotion = useReducedMotion();
-  const activeConnection = experienceConnections[activeExperience];
-  const staticMotion = reduceMotion || motionPaused;
-  return <motion.aside className={`experience-connection-map ${staticMotion ? "is-static" : ""}`} aria-label="Skills connected to the active experience role" initial={staticMotion ? false : { opacity: 0, y: 12 }} whileInView={staticMotion ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: .3 }} transition={{ duration: .42, ease: [0.23, 1, 0.32, 1] }}><div className="experience-map-head"><div><p className="label">Skills / role map</p><p>Hover or focus a role to trace its active tools.</p></div><span>{String(activeExperience + 1).padStart(2, "0")} / 03</span></div><div className="experience-map-stage" aria-live="polite"><span className="experience-map-core"><b>{activeConnection.role === "Project Intern" ? "Build" : "Design"}</b><em>{activeConnection.focus}</em></span>{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-link link-${index} ${isActive ? "is-active" : ""}`} aria-hidden="true" />; })}{experienceSkillNodes.map((skill, index) => { const isActive = activeConnection.skills.some((item) => item === skill); return <span key={skill} className={`experience-map-node node-${index} ${isActive ? "is-active" : ""}`}><b>{skill}</b></span>; })}</div><p className="experience-map-reading"><span className="label">Active role</span>{activeConnection.focus}</p></motion.aside>;
-}
+
 
 function CredentialSignalScan({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className={`credential-signal-scan ${entered && !staticMotion ? "is-active" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0 }} whileInView={staticMotion ? {} : { opacity: 1 }} viewport={{ once: true, amount: .35 }} onViewportEnter={() => setEntered(true)} transition={{ duration: .2 }}><i /><i /><i /></motion.span>;
+  return <motion.span className={`credential-signal-scan ${entered && !staticMotion ? "is-active" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0 }} whileInView={staticMotion ? {} : { opacity: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .2 }}><i /><i /><i /></motion.span>;
 }
 
 function CredentialPreviewDialog({ credential, open, onOpenChange, motionPaused, lowDataMode }: { credential: typeof certifications[number] | null; open: boolean; onOpenChange: (open: boolean) => void; motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused || lowDataMode;
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(contentRef, {
+    isActive: open,
+    onEscape: () => onOpenChange(false),
+    initialFocusSelector: ".credential-preview-close",
+  });
+
   if (!credential) return null;
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="credential-preview-dialog max-h-[min(44rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-2xl" showCloseButton={false}><div className="credential-preview-shell"><div className={`credential-preview-reel ${staticMotion ? "is-static" : ""}`} aria-hidden="true"><span className="credential-preview-grid" /><span className="credential-preview-radius radius-one" /><span className="credential-preview-radius radius-two" /><span className="credential-preview-radius radius-three" /><span className="credential-preview-axis axis-one" /><span className="credential-preview-axis axis-two" /><span className="credential-preview-orbit one" /><span className="credential-preview-orbit two" /><span className="credential-preview-accretion" /><span className="credential-preview-inner-currents"><i /><i /><i /></span><span className="credential-preview-spark-field"><i className="spark-one" /><i className="spark-two" /><i className="spark-three" /><i className="spark-four" /><i className="spark-five" /><i className="spark-six" /></span><span className="credential-preview-pulse-ring" /><span className="credential-preview-horizon" /><span className="credential-preview-core" /><span className="credential-preview-scan" /><span className="credential-preview-stamp">SMP / EVENT HORIZON</span></div><div className="credential-preview-copy"><div className="flex items-start justify-between gap-4"><p className="label">Credential / preview</p><button type="button" className="credential-preview-close" onClick={() => onOpenChange(false)} aria-label="Close credential preview"><X size={16} /></button></div><DialogTitle className="display mt-5 max-w-[16ch] text-3xl leading-[.94] text-white sm:text-5xl">{credential.title}</DialogTitle><DialogDescription className="mt-4 max-w-md text-sm leading-6 text-[#c8c0d8]">A focused record preview for {credential.issuer}, highlighting the learning signal represented in this portfolio.</DialogDescription><dl className="credential-preview-metadata"><div><dt>Issuer</dt><dd>{credential.issuer}</dd></div><div><dt>Record</dt><dd>{credential.meta}</dd></div><div><dt>Focus</dt><dd>{credential.focus}</dd></div></dl><div className="credential-preview-note"><span className="signal-dot" aria-hidden="true" /><p><b>{credential.theme}</b><br />Official verification can be added here when its credential-specific link is available.</p></div></div></div></DialogContent></Dialog>;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent ref={contentRef} className="credential-preview-dialog max-h-[min(44rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-2xl" showCloseButton={false}>
+        <div className="credential-preview-shell">
+          <div className={`credential-preview-reel ${staticMotion ? "is-static" : ""}`} aria-hidden="true">
+            <span className="credential-preview-grid" />
+            <span className="credential-preview-radius radius-one" />
+            <span className="credential-preview-radius radius-two" />
+            <span className="credential-preview-radius radius-three" />
+            <span className="credential-preview-axis axis-one" />
+            <span className="credential-preview-axis axis-two" />
+            <span className="credential-preview-orbit one" />
+            <span className="credential-preview-orbit two" />
+            <span className="credential-preview-accretion" />
+            <span className="credential-preview-inner-currents"><i /><i /><i /></span>
+            <span className="credential-preview-spark-field"><i className="spark-one" /><i className="spark-two" /><i className="spark-three" /><i className="spark-four" /><i className="spark-five" /><i className="spark-six" /></span>
+            <span className="credential-preview-pulse-ring" />
+            <span className="credential-preview-horizon" />
+            <span className="credential-preview-core" />
+            <span className="credential-preview-scan" />
+            <span className="credential-preview-stamp">SMP / EVENT HORIZON</span>
+          </div>
+          <div className="credential-preview-copy">
+            <div className="flex items-start justify-between gap-4">
+              <p className="label">Credential / preview</p>
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span>
+                <button type="button" className="credential-preview-close" onClick={() => onOpenChange(false)} aria-label="Close credential preview (Esc)"><X size={16} /></button>
+              </div>
+            </div>
+            <DialogTitle className="display mt-5 max-w-[16ch] text-3xl leading-[.94] text-white sm:text-5xl">{credential.title}</DialogTitle>
+            <DialogDescription className="mt-4 max-w-md text-sm leading-6 text-[#c8c0d8]">A focused record preview for {credential.issuer}, highlighting the learning signal represented in this portfolio.</DialogDescription>
+            <dl className="credential-preview-metadata">
+              <div><dt>Issuer</dt><dd>{credential.issuer}</dd></div>
+              <div><dt>Record</dt><dd>{credential.meta}</dd></div>
+              <div><dt>Focus</dt><dd>{credential.focus}</dd></div>
+            </dl>
+            <div className="credential-preview-note">
+              <span className="signal-dot" aria-hidden="true" />
+              <p><b>{credential.theme}</b><br />Official verification can be added here when its credential-specific link is available.</p>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function AIContentStudioDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}><div className="ai-studio-dialog"><div className="ai-studio-dialog-visual" aria-hidden="true"><img src="/images/ai-content-studio-showcase_e194be53.jpg" alt="" /><span>Studio / 03</span></div><div className="p-6 sm:p-9"><div className="flex items-start justify-between gap-5"><div><p className="label text-violet-200">Project / Showcase only</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{aiContentStudio.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#c8c0d8]">{aiContentStudio.description}</DialogDescription><dl className="ai-studio-summary"><div><dt>Category</dt><dd>{aiContentStudio.category}</dd></div><div><dt>Status</dt><dd>{aiContentStudio.status}</dd></div><div><dt>Role</dt><dd>{aiContentStudio.role}</dd></div></dl><section className="ai-studio-detail-section"><p className="label">Problem solved</p><p>{aiContentStudio.problem}</p></section><section className="ai-studio-detail-section"><p className="label">Main features</p><ul className="ai-studio-feature-list">{aiContentStudio.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technical highlights</p><ul className="ai-studio-feature-list">{aiContentStudio.highlights.map((highlight) => <li key={highlight}><span className="ai-studio-bullet" aria-hidden="true" /><span>{highlight}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technology stack</p><div className="ai-studio-stack-grid">{aiContentStudio.stack.map((group) => <div key={group.label}><b>{group.label}</b><p>{group.values.join(" · ")}</p></div>)}</div></section><section className="ai-studio-detail-section"><p className="label">Tags</p><div className="ai-studio-tags">{aiContentStudio.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section><p className="ai-studio-showcase-note"><span className="signal-dot" aria-hidden="true" />This is a portfolio showcase. No source repository, View Code, or public demo link is listed.</p></div></div></DialogContent></Dialog>;
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(contentRef, {
+    isActive: open,
+    onEscape: () => onOpenChange(false),
+    initialFocusSelector: ".credential-preview-close",
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent ref={contentRef} className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}>
+        <div className="ai-studio-dialog">
+          <div className="ai-studio-dialog-visual" aria-hidden="true">
+            <img src="/images/ai-content-studio-showcase_e194be53.jpg" alt="" />
+            <span>Studio / 03</span>
+          </div>
+          <div className="p-6 sm:p-9">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <p className="label text-violet-200">Project / Showcase only</p>
+                <DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{aiContentStudio.title}</DialogTitle>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span>
+                <button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project details (Esc)"><X size={16} /></button>
+              </div>
+            </div>
+            <DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#c8c0d8]">{aiContentStudio.description}</DialogDescription>
+            <CyberTypingDescription text={aiContentStudio.description} highlights={["Python", "continuous cloud operation", "vertical Shorts", "multilingual metadata", "operational risk"]} tone="violet" promptLabel="sys.brief_stream" speed={10} />
+            <dl className="ai-studio-summary">
+              <div><dt>Category</dt><dd>{aiContentStudio.category}</dd></div>
+              <div><dt>Status</dt><dd>{aiContentStudio.status}</dd></div>
+              <div><dt>Role</dt><dd>{aiContentStudio.role}</dd></div>
+            </dl>
+            <section className="ai-studio-detail-section"><p className="label">Problem solved</p><p>{aiContentStudio.problem}</p></section>
+            <section className="ai-studio-detail-section"><p className="label">Main features</p><ul className="ai-studio-feature-list">{aiContentStudio.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section>
+            <section className="ai-studio-detail-section"><p className="label">Technical highlights</p><ul className="ai-studio-feature-list">{aiContentStudio.highlights.map((highlight) => <li key={highlight}><span className="ai-studio-bullet" aria-hidden="true" /><span>{highlight}</span></li>)}</ul></section>
+            <section className="ai-studio-detail-section"><p className="label">Technology stack</p><div className="ai-studio-stack-grid">{aiContentStudio.stack.map((group) => <div key={group.label}><b>{group.label}</b><p>{group.values.join(" · ")}</p></div>)}</div></section>
+            <section className="ai-studio-detail-section"><p className="label">Tags</p><div className="ai-studio-tags">{aiContentStudio.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>
+            <p className="ai-studio-showcase-note"><span className="signal-dot" aria-hidden="true" />This is a portfolio showcase. No source repository, View Code, or public demo link is listed.</p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function PolurCharmDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}><div className="ai-studio-dialog polur-charm-dialog"><div className="ai-studio-dialog-visual" aria-hidden="true"><img src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="" /><span>Polur / 04</span></div><div className="p-6 sm:p-9"><div className="flex items-start justify-between gap-5"><div><p className="label text-cyan-100">Project / Active</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{polurCharm.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close Polur Charm project details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#c8c0d8]">{polurCharm.description}</DialogDescription><dl className="ai-studio-summary polur-charm-summary"><div><dt>Category</dt><dd>{polurCharm.category}</dd></div><div><dt>Status</dt><dd>{polurCharm.status}</dd></div><div><dt>Role</dt><dd>{polurCharm.role}</dd></div></dl><section className="ai-studio-detail-section"><p className="label">Problem solved</p><p>{polurCharm.problem}</p></section><section className="ai-studio-detail-section"><p className="label">Main features</p><ul className="ai-studio-feature-list">{polurCharm.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technical highlights</p><ul className="ai-studio-feature-list">{polurCharm.highlights.map((highlight) => <li key={highlight}><span className="ai-studio-bullet" aria-hidden="true" /><span>{highlight}</span></li>)}</ul></section><section className="ai-studio-detail-section"><p className="label">Technology stack</p><div className="ai-studio-stack-grid">{polurCharm.stack.map((group) => <div key={group.label}><b>{group.label}</b><p>{group.values.join(" · ")}</p></div>)}</div></section><section className="ai-studio-detail-section"><p className="label">Tags</p><div className="ai-studio-tags">{polurCharm.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section><div className="polur-charm-dialog-actions"><a href="https://polurcharm.com" target="_blank" rel="noreferrer">Visit live site <ArrowUpRight size={15} /></a><a href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noreferrer">Open repository <Github size={15} /></a></div></div></div></DialogContent></Dialog>;
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(contentRef, {
+    isActive: open,
+    onEscape: () => onOpenChange(false),
+    initialFocusSelector: ".credential-preview-close",
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent ref={contentRef} className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}>
+        <div className="ai-studio-dialog polur-charm-dialog">
+          <div className="ai-studio-dialog-visual" aria-hidden="true">
+            <img src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="" />
+            <span>Polur / 04</span>
+          </div>
+          <div className="p-6 sm:p-9">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <p className="label text-cyan-100">Project / Active</p>
+                <DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{polurCharm.title}</DialogTitle>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span>
+                <button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close Polur Charm project details (Esc)"><X size={16} /></button>
+              </div>
+            </div>
+            <DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#c8c0d8]">{polurCharm.description}</DialogDescription>
+            <CyberTypingDescription text={polurCharm.description} highlights={["interactive bilingual digital tourism", "civic discovery platform", "Polur, Parvathamalai"]} tone="cyan" promptLabel="sys.civic_stream" speed={10} />
+            <dl className="ai-studio-summary polur-charm-summary">
+              <div><dt>Category</dt><dd>{polurCharm.category}</dd></div>
+              <div><dt>Status</dt><dd>{polurCharm.status}</dd></div>
+              <div><dt>Role</dt><dd>{polurCharm.role}</dd></div>
+            </dl>
+            <section className="ai-studio-detail-section"><p className="label">Problem solved</p><p>{polurCharm.problem}</p></section>
+            <section className="ai-studio-detail-section"><p className="label">Main features</p><ul className="ai-studio-feature-list">{polurCharm.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section>
+            <section className="ai-studio-detail-section"><p className="label">Technical highlights</p><ul className="ai-studio-feature-list">{polurCharm.highlights.map((highlight) => <li key={highlight}><span className="ai-studio-bullet" aria-hidden="true" /><span>{highlight}</span></li>)}</ul></section>
+            <section className="ai-studio-detail-section"><p className="label">Technology stack</p><div className="ai-studio-stack-grid">{polurCharm.stack.map((group) => <div key={group.label}><b>{group.label}</b><p>{group.values.join(" · ")}</p></div>)}</div></section>
+            <section className="ai-studio-detail-section"><p className="label">Tags</p><div className="ai-studio-tags">{polurCharm.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>
+            <div className="polur-charm-dialog-actions">
+              <a href="https://polurcharm.com" target="_blank" rel="noopener noreferrer">Visit live site <ArrowUpRight size={15} /></a>
+              <a href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noopener noreferrer">Open repository <Github size={15} /></a>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function CollectionDialogAperture({ staticMotion }: { staticMotion: boolean }) {
@@ -535,15 +1002,19 @@ function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProject
   const onProjectOpenChangeRef = useRef(onProjectOpenChange);
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
+  const dialogContentRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     onProjectOpenChangeRef.current = onProjectOpenChange;
   }, [onProjectOpenChange]);
+
   useEffect(() => {
     if (project) {
       setDialogOpen(true);
       setIsClosing(false);
     }
   }, [project]);
+
   const onOpenChange = useCallback((open: boolean) => {
     if (open) {
       setIsClosing(false);
@@ -554,11 +1025,34 @@ function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProject
     else setIsClosing(true);
     onProjectOpenChangeRef.current(false);
   }, [staticMotion]);
+
   const handleBackToCollection = useCallback(() => {
     document.getElementById("project-collection")?.scrollIntoView({ behavior: staticMotion ? "auto" : "smooth", block: "start" });
     onOpenChange(false);
   }, [onOpenChange, staticMotion]);
+
+  const projectIndex = project ? projectCollection.findIndex((entry) => entry.id === project.id) : -1;
+  const previousProject = projectIndex > 0 ? projectCollection[projectIndex - 1] : null;
+  const nextProject = projectIndex >= 0 && projectIndex < projectCollection.length - 1 ? projectCollection[projectIndex + 1] : null;
+  const navigateTo = useCallback((index: number) => {
+    document.querySelector<HTMLButtonElement>(`.collection-card-${index + 1}`)?.click();
+  }, []);
+
+  // Traps focus inside the dialog, handles Esc key to close, and ArrowLeft/ArrowRight to switch projects
+  useFocusTrap(dialogContentRef, {
+    isActive: Boolean(project),
+    onEscape: () => onOpenChange(false),
+    onArrowLeft: () => {
+      if (previousProject) navigateTo(projectIndex - 1);
+    },
+    onArrowRight: () => {
+      if (nextProject) navigateTo(projectIndex + 1);
+    },
+    initialFocusSelector: ".credential-preview-close, .collection-dialog-breadcrumb button",
+  });
+
   const Dialog = useMemo(() => ({ children }: { children: ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) => <DialogRoot open={dialogOpen} onOpenChange={onOpenChange}>{children}</DialogRoot>, [dialogOpen, onOpenChange]);
+
   useEffect(() => {
     if (!project) return;
     setDialogImageReady(false);
@@ -570,9 +1064,73 @@ function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProject
       priorityImage.onerror = null;
     };
   }, [project]);
+
   if (!project) return null;
-  if (loading) return <Dialog open={Boolean(project)} onOpenChange={onOpenChange}><DialogContent className={`collection-dialog collection-dialog-loading-shell ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}><CollectionDialogAperture staticMotion={staticMotion} /><DialogTitle className="sr-only">Loading {project.title}</DialogTitle><DialogDescription className="sr-only">Preparing project collection details.</DialogDescription><div className="collection-dialog-loader" role="status" aria-live="polite"><img className={`collection-dialog-loader-image ${dialogImageReady ? "is-ready" : ""}`} src={project.image} alt="" aria-hidden="true" fetchPriority="high" decoding="async" /><div className="collection-dialog-loader-orbit"><Spinner className="size-7 text-violet-200" /></div><p className="label text-violet-200">Aligning project signal</p><span>Preparing {project.title}</span><div className="collection-loader-progress" aria-hidden="true"><i /></div></div><button type="button" className="credential-preview-close collection-dialog-loader-close" onClick={() => onOpenChange(false)} aria-label="Close project collection details"><X size={16} /></button></DialogContent></Dialog>;
-  return <Dialog open={Boolean(project)} onOpenChange={onOpenChange}><DialogContent className={`collection-dialog ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}><div className="collection-dialog-shell"><div className={`collection-dialog-visual ${dialogImageReady ? "is-image-ready" : ""}`} aria-hidden="true"><img src={project.image} alt="" fetchPriority="high" decoding="async" onLoad={() => setDialogImageReady(true)} onError={() => setDialogImageReady(true)} /><span>Collection / {String(projectCollection.findIndex((entry) => entry.id === project.id) + 1).padStart(2, "0")}</span></div><div className="collection-dialog-copy"><div className="flex items-start justify-between gap-5"><div><nav className="collection-dialog-breadcrumb" aria-label="Project Collection breadcrumb"><button type="button" onClick={handleBackToCollection} aria-label="Close project details and return to Project Collection"><ChevronLeft size={13} aria-hidden="true" /><span>Back to collection</span></button></nav><p className="label text-violet-200">Project collection</p><DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{project.title}</DialogTitle></div><button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project collection details"><X size={16} /></button></div><DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#d3cbdf]">{project.tagline}</DialogDescription><p className="mt-5 text-sm leading-6 text-[#bcb4ca]">{project.description}</p><dl className="collection-dialog-summary"><div><dt>Category</dt><dd>{project.category}</dd></div><div><dt>Status</dt><dd>{project.status}</dd></div><div><dt>{"role" in project ? "Role" : "Context"}</dt><dd>{"role" in project ? project.role : "context" in project ? project.context : "Project collection"}</dd></div></dl><section className="collection-detail-section"><p className="label">Problem solved</p><p>{project.problem}</p></section><section className="collection-detail-section"><p className="label">Main features</p><ul>{project.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section><section className="collection-detail-section"><p className="label">Technologies & skills</p><div className="collection-tech-list">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></section>{"results" in project ? <section className="collection-detail-section"><p className="label">Important results</p><ul>{project.results.map((result) => <li key={result}><span className="ai-studio-bullet" aria-hidden="true" /><span>{result}</span></li>)}</ul></section> : null}<section className="collection-detail-section"><p className="label">Tags</p><div className="collection-tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>{"liveUrl" in project ? <a className="collection-live-demo" href={project.liveUrl} target="_blank" rel="noreferrer">Live demo <ArrowUpRight size={15} /></a> : null}<p className="collection-security-note"><span className="signal-dot" aria-hidden="true" />This collection entry does not expose source code or repository links.</p></div></div></DialogContent></Dialog>;
+  if (loading) return (
+    <Dialog open={Boolean(project)} onOpenChange={onOpenChange}>
+      <DialogContent ref={dialogContentRef} className={`collection-dialog collection-dialog-loading-shell ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}>
+        <CollectionDialogAperture staticMotion={staticMotion} />
+        <DialogTitle className="sr-only">Loading {project.title}</DialogTitle>
+        <DialogDescription className="sr-only">Preparing project collection details.</DialogDescription>
+        <div className="collection-dialog-loader" role="status" aria-live="polite">
+          <img className={`collection-dialog-loader-image ${dialogImageReady ? "is-ready" : ""}`} src={project.image} alt="" aria-hidden="true" fetchPriority="high" decoding="async" />
+          <div className="collection-dialog-loader-orbit"><Spinner className="size-7 text-violet-200" /></div>
+          <p className="label text-violet-200">Aligning project signal</p>
+          <span>Preparing {project.title}</span>
+          <div className="collection-loader-progress" aria-hidden="true"><i /></div>
+        </div>
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span>
+          <button type="button" className="credential-preview-close collection-dialog-loader-close static" onClick={() => onOpenChange(false)} aria-label="Close project collection details (Esc)"><X size={16} /></button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  return (
+    <Dialog open={Boolean(project)} onOpenChange={onOpenChange}>
+      <DialogContent ref={dialogContentRef} className={`collection-dialog ${isClosing ? "is-closing" : ""} ${staticMotion ? "is-static" : ""} max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl`} showCloseButton={false} onCloseAutoFocus={(event) => { event.preventDefault(); onCloseAutoFocus(); }}>
+        <div className="collection-dialog-shell">
+          <div className={`collection-dialog-visual ${dialogImageReady ? "is-image-ready" : ""}`} aria-hidden="true">
+            <img src={project.image} alt="" fetchPriority="high" decoding="async" onLoad={() => setDialogImageReady(true)} onError={() => setDialogImageReady(true)} />
+            <span>Collection / {String(projectCollection.findIndex((entry) => entry.id === project.id) + 1).padStart(2, "0")}</span>
+          </div>
+          <div className="collection-dialog-copy">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <nav className="collection-dialog-breadcrumb" aria-label="Project Collection breadcrumb">
+                  <button type="button" onClick={handleBackToCollection} aria-label="Close project details and return to Project Collection">
+                    <ChevronLeft size={13} aria-hidden="true" />
+                    <span>Back to collection</span>
+                  </button>
+                </nav>
+                <p className="label text-violet-200">Project collection</p>
+                <DialogTitle className="display mt-4 max-w-[18ch] text-3xl leading-[.94] text-white sm:text-5xl">{project.title}</DialogTitle>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span>
+                <button type="button" className="credential-preview-close shrink-0" onClick={() => onOpenChange(false)} aria-label="Close project collection details (Esc)"><X size={16} /></button>
+              </div>
+            </div>
+            <DialogDescription className="mt-5 max-w-3xl text-sm leading-6 text-[#d3cbdf]">{project.tagline}</DialogDescription>
+            <p className="mt-5 text-sm leading-6 text-[#bcb4ca]">{project.description}</p>
+            <dl className="collection-dialog-summary">
+              <div><dt>Category</dt><dd>{project.category}</dd></div>
+              <div><dt>Status</dt><dd>{project.status}</dd></div>
+              <div><dt>{"role" in project ? "Role" : "Context"}</dt><dd>{"role" in project ? project.role : "context" in project ? project.context : "Project collection"}</dd></div>
+            </dl>
+            <section className="collection-detail-section"><p className="label">Problem solved</p><p>{project.problem}</p></section>
+            <section className="collection-detail-section"><p className="label">Main features</p><ul>{project.features.map((feature) => <li key={feature}><CircleCheckBig size={14} aria-hidden="true" /><span>{feature}</span></li>)}</ul></section>
+            <section className="collection-detail-section"><p className="label">Technologies & skills</p><div className="collection-tech-list">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></section>
+            {"results" in project ? <section className="collection-detail-section"><p className="label">Important results</p><ul>{project.results.map((result) => <li key={result}><span className="ai-studio-bullet" aria-hidden="true" /><span>{result}</span></li>)}</ul></section> : null}
+            <section className="collection-detail-section"><p className="label">Tags</p><div className="collection-tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>
+            {"liveUrl" in project ? <a className="collection-live-demo" href={project.liveUrl} target="_blank" rel="noopener noreferrer">Live demo <ArrowUpRight size={15} /></a> : null}
+            <p className="collection-security-note"><span className="signal-dot" aria-hidden="true" />This collection entry does not expose source code or repository links.</p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function CollectionDialogNavigator({ project, loading }: { project: CollectionProject | null; loading: boolean }) {
@@ -594,12 +1152,14 @@ function CollectionDialogNavigator({ project, loading }: { project: CollectionPr
 
   return createPortal(
     <nav className="collection-dialog-nav" aria-label="Project Collection navigation">
-      <button type="button" onClick={() => navigateTo(projectIndex - 1)} disabled={!previousProject} aria-label={previousProject ? `Previous project: ${previousProject.title}` : "No previous project"}>
+      <button type="button" onClick={() => navigateTo(projectIndex - 1)} disabled={!previousProject} aria-label={previousProject ? `Previous project: ${previousProject.title} (Shortcut: Left Arrow)` : "No previous project"}>
         <ChevronLeft size={15} aria-hidden="true" />
         <span>Previous</span>
+        <kbd className="hidden sm:inline-block ml-1 font-mono text-[9px] px-1 py-0.5 rounded bg-white/10 text-violet-300/80 border border-white/10" aria-hidden="true">←</kbd>
       </button>
       <p aria-live="polite"><span>Project</span> {String(projectIndex + 1).padStart(2, "0")} <i>/</i> {String(projectCollection.length).padStart(2, "0")}</p>
-      <button type="button" onClick={() => navigateTo(projectIndex + 1)} disabled={!nextProject} aria-label={nextProject ? `Next project: ${nextProject.title}` : "No next project"}>
+      <button type="button" onClick={() => navigateTo(projectIndex + 1)} disabled={!nextProject} aria-label={nextProject ? `Next project: ${nextProject.title} (Shortcut: Right Arrow)` : "No next project"}>
+        <kbd className="hidden sm:inline-block mr-1 font-mono text-[9px] px-1 py-0.5 rounded bg-white/10 text-violet-300/80 border border-white/10" aria-hidden="true">→</kbd>
         <span>Next</span>
         <ChevronRight size={15} aria-hidden="true" />
       </button>
@@ -616,7 +1176,6 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("about");
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
   const [starBursts, setStarBursts] = useState<Array<{ id: number; x: number; y: number }>>([]);
@@ -633,30 +1192,52 @@ export default function Home() {
   const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
   const [lowDataMode, setLowDataMode] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
   const [recruiterOpen, setRecruiterOpen] = useState(false);
   const [recruiterReviewOpen, setRecruiterReviewOpen] = useState(false);
   const [recruiterReviewStep, setRecruiterReviewStep] = useState(0);
-  const [lightPreset, setLightPreset] = useState(() => typeof window !== "undefined" && window.localStorage.getItem("smp-contrast-preset") === "light");
   const [activeOrbitProject, setActiveOrbitProject] = useState<OrbitProjectId>("attack-study");
   const [orbitSelectorPreview, setOrbitSelectorPreview] = useState<OrbitProjectId | null>(null);
   const [openCaseSignal, setOpenCaseSignal] = useState<CaseStudyId | null>(null);
   const [contactFocused, setContactFocused] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const copyEmailTimeoutRef = useRef<number | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [activeExperience, setActiveExperience] = useState(0);
   const [aiContentStudioOpen, setAiContentStudioOpen] = useState(false);
   const [polurCharmOpen, setPolurCharmOpen] = useState(false);
+  const [selectedCredential, setSelectedCredential] = useState<typeof certifications[number] | null>(null);
   const [activeCollectionProject, setActiveCollectionProject] = useState<CollectionProject | null>(null);
   const [collectionDialogLoading, setCollectionDialogLoading] = useState(false);
   const [collectionFocus, setCollectionFocus] = useState<number | null>(null);
   const [collectionOpeningIndex, setCollectionOpeningIndex] = useState<number | null>(null);
   const [mobileCollectionSnap, setMobileCollectionSnap] = useState(0);
+  const reduceMotion = useReducedMotion();
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
+  const [isNarrowMobile, setIsNarrowMobile] = useState(false);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsNarrowMobile(typeof window !== "undefined" && window.innerWidth < 480);
+    };
+    updateViewport();
+    window.addEventListener("resize", updateViewport, { passive: true });
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
+
+  const visibleNebulaStars = useMemo(() => {
+    return isNarrowMobile ? nebulaStars.slice(0, 16) : nebulaStars;
+  }, [isNarrowMobile]);
+
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroMemojiRef = useRef<HTMLDivElement>(null);
-  const heroMemojiPupilRefs = useRef<[HTMLImageElement | null, HTMLImageElement | null]>([null, null]);
-  const heroMemojiGazeTarget = useRef({ x: 0, y: 0 });
-  const heroMemojiGazeCurrent = useRef({ x: 0, y: 0 });
-  const heroMemojiGazeFrame = useRef<number | null>(null);
+  const memojiGazeTarget = useRef({ x: 0, y: 0 });
+  const memojiGazeCurrent = useRef({ x: 0, y: 0 });
+  const memojiGazeRafId = useRef<number | null>(null);
+  const memojiGazeActive = useRef(false);
+  const memojiCenterCache = useRef<{ x: number; y: number } | null>(null);
   const heroMemojiTapReleaseTimer = useRef<number | null>(null);
   const heroMemojiHoverTimer = useRef<number | null>(null);
   const heroMemojiSmileTimer = useRef<number | null>(null);
@@ -679,13 +1260,10 @@ export default function Home() {
   };
   const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const collectionDialogTriggerIndex = useRef<number | null>(null);
+  const collectionCardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const collectionOpeningTimer = useRef<number | null>(null);
   const mobileCollectionScrollLeft = useRef(0);
   const mobileCollectionTouchStart = useRef<{ x: number; y: number; time: number; index: number; triggered: boolean } | null>(null);
-  const reduceMotion = useReducedMotion();
-  const sealScrollOpacity = motionPaused || reduceMotion || lowDataMode ? 1 : Math.max(0.74, 1 - scrollProgress * 0.0026);
-  const sealOrbitScrollOffset = motionPaused || reduceMotion || lowDataMode ? 0 : Math.min(18, scrollProgress * 0.18);
-  const dividerScrollRotation = sealOrbitScrollOffset * 0.34;
   const activeOrbitPreview = motionPaused || reduceMotion || lowDataMode ? null : orbitSelectorPreview;
 
   const year = useMemo(() => new Date().getFullYear(), []);
@@ -703,8 +1281,14 @@ export default function Home() {
   }), [contactConstellationTrail]);
 
   useEffect(() => {
-    window.localStorage.setItem("smp-contrast-preset", lightPreset ? "light" : "dark");
-  }, [lightPreset]);
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem("smp-contrast-preset");
+      } catch {
+        // ignore storage errors
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (active === lastActiveSection.current) return;
@@ -760,6 +1344,181 @@ export default function Home() {
     setActiveCollectionProject(project);
   };
 
+  const recruiterCardRef = useRef<HTMLDivElement>(null);
+  const recruiterReviewRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(recruiterCardRef, {
+    isActive: recruiterOpen,
+    onEscape: () => setRecruiterOpen(false),
+    initialFocusSelector: ".recruiter-close",
+  });
+
+  useFocusTrap(recruiterReviewRef, {
+    isActive: recruiterReviewOpen,
+    onEscape: () => setRecruiterReviewOpen(false),
+    initialFocusSelector: ".recruiter-close",
+  });
+
+  // Global Esc key handler ensuring any open dialog, modal, or quick-view panel closes cleanly and restores focus
+  useEffect(() => {
+    const handleGlobalEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (activeCollectionProject) {
+          event.preventDefault();
+          setCollectionDialogLoading(false);
+          setActiveCollectionProject(null);
+          const triggerIndex = collectionDialogTriggerIndex.current;
+          window.setTimeout(() => {
+            if (triggerIndex) {
+              document.querySelector<HTMLButtonElement>(`.collection-card-${triggerIndex}`)?.focus();
+            }
+          }, 30);
+          return;
+        }
+        if (aiContentStudioOpen) {
+          event.preventDefault();
+          setAiContentStudioOpen(false);
+          window.setTimeout(() => {
+            document.querySelector<HTMLButtonElement>(".ai-studio-brief-action")?.focus();
+          }, 30);
+          return;
+        }
+        if (polurCharmOpen) {
+          event.preventDefault();
+          setPolurCharmOpen(false);
+          window.setTimeout(() => {
+            document.getElementById("polur-charm")?.focus();
+          }, 30);
+          return;
+        }
+        if (terminalOpen) {
+          event.preventDefault();
+          setTerminalOpen(false);
+          return;
+        }
+        if (selectedCredential) {
+          event.preventDefault();
+          setSelectedCredential(null);
+          return;
+        }
+        if (recruiterOpen) {
+          event.preventDefault();
+          setRecruiterOpen(false);
+          return;
+        }
+        if (recruiterReviewOpen) {
+          event.preventDefault();
+          setRecruiterReviewOpen(false);
+          return;
+        }
+      }
+      if (event.key === "`" || event.key === "~") {
+        const target = event.target as HTMLElement;
+        if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+          return;
+        }
+        event.preventDefault();
+        setTerminalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleGlobalEscape);
+    return () => window.removeEventListener("keydown", handleGlobalEscape);
+  }, [activeCollectionProject, aiContentStudioOpen, polurCharmOpen, selectedCredential, recruiterOpen, recruiterReviewOpen, terminalOpen]);
+
+  // Keyboard navigation for Project Collection cards (ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Home, End)
+  const handleCollectionCardKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let targetIndex: number | null = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      targetIndex = (index + 1) % projectCollection.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      targetIndex = (index - 1 + projectCollection.length) % projectCollection.length;
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      targetIndex = 0;
+    } else if (event.key === "End") {
+      event.preventDefault();
+      targetIndex = projectCollection.length - 1;
+    }
+
+    if (targetIndex !== null) {
+      const targetCard = collectionCardRefs.current[targetIndex] ?? document.querySelector<HTMLButtonElement>(`.collection-card-${targetIndex + 1}`);
+      if (targetCard) {
+        try {
+          targetCard.focus({ preventScroll: true });
+        } catch {
+          targetCard.focus();
+        }
+        const stage = targetCard.closest<HTMLElement>(".project-collection-stage");
+        if (stage && stage.scrollWidth > stage.clientWidth) {
+          targetCard.scrollIntoView({
+            behavior: reduceMotion || motionPaused ? "auto" : "smooth",
+            block: "nearest",
+            inline: "center",
+          });
+        }
+      }
+      setCollectionFocus(targetIndex);
+      setMobileCollectionSnap(targetIndex);
+    }
+  };
+
+  // Keyboard navigation for Selected Work case study cards
+  const workProjectIds = ["attack-study", "delivery-study", "ai-content-studio", "polur-charm"] as const;
+
+  const handleWorkProjectKeyDown = (
+    event: React.KeyboardEvent<HTMLElement>,
+    projectId: "attack-study" | "delivery-study" | "ai-content-studio" | "polur-charm",
+    index: number
+  ) => {
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const nextIndex = (index + 1) % workProjectIds.length;
+      const nextId = workProjectIds[nextIndex];
+      const el = document.getElementById(nextId);
+      el?.focus();
+      el?.scrollIntoView({ behavior: reduceMotion || motionPaused ? "auto" : "smooth", block: "nearest" });
+      setGravityProject(nextId);
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const prevIndex = (index - 1 + workProjectIds.length) % workProjectIds.length;
+      const prevId = workProjectIds[prevIndex];
+      const el = document.getElementById(prevId);
+      el?.focus();
+      el?.scrollIntoView({ behavior: reduceMotion || motionPaused ? "auto" : "smooth", block: "nearest" });
+      setGravityProject(prevId);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      const firstId = workProjectIds[0];
+      const el = document.getElementById(firstId);
+      el?.focus();
+      el?.scrollIntoView({ behavior: reduceMotion || motionPaused ? "auto" : "smooth", block: "nearest" });
+      setGravityProject(firstId);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      const lastId = workProjectIds[workProjectIds.length - 1];
+      const el = document.getElementById(lastId);
+      el?.focus();
+      el?.scrollIntoView({ behavior: reduceMotion || motionPaused ? "auto" : "smooth", block: "nearest" });
+      setGravityProject(lastId);
+    } else if (event.key === "Enter" || event.key === " ") {
+      if (event.target === event.currentTarget) {
+        event.preventDefault();
+        if (projectId === "ai-content-studio") {
+          setAiContentStudioOpen(true);
+        } else if (projectId === "polur-charm") {
+          setPolurCharmOpen(true);
+        } else if (projectId === "attack-study") {
+          setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study");
+        } else if (projectId === "delivery-study") {
+          setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study");
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 768) return;
     const activeIndex = activeCollectionProject
@@ -775,6 +1534,8 @@ export default function Home() {
   useEffect(() => {
     const video = heroVideoRef.current;
     if (!video) return;
+    video.defaultMuted = true;
+    video.muted = true;
     if (motionPaused || reduceMotion || lowDataMode) {
       video.pause();
       return;
@@ -816,8 +1577,29 @@ export default function Home() {
     if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
     if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
     if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
-    if (heroMemojiGazeFrame.current !== null) window.cancelAnimationFrame(heroMemojiGazeFrame.current);
+    if (memojiGazeRafId.current !== null) cancelAnimationFrame(memojiGazeRafId.current);
   }, []);
+
+  useEffect(() => {
+    if (motionPaused || reduceMotion || lowDataMode) return;
+
+    const onGlobalPointerMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      updateMemojiGaze(e.clientX, e.clientY);
+    };
+
+    const onGlobalPointerLeave = () => {
+      resetHeroMemojiGaze();
+    };
+
+    window.addEventListener("pointermove", onGlobalPointerMove, { passive: true });
+    document.addEventListener("mouseleave", onGlobalPointerLeave);
+
+    return () => {
+      window.removeEventListener("pointermove", onGlobalPointerMove);
+      document.removeEventListener("mouseleave", onGlobalPointerLeave);
+    };
+  }, [lowDataMode, motionPaused, reduceMotion]);
 
   useEffect(() => {
     if (motionPaused || reduceMotion || lowDataMode) return;
@@ -826,28 +1608,68 @@ export default function Home() {
   }, [motionPaused, reduceMotion, lowDataMode]);
 
   useEffect(() => {
+    let scrollTicking = false;
+    let scrollFrameId: number | null = null;
     const onScroll = () => {
-      const nextScrolled = window.scrollY > 24;
-      const maximum = document.documentElement.scrollHeight - window.innerHeight;
-      const nextProgress = maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0;
-      setScrolled((current) => current === nextScrolled ? current : nextScrolled);
-      setScrollProgress((current) => Math.abs(current - nextProgress) < .25 ? current : nextProgress);
+      if (scrollTicking) return;
+      scrollTicking = true;
+      scrollFrameId = requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 24;
+        setScrolled((current) => current === nextScrolled ? current : nextScrolled);
+        const maximum = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0;
+        const sealOpacity = (Math.max(0.74, 1 - progress * 0.0026)).toFixed(3);
+        const sealRot = (Math.min(18, progress * 0.18)).toFixed(2);
+        const dividerRot = (Math.min(18, progress * 0.18) * 0.34).toFixed(2);
+        document.documentElement.style.setProperty("--seal-scroll-opacity", sealOpacity);
+        document.documentElement.style.setProperty("--seal-orbit-rot", `${sealRot}deg`);
+        document.documentElement.style.setProperty("--divider-rot", `${dividerRot}deg`);
+        memojiCenterCache.current = null;
+        scrollTicking = false;
+        scrollFrameId = null;
+      });
     };
-    const onPointer = (event: PointerEvent) => {
+
+    let cursorTargetX = -100;
+    let cursorTargetY = -100;
+    let cursorCurrentX = -100;
+    let cursorCurrentY = -100;
+    let cursorAnimId: number | null = null;
+
+    const updateCursor = () => {
       const cursor = cursorRef.current;
-      if (cursor) cursor.style.transform = `translate3d(${event.clientX - 5}px, ${event.clientY - 5}px, 0)`;
+      if (cursor) {
+        cursorCurrentX += (cursorTargetX - cursorCurrentX) * 0.35;
+        cursorCurrentY += (cursorTargetY - cursorCurrentY) * 0.35;
+        cursor.style.transform = `translate3d(${(cursorCurrentX - 5).toFixed(1)}px, ${(cursorCurrentY - 5).toFixed(1)}px, 0)`;
+        if (Math.hypot(cursorTargetX - cursorCurrentX, cursorTargetY - cursorCurrentY) > 0.1) {
+          cursorAnimId = requestAnimationFrame(updateCursor);
+          return;
+        }
+      }
+      cursorAnimId = null;
     };
-    const onEnter = () => cursorRef.current?.classList.add("is-active");
-    const onLeave = () => cursorRef.current?.classList.remove("is-active");
-    const interactive = Array.from(document.querySelectorAll<HTMLElement>("a,button,input,textarea"));
+
+    const onPointer = (event: PointerEvent) => {
+      cursorTargetX = event.clientX;
+      cursorTargetY = event.clientY;
+      if (!cursorAnimId) {
+        cursorAnimId = requestAnimationFrame(updateCursor);
+      }
+    };
+    const onPointerOver = (event: globalThis.PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("a, button, input, textarea, select, [role='button'], [tabindex='0']")) {
+        cursorRef.current?.classList.add("is-active");
+      } else {
+        cursorRef.current?.classList.remove("is-active");
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     onScroll();
     window.addEventListener("pointermove", onPointer, { passive: true });
-    interactive.forEach((element) => {
-      element.addEventListener("pointerenter", onEnter);
-      element.addEventListener("pointerleave", onLeave);
-    });
+    document.addEventListener("pointerover", onPointerOver, { passive: true });
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -886,13 +1708,12 @@ export default function Home() {
     );
     experienceRows.forEach((row) => experienceObserver.observe(row));
     return () => {
+      if (scrollFrameId !== null) cancelAnimationFrame(scrollFrameId);
+      if (cursorAnimId !== null) cancelAnimationFrame(cursorAnimId);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("pointermove", onPointer);
-      interactive.forEach((element) => {
-        element.removeEventListener("pointerenter", onEnter);
-        element.removeEventListener("pointerleave", onLeave);
-      });
+      document.removeEventListener("pointerover", onPointerOver);
       observer.disconnect();
       experienceObserver.disconnect();
     };
@@ -966,30 +1787,119 @@ export default function Home() {
 
   // Experience reading beam: fills the role timeline as the reading band scrolls down it.
   useEffect(() => {
+    let ticking = false;
+    let beamFrameId: number | null = null;
     const updateTimelineBeam = () => {
-      const list = document.querySelector<HTMLElement>("#experience .timeline-list");
-      if (!list) return;
-      const rect = list.getBoundingClientRect();
-      const readingLine = window.innerHeight * 0.44;
-      const progress = rect.height > 0 ? Math.min(1, Math.max(0, (readingLine - rect.top) / rect.height)) : 0;
-      list.style.setProperty("--timeline-progress", progress.toFixed(4));
+      if (ticking) return;
+      ticking = true;
+      beamFrameId = requestAnimationFrame(() => {
+        const list = document.querySelector<HTMLElement>("#experience .timeline-list");
+        if (list) {
+          const rect = list.getBoundingClientRect();
+          const readingLine = window.innerHeight * 0.44;
+          const progress = rect.height > 0 ? Math.min(1, Math.max(0, (readingLine - rect.top) / rect.height)) : 0;
+          list.style.setProperty("--timeline-progress", progress.toFixed(4));
+        }
+        ticking = false;
+        beamFrameId = null;
+      });
     };
     updateTimelineBeam();
     window.addEventListener("scroll", updateTimelineBeam, { passive: true });
-    window.addEventListener("resize", updateTimelineBeam);
+    window.addEventListener("resize", updateTimelineBeam, { passive: true });
     return () => {
+      if (beamFrameId !== null) cancelAnimationFrame(beamFrameId);
       window.removeEventListener("scroll", updateTimelineBeam);
       window.removeEventListener("resize", updateTimelineBeam);
     };
   }, []);
 
+  const handleCopyEmail = useCallback(async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const emailToCopy = "manojprabhu0707@gmail.com";
+    let copied = false;
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(emailToCopy);
+        copied = true;
+      } catch (err) {
+        console.warn("Clipboard API write failed, using fallback", err);
+      }
+    }
+    if (!copied && typeof document !== "undefined") {
+      try {
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = emailToCopy;
+        tempTextarea.setAttribute("readonly", "");
+        tempTextarea.style.position = "fixed";
+        tempTextarea.style.opacity = "0";
+        tempTextarea.style.pointerEvents = "none";
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        copied = document.execCommand("copy");
+        document.body.removeChild(tempTextarea);
+      } catch (err) {
+        console.error("Fallback copy failed", err);
+      }
+    }
+
+    setCopiedEmail(true);
+    toast.success("Email copied to clipboard!", {
+      description: emailToCopy,
+      duration: 3500,
+    });
+
+    if (copyEmailTimeoutRef.current) {
+      window.clearTimeout(copyEmailTimeoutRef.current);
+    }
+    copyEmailTimeoutRef.current = window.setTimeout(() => {
+      setCopiedEmail(false);
+    }, 2400);
+  }, []);
+
+  function downloadVCard() {
+    const vcard = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      "FN:S Manoj Prabhu",
+      "N:Prabhu;S Manoj;;;",
+      "TITLE:Frontend Developer & UI/UX Designer",
+      "EMAIL;TYPE=INTERNET:manojprabhu0707@gmail.com",
+      "TEL;TYPE=CELL:+919677518268",
+      "ADR;TYPE=HOME:;;Polur;Tamil Nadu;;India",
+      "URL:https://manojprabhu.dev",
+      "X-SOCIALPROFILE;type=github:https://github.com/manojprabhu07",
+      "X-SOCIALPROFILE;type=linkedin:https://www.linkedin.com/in/manojprabhu07",
+      "NOTE:Frontend Developer | UI/UX Designer | Java & Applied ML",
+      "END:VCARD",
+    ].join("\r\n");
+
+    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "S_Manoj_Prabhu.vcf";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    toast.success("Contact card (.vcf) downloaded!", {
+      description: "Ready to save Manoj directly to your phone contacts.",
+    });
+  }
+
   function handleContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const name = String(data.get("name") || "");
-    const email = String(data.get("email") || "");
-    const message = String(data.get("message") || "");
-    const subject = encodeURIComponent(`Portfolio enquiry from ${name || "a visitor"}`);
+    const name = String(data.get("name") || "").trim().slice(0, 100);
+    const email = String(data.get("email") || "").trim().slice(0, 100);
+    const message = (contactMessage || String(data.get("message") || "")).trim().slice(0, 2000);
+    const topicLabel = contactTopics.find((t) => t.id === selectedTopic)?.label;
+    const subjectPrefix = topicLabel ? `[${topicLabel}] ` : "";
+    const subject = encodeURIComponent(`${subjectPrefix}Portfolio enquiry from ${name || "a visitor"}`);
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
     window.location.href = `mailto:manojprabhu0707@gmail.com?subject=${subject}&body=${body}`;
     setSent(true);
@@ -1001,6 +1911,7 @@ export default function Home() {
     const rect = card.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
+    card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
     card.style.transform = `perspective(900px) rotateX(${y * -3.5}deg) rotateY(${x * 3.5}deg) translateY(-5px)`;
     // Pointer light on the artwork: paint-free CSS variables consumed by the scrim overlay.
     card.style.setProperty("--card-light-x", `${((x + 0.5) * 100).toFixed(2)}%`);
@@ -1009,6 +1920,7 @@ export default function Home() {
 
   function resetProjectTilt(event: MouseEvent<HTMLElement>) {
     const card = event.currentTarget;
+    card.style.transition = "transform 0.52s cubic-bezier(0.23, 1, 0.32, 1)";
     card.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
     card.style.removeProperty("--card-light-x");
     card.style.removeProperty("--card-light-y");
@@ -1029,39 +1941,65 @@ export default function Home() {
     tile.style.removeProperty("--cell-glow-y");
   }
 
-  function animateHeroMemojiGaze() {
-    const target = heroMemojiGazeTarget.current;
-    const current = heroMemojiGazeCurrent.current;
-    const ease = 0.18;
-    current.x += (target.x - current.x) * ease;
-    current.y += (target.y - current.y) * ease;
-    const pupilOffsetX = current.x.toFixed(2);
-    const pupilOffsetY = current.y.toFixed(2);
-    heroMemojiPupilRefs.current.forEach((pupil) => {
-      if (pupil) pupil.style.transform = `translate3d(${pupilOffsetX}px, ${pupilOffsetY}px, 0)`;
-    });
-    const settling = Math.max(Math.abs(target.x - current.x), Math.abs(target.y - current.y)) > 0.02;
-    if (settling) {
-      heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
+  const tickMemojiGaze = useCallback(() => {
+    const portrait = heroMemojiRef.current;
+    if (!portrait) {
+      memojiGazeRafId.current = null;
+      return;
+    }
+    const target = memojiGazeTarget.current;
+    const current = memojiGazeCurrent.current;
+    const damping = 0.085;
+    current.x += (target.x - current.x) * damping;
+    current.y += (target.y - current.y) * damping;
+
+    portrait.style.setProperty("--hero-memoji-tilt-y", `${(current.x * 1.5).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-tilt-x", `${(current.y * -1.1).toFixed(2)}deg`);
+    portrait.style.setProperty("--hero-memoji-shadow-x", `${(current.x * -4.2).toFixed(2)}px`);
+    portrait.style.setProperty("--hero-memoji-shadow-y", `${(current.y * 2.6).toFixed(2)}px`);
+
+    const dist = Math.hypot(target.x - current.x, target.y - current.y);
+    if (dist > 0.003 || memojiGazeActive.current) {
+      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
     } else {
-      current.x = target.x;
-      current.y = target.y;
-      heroMemojiGazeFrame.current = null;
+      memojiGazeRafId.current = null;
+      if (!memojiGazeActive.current) {
+        portrait.classList.remove("is-gazing");
+      }
+    }
+  }, []);
+
+  function updateMemojiGaze(clientX: number, clientY: number) {
+    if (reduceMotion || motionPaused || lowDataMode || window.innerWidth < 768) return;
+    const portrait = heroMemojiRef.current;
+    if (!portrait) return;
+
+    if (!memojiCenterCache.current) {
+      const rect = portrait.getBoundingClientRect();
+      if (rect.bottom < -80 || rect.top > window.innerHeight + 80) return;
+      memojiCenterCache.current = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+    }
+
+    const { x: centerX, y: centerY } = memojiCenterCache.current;
+    const normX = Math.max(-1, Math.min(1, (clientX - centerX) / (window.innerWidth * 0.5)));
+    const normY = Math.max(-1, Math.min(1, (clientY - centerY) / (window.innerHeight * 0.5)));
+
+    memojiGazeActive.current = true;
+    memojiGazeTarget.current = { x: normX, y: normY };
+    portrait.classList.add("is-gazing");
+
+    if (memojiGazeRafId.current === null) {
+      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
     }
   }
 
-  // Hero Memoji gaze: update a target directly, then ease the actual pupil nodes toward it.
+  // Hero Memoji gaze: direct pointer move handler forwards coordinates to updateMemojiGaze
   function followHeroMemojiGaze(event: ReactPointerEvent<HTMLDivElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
-    const portrait = heroMemojiRef.current;
-    if (!portrait) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
-    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
-    portrait.classList.add("is-gazing");
-    heroMemojiGazeTarget.current = { x: x * HERO_MEMOJI_PUPIL_MAX_X, y: y * HERO_MEMOJI_PUPIL_MAX_Y };
-    if (heroMemojiGazeFrame.current === null) heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
-    // Pupil-only tracking: glasses, brows, face, backdrop, and reflections stay fixed.
+    if (event.pointerType !== "mouse") return;
+    updateMemojiGaze(event.clientX, event.clientY);
   }
 
   function resetHeroMemojiGaze() {
@@ -1069,23 +2007,15 @@ export default function Home() {
     if (!portrait) return;
     if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
     heroMemojiHoverTimer.current = null;
-    portrait.classList.remove("is-gazing");
-    portrait.classList.remove("is-settled");
-    heroMemojiGazeTarget.current = { x: 0, y: 0 };
-    if (reduceMotion || motionPaused || lowDataMode) {
-      if (heroMemojiGazeFrame.current !== null) window.cancelAnimationFrame(heroMemojiGazeFrame.current);
-      heroMemojiGazeFrame.current = null;
-      heroMemojiGazeCurrent.current = { x: 0, y: 0 };
-      heroMemojiPupilRefs.current.forEach((pupil) => pupil?.style.removeProperty("transform"));
-    } else if (heroMemojiGazeFrame.current === null) {
-      heroMemojiGazeFrame.current = window.requestAnimationFrame(animateHeroMemojiGaze);
+    memojiGazeActive.current = false;
+    memojiGazeTarget.current = { x: 0, y: 0 };
+    memojiCenterCache.current = null;
+    if (memojiGazeRafId.current === null) {
+      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
     }
+    portrait.classList.remove("is-settled");
     portrait.style.removeProperty("--hero-memoji-brow-x");
     portrait.style.removeProperty("--hero-memoji-brow-y");
-    portrait.style.removeProperty("--hero-memoji-tilt-x");
-    portrait.style.removeProperty("--hero-memoji-tilt-y");
-    portrait.style.removeProperty("--hero-memoji-shadow-x");
-    portrait.style.removeProperty("--hero-memoji-shadow-y");
     portrait.style.removeProperty("--hero-memoji-ground-shadow-x");
     portrait.style.removeProperty("--hero-memoji-ground-shadow-y");
     portrait.style.removeProperty("--hero-memoji-glint-x");
@@ -1146,6 +2076,7 @@ export default function Home() {
     const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
     const depth = Math.min(1, Math.hypot(x, y) / Math.SQRT2);
     card.classList.add("is-artwork-parallax");
+    card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
     card.style.setProperty("--collection-art-parallax-x", `${(x * 6.25).toFixed(2)}px`);
     card.style.setProperty("--collection-art-parallax-y", `${(y * 4.25).toFixed(2)}px`);
     card.style.setProperty("--collection-art-parallax-rotate-x", `${(y * -1.35).toFixed(2)}deg`);
@@ -1158,6 +2089,7 @@ export default function Home() {
   function resetCollectionArtworkParallax(event: React.SyntheticEvent<HTMLButtonElement>) {
     const card = event.currentTarget;
     card.classList.remove("is-artwork-parallax");
+    card.style.transition = "transform 0.52s cubic-bezier(0.23, 1, 0.32, 1)";
     card.style.removeProperty("--collection-art-parallax-x");
     card.style.removeProperty("--collection-art-parallax-y");
     card.style.removeProperty("--collection-art-parallax-rotate-x");
@@ -1225,7 +2157,6 @@ export default function Home() {
 
   function selectOrbitProject(id: OrbitProjectId) {
     setActiveOrbitProject(id);
-    scrollToSection(id);
   }
 
   function startRecruiterReview() {
@@ -1334,45 +2265,61 @@ export default function Home() {
   }
 
   return (
-    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${lightPreset ? "contrast-light" : ""} ${recruiterReviewOpen ? "recruiter-review-active" : ""}`}>
+    <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${recruiterReviewOpen ? "recruiter-review-active" : ""}`}>
       <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" role="status" aria-label="Loading S Manoj Prabhu portfolio" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div ref={cursorRef} className="cursor" aria-hidden="true" />}
+      <AmbientBackground motionPaused={motionPaused} reduceMotion={Boolean(reduceMotion)} lowDataMode={lowDataMode} />
       <div className="grain" aria-hidden="true" />
-      <div className="scroll-progress-rail" aria-hidden="true"><span className="scroll-progress-label">Field progress</span><span className="scroll-progress-track"><span className="scroll-progress-fill" style={{ height: `${scrollProgress}%` }} /></span><span className="scroll-progress-value">{String(Math.round(scrollProgress)).padStart(2, "0")}</span></div>
       <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram" aria-describedby="mj-brand-tooltip">
-              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: sealScrollOpacity }}><span className="monogram-halo" aria-hidden="true" style={{ transform: `rotate(${sealOrbitScrollOffset}deg)` }}><i className="monogram-halo-sweep" /><i key={`section-glint-${monogramSectionGlint || "idle"}`} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><i key={`project-echo-${monogramProjectEcho || "idle"}`} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" || openCaseSignal === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`} /><span className={`monogram-selector-preview ${activeOrbitPreview ? `is-active ${activeOrbitPreview === "attack-study" || activeOrbitPreview === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`}><i className="monogram-selector-preview-cyan" /><i className="monogram-selector-preview-violet" /></span><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span>
+              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: "var(--seal-scroll-opacity, 1)" }}><span className="monogram-halo" aria-hidden="true" style={{ transform: "rotate(var(--seal-orbit-rot, 0deg))" }}><i className="monogram-halo-sweep" /><i key={`section-glint-${monogramSectionGlint || "idle"}`} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><i key={`project-echo-${monogramProjectEcho || "idle"}`} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" || openCaseSignal === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`} /><span className={`monogram-selector-preview ${activeOrbitPreview ? `is-active ${activeOrbitPreview === "attack-study" || activeOrbitPreview === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`}><i className="monogram-selector-preview-cyan" /><i className="monogram-selector-preview-violet" /></span><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" decoding="async" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
               <span id="mj-brand-tooltip" className="monogram-brand-tooltip" role="tooltip">MJ / Event horizon</span>
             </button>
-            <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" style={{ opacity: sealScrollOpacity, transform: `rotate(${dividerScrollRotation}deg)` }} />
+            <span className="monogram-nav-divider hidden lg:block" aria-hidden="true" style={{ opacity: "var(--seal-scroll-opacity, 1)", transform: "rotate(var(--divider-rot, 0deg))" }} />
           </div>
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
-            {navItems.map(([label, id]) => (
-              <button key={id} className={`nav-link ${active === id ? "is-active" : ""}`} onClick={() => scrollToSection(id)}>{label}</button>
-            ))}
-          </nav>
-          <div className="hidden items-center gap-2 md:flex"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark" : "Light"}</button><button className="recruiter-trigger" type="button" onClick={startRecruiterReview}>Recruiter path</button><a href="mailto:manojprabhu0707@gmail.com" className="signal-button min-h-0 px-4 py-2.5">Open correspondence <ArrowUpRight size={14} /></a></div>
-          <button className="icon-button md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>{mobileOpen ? <X size={18} /> : <Menu size={18} />}</button>
+          <MagneticNav
+            items={navItems}
+            activeId={active}
+            onSelect={scrollToSection}
+            motionPaused={motionPaused}
+          />
+          <div className="hidden items-center gap-2 md:flex">
+            <button className="recruiter-trigger" type="button" onClick={startRecruiterReview}>Recruiter path</button>
+            <a href="mailto:manojprabhu0707@gmail.com" className="signal-button min-h-0 px-4 py-2.5">Open correspondence <ArrowUpRight size={14} /></a>
+          </div>
+          <button
+            id="mobile-nav-trigger"
+            className="icon-button md:hidden"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
-        {mobileOpen ? (
-          <div className="border-t border-violet-200/10 bg-[#0b0a12]/95 px-5 py-6 backdrop-blur-xl md:hidden">
-            <nav className="flex flex-col gap-5" aria-label="Mobile navigation">
-              {navItems.map(([label, id]) => <button key={id} className="display text-left text-2xl text-white" onClick={() => { setMobileOpen(false); scrollToSection(id); }}>{label}</button>)}
-              <div className="flex gap-3 pt-1"><button className="contrast-toggle" type="button" onClick={() => setLightPreset((enabled) => !enabled)} aria-pressed={lightPreset}>{lightPreset ? <Moon size={14} /> : <Sun size={14} />}{lightPreset ? "Dark preset" : "Light preset"}</button><button className="recruiter-trigger" type="button" onClick={startRecruiterReview}>Recruiter path</button></div>
-              <a href="mailto:manojprabhu0707@gmail.com" className="label mt-2 inline-flex items-center gap-2 text-violet-200">Send an email <ArrowUpRight size={15} /></a>
-            </nav>
-          </div>
-        ) : null}
       </header>
+
+      {/* Slide-out Mobile Navigation Drawer */}
+      <MobileNavDrawer
+        isOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        navItems={navItems}
+        activeSection={active}
+        onSelectSection={scrollToSection}
+        onOpenRecruiterReview={startRecruiterReview}
+        onOpenTerminal={() => setTerminalOpen(true)}
+        onDownloadResume={downloadResume}
+        motionPaused={motionPaused}
+      />
 
       <section id="top" className="hero container">
         <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:gap-12">
           <div className="relative z-10 pt-4 lg:pt-0">
-            <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: [0.23, 1, 0.32, 1] }} className="mb-7 flex items-center gap-3">
-              <span className="signal-dot" />
+            <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: [0.23, 1, 0.32, 1] }} className="mb-7 flex flex-wrap items-center gap-3">
+              <span className="signal-dot animate-pulse" />
               <span className="label text-[#d3c5ff]">Available for considered digital work</span>
             </motion.div>
             <motion.p initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08, ease: [0.23, 1, 0.32, 1] }} className="label mb-5">01 / SMP field reel</motion.p>
@@ -1394,25 +2341,107 @@ export default function Home() {
               <div className="hero-contact-cluster mt-9 flex flex-wrap gap-2.5">
                 <a className="icon-button hero-contact-link" href="mailto:manojprabhu0707@gmail.com" aria-label="Email Manoj" data-tooltip="Email Manoj"><Mail size={17} /></a>
                 <a className="icon-button hero-contact-link" href="tel:+919677518268" aria-label="Call Manoj" data-tooltip="Call Manoj"><Phone size={17} /></a>
-                <a className="icon-button hero-contact-link" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit GitHub" data-tooltip="GitHub"><Github size={17} /></a>
-                <a className="icon-button hero-contact-link" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noreferrer" aria-label="Visit LinkedIn" data-tooltip="LinkedIn"><Linkedin size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://github.com/manojprabhu07" target="_blank" rel="noopener noreferrer" aria-label="Visit GitHub" data-tooltip="GitHub"><Github size={17} /></a>
+                <a className="icon-button hero-contact-link" href="https://www.linkedin.com/in/manojprabhu07" target="_blank" rel="noopener noreferrer" aria-label="Visit LinkedIn" data-tooltip="LinkedIn"><Linkedin size={17} /></a>
               </div>
               <button className="recruiter-hero-trigger hero-recruiter-signal" type="button" onClick={() => setRecruiterOpen(true)}>Recruiter quick-view <ArrowUpRight size={14} /></button>
             </motion.div>
           </div>
-          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual">
-            <div ref={heroMemojiRef} className="hero-memoji-portrait" onPointerEnter={beginHeroMemojiHover} onPointerMove={followHeroMemojiGaze} onPointerLeave={resetHeroMemojiGaze} onPointerDown={noteHeroMemojiTouchStart} onPointerUp={handleHeroMemojiPointerUp}>
+          <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual relative">
+            <div className="hero-grid" aria-hidden="true" />
+
+            {/* Responsive Nebula Starfield (16 stars under 480px, 34 stars on desktop/tablet) */}
+            <div className="nebula-starfield" aria-hidden="true">
+              {visibleNebulaStars.map((star) => (
+                <span
+                  key={star.id}
+                  className={`nebula-star ${star.tone}`}
+                  style={{
+                    left: `${star.left}%`,
+                    top: `${star.top}%`,
+                    "--star-size": `${star.size}px`,
+                    "--star-opacity": star.opacity,
+                    "--star-speed": `${star.speed}s`,
+                    "--star-delay": `${star.delay}s`,
+                  } as React.CSSProperties}
+                />
+              ))}
+            </div>
+
+            {/* Apple-Style "Dynamic Island" Live Status Pill - Shifted gracefully to the right side */}
+            <div className="absolute top-2 sm:top-3.5 right-3 sm:right-6 md:right-10 z-30 flex justify-end pointer-events-none">
+              <DynamicIslandStatus
+                onOpenContact={() => scrollToSection("contact")}
+                onOpenRecruiter={() => setRecruiterOpen(true)}
+              />
+            </div>
+
+            <div
+              ref={heroMemojiRef}
+              className="hero-memoji-portrait"
+              onPointerEnter={beginHeroMemojiHover}
+              onPointerMove={followHeroMemojiGaze}
+              onPointerLeave={resetHeroMemojiGaze}
+              onPointerDown={noteHeroMemojiTouchStart}
+              onPointerUp={handleHeroMemojiPointerUp}
+              title="Manoj Prabhu"
+            >
               <span className="hero-memoji-ground-shadow" aria-hidden="true" />
               <span className="hero-memoji-backdrop" aria-hidden="true" />
-              <img className="hero-memoji-reference-scene" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" />
-              <span className="hero-memoji-pupil-window left" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[0] = node; }} data-memoji-pupil="left" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
-              <span className="hero-memoji-pupil-window right" aria-hidden="true"><img ref={(node) => { heroMemojiPupilRefs.current[1] = node; }} data-memoji-pupil="right" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="" /></span>
-              <span className="hero-memoji-lid left" aria-hidden="true" /><span className="hero-memoji-lid right" aria-hidden="true" />
+
+              {/* Ambient Laptop Screen Glow */}
+              <div className="hero-memoji-laptop-glow" aria-hidden="true" />
+              {/* Authentic unedited artwork */}
+              <img className="hero-memoji-reference-scene" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" width={640} height={640} loading="eager" fetchPriority="high" decoding="async" />
+
+              {/* Illuminated Precision Line on Laptop Backside - Click to open terminal */}
+              <div
+                className="hero-laptop-terminal-line-container"
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTerminalOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setTerminalOpen(true);
+                  }
+                }}
+                title="Click to open Developer Terminal"
+                aria-label="Open Developer Terminal"
+              >
+                {/* Horizontal glowing cyber line across laptop backside with silky-smooth running animation */}
+                <div className="hero-laptop-laser-bar">
+                  <span className="hero-laptop-laser-glow" />
+                  <div className="hero-laptop-laser-track">
+                    <span className="hero-laptop-laser-base" />
+                    <span className="hero-laptop-laser-runner" />
+                  </div>
+                </div>
+              </div>
             </div>
             <span className="hero-memoji-greeting" aria-hidden="true">Hi, I’m Manoj</span>
+
+            {/* Interactive Steam Ceramic Coffee Mug Desk Prop (Right) */}
+            <div className="absolute -bottom-1.5 right-3 sm:bottom-2 sm:right-8 md:bottom-4 md:right-10 z-20">
+              <InteractiveCoffeeMug />
+            </div>
           </motion.div>
         </div>
       </section>
+
+      {/* Interactive Developer Terminal Shell */}
+      <DeveloperTerminal
+        isOpen={terminalOpen}
+        onClose={() => setTerminalOpen(false)}
+        onDownloadResume={downloadResume}
+        onScrollToSection={scrollToSection}
+      />
+
+
 
       <div className="reel" aria-label="Selected capabilities">
         <div className="reel-track">
@@ -1420,9 +2449,9 @@ export default function Home() {
         </div>
       </div>
 
-      <AnimatePresence>{recruiterOpen ? <motion.aside className="recruiter-brief-card" role="dialog" aria-modal="true" aria-label="Recruiter quick-view" initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.97 }} transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-brief-head"><div><p className="label">Recruiter quick-view</p><p className="mt-1 text-sm font-semibold text-white">S Manoj Prabhu</p></div><button className="recruiter-close" type="button" onClick={() => setRecruiterOpen(false)} aria-label="Close recruiter quick-view"><X size={17} /></button></div><div className="recruiter-availability"><span className="signal-dot" /><span>Open to internships and collaborative product work</span></div><div className="recruiter-detail-grid"><div><p className="label">Based in</p><p>Polur, Tamil Nadu</p></div><div><p className="label">Core stack</p><p>React · Figma · Java</p></div><div><p className="label">Proof</p><p>85% ML accuracy</p></div><div><p className="label">Contact</p><p>Reply within 1–2 days</p></div></div><div className="recruiter-brief-actions"><button className="signal-button primary" type="button" onClick={downloadResume}>Get résumé <Download size={14} /></button><a className="signal-button" href="mailto:manojprabhu0707@gmail.com">Email Manoj <Mail size={14} /></a></div></motion.aside> : null}</AnimatePresence>
+      <AnimatePresence>{recruiterOpen ? <motion.aside ref={recruiterCardRef} className="recruiter-brief-card" role="dialog" aria-modal="true" aria-label="Recruiter quick-view" data-lenis-prevent initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.97 }} transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-brief-head"><div><p className="label">Recruiter quick-view</p><p className="mt-1 text-sm font-semibold text-white">S Manoj Prabhu</p></div><div className="flex items-center gap-2"><span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span><button className="recruiter-close" type="button" onClick={() => setRecruiterOpen(false)} aria-label="Close recruiter quick-view (Esc)"><X size={17} /></button></div></div><div className="recruiter-availability"><span className="signal-dot" /><span>Open to internships and collaborative product work</span></div><div className="recruiter-detail-grid"><div><p className="label">Based in</p><p>Polur, Tamil Nadu</p></div><div><p className="label">Core stack</p><p>React · Figma · Java</p></div><div><p className="label">Proof</p><p>85% ML accuracy</p></div><div><p className="label">Contact</p><p>Reply within 1–2 days</p></div></div><div className="recruiter-brief-actions"><button className="signal-button primary" type="button" onClick={downloadResume}>Get résumé <Download size={14} /></button><a className="signal-button" href="mailto:manojprabhu0707@gmail.com">Email Manoj <Mail size={14} /></a></div></motion.aside> : null}</AnimatePresence>
 
-      <AnimatePresence>{recruiterReviewOpen ? <motion.aside className="recruiter-review-panel" role="region" aria-label="Recruiter review path" initial={reduceMotion ? false : { opacity: 0, y: 16, scale: .98 }} animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: .98 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-review-head"><div><p className="label">Recruiter review path</p><p>Four signals. One concise review.</p></div><button type="button" className="recruiter-close" onClick={() => setRecruiterReviewOpen(false)} aria-label="Close recruiter review path"><X size={17} /></button></div><div className="recruiter-review-progress" aria-label={`Checkpoint ${recruiterReviewStep + 1} of ${recruiterReviewSteps.length}`}>{recruiterReviewSteps.map((step, index) => <button key={step.id} type="button" className={index === recruiterReviewStep ? "is-active" : index < recruiterReviewStep ? "is-complete" : ""} onClick={() => goToRecruiterReviewStep(index)} aria-current={index === recruiterReviewStep ? "step" : undefined}><span>{step.index}</span><em>{step.label}</em></button>)}</div><div className="recruiter-review-copy" aria-live="polite"><span className="label">{recruiterReviewSteps[recruiterReviewStep].index} / {recruiterReviewSteps[recruiterReviewStep].label}</span><p>{recruiterReviewSteps[recruiterReviewStep].note}</p></div><div className="recruiter-review-actions"><button type="button" onClick={() => goToRecruiterReviewStep(recruiterReviewStep - 1)} disabled={recruiterReviewStep === 0}>Previous</button><button type="button" className="signal-button primary" onClick={() => recruiterReviewStep === recruiterReviewSteps.length - 1 ? setRecruiterReviewOpen(false) : goToRecruiterReviewStep(recruiterReviewStep + 1)}>{recruiterReviewStep === recruiterReviewSteps.length - 1 ? "Complete review" : "Next signal"} <ArrowDownRight size={14} /></button></div></motion.aside> : null}</AnimatePresence>
+      <AnimatePresence>{recruiterReviewOpen ? <motion.aside ref={recruiterReviewRef} className="recruiter-review-panel" role="region" aria-label="Recruiter review path" data-lenis-prevent initial={reduceMotion ? false : { opacity: 0, y: 16, scale: .98 }} animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: .98 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-review-head"><div><p className="label">Recruiter review path</p><p>Four signals. One concise review.</p></div><div className="flex items-center gap-2"><span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span><button type="button" className="recruiter-close" onClick={() => setRecruiterReviewOpen(false)} aria-label="Close recruiter review path (Esc)"><X size={17} /></button></div></div><div className="recruiter-review-progress" aria-label={`Checkpoint ${recruiterReviewStep + 1} of ${recruiterReviewSteps.length}`}>{recruiterReviewSteps.map((step, index) => <button key={step.id} type="button" className={index === recruiterReviewStep ? "is-active" : index < recruiterReviewStep ? "is-complete" : ""} onClick={() => goToRecruiterReviewStep(index)} aria-current={index === recruiterReviewStep ? "step" : undefined}><span>{step.index}</span><em>{step.label}</em></button>)}</div><div className="recruiter-review-copy" aria-live="polite"><span className="label">{recruiterReviewSteps[recruiterReviewStep].index} / {recruiterReviewSteps[recruiterReviewStep].label}</span><p>{recruiterReviewSteps[recruiterReviewStep].note}</p></div><div className="recruiter-review-actions"><button type="button" onClick={() => goToRecruiterReviewStep(recruiterReviewStep - 1)} disabled={recruiterReviewStep === 0}>Previous</button><button type="button" className="signal-button primary" onClick={() => recruiterReviewStep === recruiterReviewSteps.length - 1 ? setRecruiterReviewOpen(false) : goToRecruiterReviewStep(recruiterReviewStep + 1)}>{recruiterReviewStep === recruiterReviewSteps.length - 1 ? "Complete review" : "Next signal"} <ArrowDownRight size={14} /></button></div></motion.aside> : null}</AnimatePresence>
 
       <section id="about" className="editorial-band container py-28 md:py-40">
         {/* Obsidian Studio About visual: restore the original black-hole reel as a quiet right-side signal, with the copy kept in the foreground. */}
@@ -1447,41 +2476,211 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="work" className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
-        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
+      <section id="work" className="editorial-band top-rule bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
+        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" loading="lazy" decoding="async" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
         <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused project studies across applied machine learning, mobile product design, autonomous content operations, and civic discovery." motionPaused={motionPaused} /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button><button onClick={() => scrollToSection("ai-content-studio")}>03 AI studio</button><button onClick={() => scrollToSection("polur-charm")}>04 Polur Charm</button></nav>
-          <div className="project-orbit-selector" aria-label="Featured project selector">
-            <div className="project-orbit-intro"><p className="label">Project orbit / choose a signal</p><p>Rotate between the four studies, then follow the selected signal into the work.</p><span className="project-orbit-current">{orbitProjects.find((project) => project.id === activeOrbitProject)?.signal}</span></div>
-            <div className="project-orbit-stage">
-              <span className="project-orbit-ring outer" aria-hidden="true" /><span className="project-orbit-ring inner" aria-hidden="true" /><span className="project-orbit-axis" aria-hidden="true" />
-              <span className="project-orbit-core" aria-hidden="true"><i /><b>Work<br />orbit</b></span>
-              {orbitProjects.map((project, index) => <button key={project.id} className={`orbit-project-node node-${index + 1} ${project.id === "attack-study" || project.id === "polur-charm" ? "project-tone-cyan" : "project-tone-violet"} ${activeOrbitProject === project.id ? "is-active" : ""}`} type="button" aria-pressed={activeOrbitProject === project.id} onMouseEnter={() => setOrbitSelectorPreview(project.id)} onMouseLeave={() => setOrbitSelectorPreview(null)} onFocus={() => { setActiveOrbitProject(project.id); setOrbitSelectorPreview(project.id); }} onBlur={() => setOrbitSelectorPreview(null)} onClick={() => selectOrbitProject(project.id)}><span className="orbit-project-index">{project.index}</span><span><b>{project.title}</b><em>{project.discipline}</em></span></button>)}
-            </div>
-          </div>
+          <ProjectOrbitSelector
+            projects={orbitProjects}
+            activeProjectId={activeOrbitProject}
+            onSelectProject={selectOrbitProject}
+            onHoverProject={setOrbitSelectorPreview}
+            motionPaused={motionPaused}
+            lowDataMode={lowDataMode}
+            reduceMotion={reduceMotion}
+          />
           <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare signals</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
-            <Reveal delay={0.06}><article id="attack-study" className={`project-card panel ${gravityProject === "attack-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus or hover to align related capabilities." onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("attack-study")} onFocus={() => setGravityProject("attack-study")} onClick={() => setGravityProject("attack-study")} onMouseLeave={resetProjectTilt}>
-              <img className="project-art" src="/images/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" />
+            <Reveal delay={0.06}><article id="attack-study" className={`project-card panel ${gravityProject === "attack-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "attack-study", 0)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("attack-study")} onFocus={() => setGravityProject("attack-study")} onClick={() => setGravityProject("attack-study")} onMouseLeave={resetProjectTilt}>
+              <img className="project-art" src="/images/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" />
               <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><LensAperture motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Prediction of Perpetration Attack</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching <strong className="font-semibold text-white">85% classification accuracy</strong> on a cybersecurity dataset.</p><ProjectProofMarker value="85" suffix="%" ringValue={85} label="Best accuracy" detail="XGBoost selected after four-model evaluation" tone="cyan" motionPaused={motionPaused} /><AttackModelWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9">
+                <p className="project-meta label text-violet-200">Machine learning · 01/2024—04/2024</p>
+                <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[0.95] text-white md:text-5xl [text-wrap:balance]">Prediction of Perpetration Attack</h3>
+                <CyberTypingDescription
+                  text="Built and evaluated four Python / Scikit-learn models — XGBoost, SVM, Logistic Regression, and Gradient Boosting — reaching 85% classification accuracy on a cybersecurity dataset."
+                  highlights={["Python / Scikit-learn models", "XGBoost", "SVM", "Logistic Regression", "Gradient Boosting", "85% classification accuracy", "cybersecurity dataset"]}
+                  tone="cyan"
+                  promptLabel="sys.ml_defense"
+                  motionPaused={motionPaused}
+                  lowDataMode={lowDataMode}
+                />
+                <ProjectProofMarker value="85" suffix="%" ringValue={85} label="Best accuracy" detail="XGBoost selected after four-model evaluation" tone="cyan" motionPaused={motionPaused} /><AttackModelWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noopener noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
-            <Reveal delay={0.13}><article id="delivery-study" className={`project-card panel ${gravityProject === "delivery-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus or hover to align related capabilities." onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("delivery-study")} onFocus={() => setGravityProject("delivery-study")} onClick={() => setGravityProject("delivery-study")} onMouseLeave={resetProjectTilt}>
-              <img className="project-art" src="/images/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" />
+            <Reveal delay={0.13}><article id="delivery-study" className={`project-card panel ${gravityProject === "delivery-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "delivery-study", 1)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("delivery-study")} onFocus={() => setGravityProject("delivery-study")} onClick={() => setGravityProject("delivery-study")} onMouseLeave={resetProjectTilt}>
+              <img className="project-art" src="/images/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" />
               <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><BlueprintCrosshair motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
-              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[0.95] text-white md:text-5xl">Food Delivery Mobile App</h3><p className="mt-5 max-w-[44ch] text-sm leading-6 text-[#cec6da]">Designed <strong className="font-semibold text-white">15+ production-ready screens</strong>, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles.</p><ProjectProofMarker value="15+" ringValue={100} label="Screens mapped" detail="Two usability review cycles across the mobile flow" motionPaused={motionPaused} /><DeliveryWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryInteractionLoop motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryDeviceRelay motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200">Case study available on request <ArrowUpRight size={15} /></span></div></div>
+              <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9">
+                <p className="project-meta label text-violet-200">UI / UX design · 06/2023—08/2023</p>
+                <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[0.95] text-white md:text-5xl [text-wrap:balance]">Food Delivery Mobile App</h3>
+                <CyberTypingDescription
+                  text="Designed 15+ production-ready screens, covering onboarding, discovery, cart, and order tracking, guided by Material Design and refined across two usability review cycles."
+                  highlights={["15+ production-ready screens", "onboarding, discovery, cart", "order tracking", "Material Design", "two usability review cycles"]}
+                  tone="violet"
+                  promptLabel="sys.ux_architecture"
+                  motionPaused={motionPaused}
+                  lowDataMode={lowDataMode}
+                />
+                <ProjectProofMarker value="15+" ringValue={100} label="Screens mapped" detail="Two usability review cycles across the mobile flow" motionPaused={motionPaused} /><DeliveryWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryInteractionLoop motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryDeviceRelay motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><a href="mailto:manojprabhu0707@gmail.com?subject=Case%20Study%20Request%20%E2%80%94%20Food%20Delivery%20Mobile%20App" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white transition-colors cursor-pointer" aria-label="Request Food Delivery Mobile App case study via email">Case study available on request <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
-            <Reveal delay={0.18} className="project-sequence-third"><article id="ai-content-studio" className={`project-card ai-studio-project panel ${gravityProject === "ai-content-studio" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="YouTube Auto-Uploader and Autonomous AI Content Studio showcase. Focus or hover to align related capabilities." onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("ai-content-studio")} onFocus={() => setGravityProject("ai-content-studio")} onClick={() => setGravityProject("ai-content-studio")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/ai-content-studio-showcase_e194be53.jpg" alt="Abstract autonomous AI media studio with vertical video frames and orbital data streams" /><div className="project-scrim" /><span className="project-signal">autonomous studio</span><span className="project-index">03 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">Auto pipeline</span></div><p>From channel monitoring through scheduled publishing.</p></div><div className="relative z-10 flex min-h-[620px] flex-col p-7 md:p-9 ai-studio-card-copy"><p className="project-meta label text-violet-200">AI & backend automation · production workflow</p><h3 className="display mt-3 max-w-[13ch] text-4xl leading-[.93] text-white md:text-5xl">YouTube Auto-Uploader & Autonomous AI Content Studio</h3><p className="mt-5 max-w-[43ch] text-sm leading-6 text-[#d1cadb]">A Python automation system for multi-channel monitoring, vertical Shorts, AI-assisted metadata, bilingual workflows, and resilient publishing operations.</p><div className="ai-studio-outcome"><span className="ai-studio-outcome-orbit" aria-hidden="true"><i /></span><div><p className="label">Outcome marker</p><b>Autonomous content pipeline</b><em>Ingestion → Shorts → metadata → scheduling</em></div></div><AutomationStudioWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><button type="button" className="ai-studio-detail-trigger ai-studio-brief-action" onClick={() => setAiContentStudioOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button></div></article></Reveal>
-            <Reveal delay={0.23} className="project-sequence-fourth"><article id="polur-charm" className={`project-card polur-charm-project panel ${gravityProject === "polur-charm" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Polur Charm tourism and civic platform case study. Focus or hover to align related capabilities." onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("polur-charm")} onFocus={() => setGravityProject("polur-charm")} onClick={() => setGravityProject("polur-charm")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="Cinematic Parvathamalai and Polur travel-civic discovery visual" /><div className="project-scrim" /><span className="project-signal">regional discovery</span><span className="project-index">04 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-cyan-100">Case signal</span><span className="project-metric">24/7 discovery</span></div><p>Travel, civic essentials, and heritage exploration in one guide.</p></div><div className="relative z-10 flex min-h-[560px] flex-col justify-end p-7 md:p-9"><p className="project-meta label text-cyan-100">Web development · travel & civic tech</p><h3 className="display mt-3 max-w-[11ch] text-4xl leading-[.93] text-white md:text-5xl">Polur Charm</h3><p className="mt-5 max-w-[43ch] text-sm leading-6 text-[#d1cadb]">An interactive bilingual guide for Polur, Parvathamalai, and nearby heritage destinations—joining local discovery, transit, safety, public services, and gamified trails.</p><ProjectProofMarker value="24" suffix="/7" ringValue={100} label="Discovery access" detail="Transit, civic essentials, and heritage trails in one platform" tone="cyan" motionPaused={motionPaused} /><PolurCharmWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><PolurTripPlannerMicroFlow motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="polur-charm" open={openCaseSignal === "polur-charm"} onToggle={() => setOpenCaseSignal((current) => current === "polur-charm" ? null : "polur-charm")} motionPaused={motionPaused} /><button type="button" className="ai-studio-detail-trigger mt-6" onClick={() => setPolurCharmOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">React 19 · TypeScript · TanStack · i18n</span><span className="flex flex-wrap gap-x-4 gap-y-2"><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://polurcharm.com" target="_blank" rel="noreferrer">Visit live site <ArrowUpRight size={15} /></a><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noreferrer">Repository <Github size={15} /></a></span></div></div></article></Reveal>
+            <Reveal delay={0.18} className="project-sequence-third"><article id="ai-content-studio" className={`project-card ai-studio-project panel ${gravityProject === "ai-content-studio" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="YouTube Auto-Uploader and Autonomous AI Content Studio showcase. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "ai-content-studio", 2)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("ai-content-studio")} onFocus={() => setGravityProject("ai-content-studio")} onClick={() => setGravityProject("ai-content-studio")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/ai-content-studio-showcase_e194be53.jpg" alt="Abstract autonomous AI media studio with vertical video frames and orbital data streams" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" /><div className="project-scrim" /><span className="project-signal">autonomous studio</span><span className="project-index">03 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">Auto pipeline</span></div><p>From channel monitoring through scheduled publishing.</p></div><div className="relative z-10 flex min-h-[620px] flex-col p-7 md:p-9 ai-studio-card-copy">
+              <p className="project-meta label text-violet-200">AI & backend automation · production workflow</p>
+              <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[.93] text-white md:text-5xl [text-wrap:balance]">YouTube Auto-Uploader & Autonomous AI Content Studio</h3>
+              <CyberTypingDescription
+                text="A Python automation system for multi-channel monitoring, vertical Shorts, AI-assisted metadata, bilingual workflows, and resilient publishing operations."
+                highlights={["Python automation system", "multi-channel monitoring", "vertical Shorts", "AI-assisted metadata", "bilingual workflows", "publishing operations"]}
+                tone="violet"
+                promptLabel="sys.ai_pipeline"
+                motionPaused={motionPaused}
+                lowDataMode={lowDataMode}
+              />
+              <div className="ai-studio-outcome"><span className="ai-studio-outcome-orbit" aria-hidden="true"><i /></span><div><p className="label">Outcome marker</p><b>Autonomous content pipeline</b><em>Ingestion → Shorts → metadata → scheduling</em></div></div><AutomationStudioWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><button type="button" className="ai-studio-detail-trigger ai-studio-brief-action" onClick={() => setAiContentStudioOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button></div></article></Reveal>
+            <Reveal delay={0.23} className="project-sequence-fourth"><article id="polur-charm" className={`project-card polur-charm-project panel ${gravityProject === "polur-charm" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Polur Charm tourism and civic platform case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "polur-charm", 3)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("polur-charm")} onFocus={() => setGravityProject("polur-charm")} onClick={() => setGravityProject("polur-charm")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="Cinematic Parvathamalai and Polur travel-civic discovery visual" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" /><div className="project-scrim" /><span className="project-signal">regional discovery</span><span className="project-index">04 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-cyan-100">Case signal</span><span className="project-metric">24/7 discovery</span></div><p>Travel, civic essentials, and heritage exploration in one guide.</p></div><div className="relative z-10 flex min-h-[560px] flex-col justify-end p-7 md:p-9">
+              <p className="project-meta label text-cyan-100">Web development · travel & civic tech</p>
+              <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[.93] text-white md:text-5xl [text-wrap:balance]">Polur Charm</h3>
+              <CyberTypingDescription
+                text="An interactive bilingual guide for Polur, Parvathamalai, and nearby heritage destinations—joining local discovery, transit, safety, public services, and gamified trails."
+                highlights={["interactive bilingual guide", "Polur, Parvathamalai", "local discovery, transit", "public services", "gamified trails"]}
+                tone="cyan"
+                promptLabel="sys.civic_hub"
+                motionPaused={motionPaused}
+                lowDataMode={lowDataMode}
+              />
+              <ProjectProofMarker value="24" suffix="/7" ringValue={100} label="Discovery access" detail="Transit, civic essentials, and heritage trails in one platform" tone="cyan" motionPaused={motionPaused} /><PolurCharmWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><PolurTripPlannerMicroFlow motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="polur-charm" open={openCaseSignal === "polur-charm"} onToggle={() => setOpenCaseSignal((current) => current === "polur-charm" ? null : "polur-charm")} motionPaused={motionPaused} /><button type="button" className="ai-studio-detail-trigger mt-6" onClick={() => setPolurCharmOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">React 19 · TypeScript · TanStack · i18n</span><span className="flex flex-wrap gap-x-4 gap-y-2"><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://polurcharm.com" target="_blank" rel="noopener noreferrer">Visit live site <ArrowUpRight size={15} /></a><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noopener noreferrer">Repository <Github size={15} /></a></span></div></div></article></Reveal>
           </div>
         </div>
       </section>
       <AIContentStudioDialog open={aiContentStudioOpen} onOpenChange={setAiContentStudioOpen} />
       <PolurCharmDialog open={polurCharmOpen} onOpenChange={setPolurCharmOpen} />
-      <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911] py-28 md:py-40">
-        <div className="container"><Reveal><SectionIntro index="03.5" eyebrow="Project collection" title="More signals in the field." detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research." motionPaused={motionPaused} /></Reveal><div className="collection-guidance" id="collection-guidance" aria-live="polite"><span className="collection-guidance-kicker">Browse the hand</span><span className="collection-guidance-state">{collectionFocus === null ? "Hover or focus a card to bring its signal forward." : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}</span><span className="collection-guidance-hint">Select for full brief <ArrowUpRight size={13} /></span></div><div className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`} onScroll={handleMobileCollectionScroll} onTouchStart={handleMobileCollectionTouchStart} onTouchMove={handleMobileCollectionTouchMove} onTouchEnd={clearMobileCollectionTouchIntent} onTouchCancel={clearMobileCollectionTouchIntent} aria-label="Project Collection. Select a project card to view its details." aria-describedby="collection-guidance"><span className="collection-selection-pulse" aria-hidden="true" />{projectCollection.map((project, index) => <div key={project.id} className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}><button type="button" className={`collection-card collection-card-${index + 1} ${collectionOpeningIndex === index ? "is-opening" : ""}`} onClick={() => openCollectionProject(project, index)} onMouseEnter={() => setCollectionFocus(index)} onMouseLeave={(event) => { setCollectionFocus(null); resetCollectionArtworkParallax(event); }} onPointerMove={handleCollectionArtworkParallax} onPointerLeave={resetCollectionArtworkParallax} onFocus={() => setCollectionFocus(index)} onBlur={() => setCollectionFocus(null)} aria-label={`Open details for ${project.title}`}><img src={project.image} alt={project.alt} /><span className="collection-card-scrim" aria-hidden="true" /><span className="collection-card-refraction" aria-hidden="true" />{index === 3 && <span className="smart-aroma-sensor-pulse" aria-hidden="true" />}<span className="collection-card-index">0{index + 1} / 04</span><span className="collection-card-copy"><em>{project.label}</em><b>{project.title}</b></span><span className="collection-card-open">Open <ArrowUpRight size={14} /></span></button></div>)}</div><div className="collection-snap-indicator" aria-live="polite"><span className="collection-snap-line" aria-hidden="true" />{projectCollection.map((project, index) => <span key={project.id} className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`} aria-hidden="true" />)}<span className="sr-only">Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {mobileCollectionSnap + 1} / {projectCollection.length} · {projectCollection[mobileCollectionSnap].title}</span></div><Reveal delay={.28}><p className="collection-footnote"><span className="signal-dot" />Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.</p></Reveal></div>
+      <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911]/90 backdrop-blur-sm py-28 md:py-40">
+        <div className="container">
+          <Reveal>
+            <SectionIntro
+              index="03.5"
+              eyebrow="Project collection"
+              title="More signals in the field."
+              detail="Four smaller studies across automation, AI media systems, career intelligence, and experimental IoT research."
+              motionPaused={motionPaused}
+            />
+          </Reveal>
+          <div className="collection-guidance flex flex-wrap items-center justify-between gap-3" id="collection-guidance" aria-live="polite">
+            <div className="flex items-center gap-3">
+              <span className="collection-guidance-kicker">Browse the hand</span>
+              <span className="collection-guidance-state">
+                {collectionFocus === null
+                  ? "Hover or focus a card to bring its signal forward."
+                  : `Signal 0${collectionFocus + 1} / 04 · ${projectCollection[collectionFocus].title}`}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] text-white/50">
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-violet-300">←</kbd>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-violet-300">→</kbd>
+                <span>navigate cards</span>
+                <span className="mx-1 text-white/20">·</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-violet-300">Enter</kbd>
+                <span>open</span>
+                <span className="mx-1 text-white/20">·</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-violet-300">Esc</kbd>
+                <span>close</span>
+              </span>
+              <span className="collection-guidance-hint">
+                Select for full brief <ArrowUpRight size={13} />
+              </span>
+            </div>
+          </div>
+          <div
+            className={`project-collection-stage mt-7 ${collectionFocus !== null ? "is-collection-engaged" : ""}`}
+            onScroll={handleMobileCollectionScroll}
+            onTouchStart={handleMobileCollectionTouchStart}
+            onTouchMove={handleMobileCollectionTouchMove}
+            onTouchEnd={clearMobileCollectionTouchIntent}
+            onTouchCancel={clearMobileCollectionTouchIntent}
+            aria-label="Project Collection. Select a project card to view its details."
+            aria-describedby="collection-guidance"
+          >
+            <span className="collection-selection-pulse" aria-hidden="true" />
+            {projectCollection.map((project, index) => (
+              <motion.div
+                key={project.id}
+                custom={index}
+                variants={collectionFanVariants}
+                initial={reduceMotion || motionPaused ? false : "hidden"}
+                whileInView={reduceMotion || motionPaused ? undefined : "visible"}
+                viewport={{ once: true, amount: "some", margin: "0px 0px 80px 0px" }}
+                className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}
+              >
+                <button
+                  type="button"
+                  ref={(el) => {
+                    collectionCardRefs.current[index] = el;
+                  }}
+                  className={`collection-card collection-card-${index + 1} ${collectionFocus === index ? "is-focused is-active" : ""} ${collectionOpeningIndex === index ? "is-opening" : ""}`}
+                  onClick={() => openCollectionProject(project, index)}
+                  onKeyDown={(event) => handleCollectionCardKeyDown(event, index)}
+                  onMouseEnter={() => setCollectionFocus(index)}
+                  onMouseLeave={(event) => {
+                    setCollectionFocus(null);
+                    resetCollectionArtworkParallax(event);
+                  }}
+                  onPointerMove={handleCollectionArtworkParallax}
+                  onPointerLeave={resetCollectionArtworkParallax}
+                  onFocus={() => setCollectionFocus(index)}
+                  onBlur={(event) => {
+                    const related = event.relatedTarget as HTMLElement | null;
+                    if (!related?.closest(".project-collection-stage")) {
+                      setCollectionFocus(null);
+                    }
+                  }}
+                  aria-label={`Open details for ${project.title}. Keyboard shortcut: Left or Right arrow to change card, Enter to view brief.`}
+                  aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter"
+                >
+                  <ProgressiveImage
+                    src={project.image}
+                    placeholderSrc={project.placeholder}
+                    alt={project.alt}
+                    motionPaused={Boolean(motionPaused || reduceMotion)}
+                  />
+                  <span className="collection-card-scrim" aria-hidden="true" />
+                  <span className="collection-card-refraction" aria-hidden="true" />
+                  {index === 3 && <span className="smart-aroma-sensor-pulse" aria-hidden="true" />}
+                  <span className="collection-card-index">0{index + 1} / 04</span>
+                  <span className="collection-card-copy">
+                    <em>{project.label}</em>
+                    <b>{project.title}</b>
+                  </span>
+                  <span className="collection-card-open">
+                    Open <ArrowUpRight size={14} />
+                  </span>
+                </button>
+              </motion.div>
+            ))}
+          </div>
+          <div className="collection-snap-indicator" aria-live="polite">
+            <span className="collection-snap-line" aria-hidden="true" />
+            {projectCollection.map((project, index) => (
+              <span
+                key={project.id}
+                className={`collection-snap-dot ${mobileCollectionSnap === index ? "is-active" : ""}`}
+                aria-hidden="true"
+              />
+            ))}
+            <span className="sr-only">
+              Card {mobileCollectionSnap + 1} of {projectCollection.length} centred: {mobileCollectionSnap + 1} / {projectCollection.length} · {projectCollection[mobileCollectionSnap].title}
+            </span>
+          </div>
+          <div className="mobile-swipe-hint flex lg:hidden items-center justify-center gap-1.5 text-[11px] font-mono text-violet-300/60 mt-3 mb-2" aria-hidden="true">
+            <span className="animate-pulse">←</span> Swipe to browse collection <span className="animate-pulse">→</span>
+          </div>
+          <Reveal delay={0.28}>
+            <p className="collection-footnote">
+              <span className="signal-dot" />
+              Each collection card opens a focused brief. Only MyJob AI Radar includes its supplied public demo; no source-code links are shown.
+            </p>
+          </Reveal>
+        </div>
       </section>
       <ProjectCollectionDialog project={activeCollectionProject} loading={collectionDialogLoading} motionPaused={motionPaused} onCloseAutoFocus={() => window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 0)} onOpenChange={(open) => { if (!open) { setCollectionDialogLoading(false); const staticClose = reduceMotion || motionPaused; window.setTimeout(() => { setActiveCollectionProject(null); if (!staticClose) window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 24); }, staticClose ? 0 : 260); } }} />
 
@@ -1491,36 +2690,310 @@ export default function Home() {
           <div className="timeline-list"><Reveal><div className={`timeline-row ${activeExperience === 0 ? "is-map-active" : ""}`} tabIndex={0} aria-label="Project Intern. Focus to highlight related skills." onMouseEnter={() => pinExperienceRow(0)} onFocus={() => pinExperienceRow(0)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
             {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className={`timeline-row ${activeExperience === index + 1 ? "is-map-active" : ""}`} tabIndex={0} aria-label={`${item.role}. Focus to highlight related skills.`} onMouseEnter={() => pinExperienceRow(index + 1)} onFocus={() => pinExperienceRow(index + 1)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
           </div>
-          <Reveal delay={0.1} className="experience-aside-stack self-start"><ExperienceConnectionMap activeExperience={activeExperience} motionPaused={motionPaused} /><div className="panel p-7 md:p-8"><div className="flex items-center gap-3"><GraduationCap className="text-violet-300" size={20} /><p className="label">Education</p></div><div className="mt-7"><p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p><p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p><p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p></div><div className="mt-8 space-y-3 border-t border-white/10 pt-6"><div className="flex justify-between text-sm text-[#aaa4b7]"><span>HSC</span><span className="text-white">80%</span></div><div className="flex justify-between text-sm text-[#aaa4b7]"><span>SSLC</span><span className="text-white">79%</span></div></div></div></Reveal>
+          <Reveal delay={0.1} className="experience-aside-stack self-start">
+            <ExperienceConnectionMap
+              activeExperience={activeExperience}
+              onSelectExperience={pinExperienceRow}
+              motionPaused={motionPaused}
+            />
+
+            <div className="panel p-7 md:p-8 mt-6">
+              <div className="flex items-center gap-3">
+                <GraduationCap className="text-violet-300" size={20} />
+                <p className="label">Education</p>
+              </div>
+              <div className="mt-7">
+                <p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p>
+                <p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p>
+                <p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p>
+              </div>
+              <div className="mt-8 space-y-3 border-t border-white/10 pt-6">
+                <div className="flex justify-between text-sm text-[#aaa4b7]">
+                  <span>HSC</span>
+                  <span className="text-white">80%</span>
+                </div>
+                <div className="flex justify-between text-sm text-[#aaa4b7]">
+                  <span>SSLC</span>
+                  <span className="text-white">79%</span>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="editorial-band top-rule bg-[#0d0b15] py-28 md:py-40">
-        <div className="mini-singularity skill-singularity" aria-hidden="true"><span /></div><span className="signal-thread skill-thread" aria-hidden="true" />
+      <section className="editorial-band top-rule bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40 relative">
+        <span className="signal-thread skill-thread" aria-hidden="true" />
         <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." motionPaused={motionPaused} /></Reveal>
           <Reveal delay={0.08}><div className="skill-legend" aria-label="Four-point star-map proficiency scale"><span className="skill-legend-title">Star map / four-point scale</span>{[[1, "Exploring"], [2, "Foundation"], [3, "Working"], [4, "Applied"]].map(([stars, label]) => <span className="skill-legend-item" key={label as string}><span className="skill-legend-stars" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <b key={star} className={star < Number(stars) ? "is-lit" : ""} />)}</span>{label}</span>)}</div></Reveal>
-          <div className={`skill-gravity-status ${gravityProject ? "is-active" : ""}`} aria-live="polite"><span className="skill-gravity-core" aria-hidden="true"><i /></span><div><p className="label">Project gravity</p><p>{gravityProject ? <><b>{projectSkillGravity[gravityProject].label}</b> draws in {projectSkillGravity[gravityProject].note}.</> : "Hover or focus a featured project to align its relevant skills."}</p></div><div className="skill-gravity-controls" aria-label="Choose a project skill alignment">{orbitProjects.map((project) => <button type="button" key={project.id} className={gravityProject === project.id ? "is-active" : ""} onClick={() => setGravityProject(project.id)} aria-pressed={gravityProject === project.id}>{project.index}</button>)}<button type="button" className="skill-gravity-reset" onClick={() => setGravityProject(null)} disabled={!gravityProject}>Reset</button></div></div>
-          <div className="capability-grid mt-10 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {skills.map((skill, index) => <Reveal key={skill.code} delay={index * 0.04}><div className={`capability-cell min-h-[180px] bg-[#100d18] p-6 transition-colors hover:bg-[#171126] ${gravityProject && skill.items.some((item) => projectSkillGravity[gravityProject].skills.includes(item as never)) ? "is-gravity-group" : ""}`} onPointerMove={handleCapabilityGlow} onPointerLeave={clearCapabilityGlow}><div className="flex items-start justify-between"><p className="label">{skill.code}</p><Layers3 size={18} className="text-violet-300" /></div><h3 className="display mt-7 text-2xl text-white">{skill.title}</h3><div className="mt-5 flex flex-wrap gap-2">{skill.items.map((item) => { const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 }; const isGravityActive = Boolean(gravityProject && projectSkillGravity[gravityProject].skills.includes(item as never)); const vector = skillGravityVectors[item] ?? { x: "0px", y: "0px" }; return <span className={`skill-chip ${isGravityActive ? "is-gravity-active" : ""}`} key={item} tabIndex={0} aria-label={`${item}: ${proficiency.level} proficiency${isGravityActive ? ". Related to the active project." : ""}`} style={{ "--gravity-x": vector.x, "--gravity-y": vector.y } as React.CSSProperties}><span>{item}</span><span className="skill-tooltip" role="tooltip"><span className="skill-star-map" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />)}</span><span className="skill-tooltip-copy">{proficiency.level} proficiency</span></span></span>; })}</div></div></Reveal>)}
+          {/* Enhanced Cosmic Glassmorphic Project Gravity Bar */}
+          <div className={`skill-gravity-status ${gravityProject ? "is-active" : ""}`} aria-live="polite">
+            <span className="skill-gravity-core" aria-hidden="true">
+              <i />
+            </span>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="label text-[10px] tracking-widest text-violet-300 font-mono">PROJECT GRAVITY FIELD</span>
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-[#b3a8cb]">
+                  <span className={`w-1.5 h-1.5 rounded-full ${gravityProject ? "bg-emerald-400 animate-pulse" : "bg-white/30"}`} />
+                  <span className={gravityProject ? "text-emerald-300 font-semibold" : "text-[#8e879f]"}>
+                    {gravityProject ? "ALIGNED" : "IDLE"}
+                  </span>
+                </span>
+              </div>
+              <p>{gravityProject ? <><b>{projectSkillGravity[gravityProject].label}</b> draws in {projectSkillGravity[gravityProject].note}.</> : "Hover or focus a featured project to align its relevant skills in real-time."}</p>
+            </div>
+            <div className="skill-gravity-controls" aria-label="Choose a project skill alignment">
+              {orbitProjects.map((project) => (
+                <button
+                  type="button"
+                  key={project.id}
+                  className={`${gravityProject === project.id ? "is-active" : ""}`}
+                  onClick={() => setGravityProject(project.id)}
+                  aria-pressed={gravityProject === project.id}
+                  title={`Align skills for ${project.title}`}
+                >
+                  {project.index}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="skill-gravity-reset flex items-center gap-1.5"
+                onClick={() => setGravityProject(null)}
+                disabled={!gravityProject}
+                title="Reset skill gravity alignment"
+              >
+                <RotateCcw size={11} className={gravityProject ? "text-rose-400" : "opacity-40"} />
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-80 w-[85%] -translate-x-1/2 rounded-full bg-gradient-to-b from-violet-600/12 via-purple-500/5 to-transparent blur-3xl" aria-hidden="true" />
+            <div className="capability-grid relative mt-10 grid gap-px overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] shadow-[0_24px_80px_rgba(0,0,0,0.55),inset_0_1px_1px_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-3">
+              {skills.map((skill, index) => {
+                // Category-specific visual icon & theme
+                const categoryVisuals = {
+                  "01": { Icon: Code2, color: "text-emerald-300", border: "border-emerald-400/25", bg: "bg-emerald-500/10", glow: "group-hover:border-emerald-300/40 group-hover:bg-emerald-500/20 group-hover:shadow-[0_0_18px_rgba(16,185,129,0.35)]", label: "Core" },
+                  "02": { Icon: Layout, color: "text-cyan-300", border: "border-cyan-400/25", bg: "bg-cyan-500/10", glow: "group-hover:border-cyan-300/40 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_18px_rgba(6,182,212,0.35)]", label: "Web UI" },
+                  "03": { Icon: Palette, color: "text-fuchsia-300", border: "border-fuchsia-400/25", bg: "bg-fuchsia-500/10", glow: "group-hover:border-fuchsia-300/40 group-hover:bg-fuchsia-500/20 group-hover:shadow-[0_0_18px_rgba(217,70,239,0.35)]", label: "Visual" },
+                  "04": { Icon: Server, color: "text-indigo-300", border: "border-indigo-400/25", bg: "bg-indigo-500/10", glow: "group-hover:border-indigo-300/40 group-hover:bg-indigo-500/20 group-hover:shadow-[0_0_18px_rgba(99,102,241,0.35)]", label: "Services" },
+                  "05": { Icon: Cloud, color: "text-sky-300", border: "border-sky-400/25", bg: "bg-sky-500/10", glow: "group-hover:border-sky-300/40 group-hover:bg-sky-500/20 group-hover:shadow-[0_0_18px_rgba(14,165,233,0.35)]", label: "Infra" },
+                  "06": { Icon: Cpu, color: "text-amber-300", border: "border-amber-400/25", bg: "bg-amber-500/10", glow: "group-hover:border-amber-300/40 group-hover:bg-amber-500/20 group-hover:shadow-[0_0_18px_rgba(245,158,11,0.35)]", label: "ML & Flow" },
+                }[skill.code] ?? { Icon: Layers3, color: "text-violet-300", border: "border-violet-400/20", bg: "bg-violet-500/10", glow: "group-hover:border-violet-300/40 group-hover:bg-violet-500/20 group-hover:shadow-[0_0_14px_rgba(139,92,246,0.35)]", label: "Stack" };
+                const { Icon, color, border, bg, glow } = categoryVisuals;
+
+                const isCardGravityGroup = Boolean(gravityProject && skill.items.some((item) => projectSkillGravity[gravityProject].skills.includes(item as never)));
+
+                return (
+                  <Reveal key={skill.code} delay={index * 0.04}>
+                    <div
+                      className={`capability-cell group relative min-h-[200px] p-6 transition-all duration-300 ${isCardGravityGroup ? "is-gravity-group" : ""}`}
+                      onPointerMove={handleCapabilityGlow}
+                      onPointerLeave={clearCapabilityGlow}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <p className="label font-mono text-[11px] text-violet-300">{skill.code}</p>
+                          {isCardGravityGroup && (
+                            <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              active
+                            </span>
+                          )}
+                        </div>
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${border} ${bg} backdrop-blur-sm transition-all duration-300 group-hover:scale-110 ${glow}`}>
+                          <Icon size={16} className={`${color} transition-colors group-hover:brightness-125`} />
+                        </div>
+                      </div>
+                      <h3 className="display mt-5 text-2xl tracking-tight text-white group-hover:text-violet-100 transition-colors">{skill.title}</h3>
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {skill.items.map((item) => {
+                          const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 };
+                          const isGravityActive = Boolean(gravityProject && projectSkillGravity[gravityProject].skills.includes(item as never));
+                          const vector = skillGravityVectors[item] ?? { x: "0px", y: "0px" };
+                          return (
+                            <span
+                              className={`skill-chip ${isGravityActive ? "is-gravity-active" : ""}`}
+                              key={item}
+                              tabIndex={0}
+                              aria-label={`${item}: ${proficiency.level} proficiency${isGravityActive ? ". Related to the active project." : ""}`}
+                              style={{ "--gravity-x": vector.x, "--gravity-y": vector.y } as React.CSSProperties}
+                            >
+                              {isGravityActive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
+                              <span>{item}</span>
+                              <span className="skill-tooltip" role="tooltip">
+                                <span className="skill-star-map" aria-hidden="true">
+                                  {Array.from({ length: 4 }, (_, star) => (
+                                    <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />
+                                  ))}
+                                </span>
+                                <span className="skill-tooltip-copy">{proficiency.level} proficiency</span>
+                              </span>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
       <section className="editorial-band container py-28 md:py-40">
         <span className="signal-thread credential-thread" aria-hidden="true" />
-        <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
-        <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4"><CredentialSignalScan motionPaused={motionPaused} />{certifications.map((credential, index) => <Reveal delay={index * 0.06} key={credential.title}><article className="cert credential-card relative w-full bg-[#0d0b15] text-left" aria-label={`${credential.title}, issued by ${credential.issuer}`}><span className="cert-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><p className="label text-violet-200">{credential.issuer}</p><p className="display mt-6 text-xl leading-tight text-white">{credential.title}</p><p className="mt-4 text-xs text-[#9d96ac]">{credential.meta}</p><span className="credential-open-cue">Credential record</span></article></Reveal>)}</div>
-        <div className={`credential-exterior-field ${motionPaused || reduceMotion || lowDataMode ? "is-static" : ""}`} aria-hidden="true"><span className="credential-exterior-horizon" /><span className="credential-exterior-ring ring-one" /><span className="credential-exterior-ring ring-two" /><span className="credential-exterior-stream stream-one" /><span className="credential-exterior-stream stream-two" /><span className="credential-exterior-sparks"><i /><i /><i /><i /></span><span className="credential-exterior-caption">SMP / GRAVITY FIELD</span></div>
+        <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl [text-wrap:balance]">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
+        <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          <CredentialSignalScan motionPaused={motionPaused} />
+          {certifications.map((credential, index) => (
+            <Reveal delay={index * 0.06} key={credential.title} className="h-full">
+              <article
+                className="cert credential-card relative w-full h-full bg-[#0d0b15] text-left flex flex-col justify-between cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400"
+                tabIndex={0}
+                role="button"
+                aria-label={`${credential.title}, issued by ${credential.issuer}. Press Enter to view full credential verification brief.`}
+                onClick={() => setSelectedCredential(credential)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedCredential(credential);
+                  }
+                }}
+              >
+                <span className="cert-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <div className="flex-1">
+                  <p className="label text-violet-200">{credential.issuer}</p>
+                  <p className="display mt-5 text-xl leading-tight text-white">{credential.title}</p>
+                  <p className="mt-3 text-xs text-[#9d96ac]">{credential.meta}</p>
+                </div>
+                <div className="credential-cue-row">
+                  <span className="credential-open-cue">Credential record <ArrowUpRight size={12} className="inline ml-1 opacity-70" /></span>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+        <CredentialPreviewDialog
+          credential={selectedCredential}
+          open={Boolean(selectedCredential)}
+          onOpenChange={(open) => !open && setSelectedCredential(null)}
+          motionPaused={motionPaused}
+          lowDataMode={lowDataMode}
+        />
       </section>
 
-      <section id="contact" className="editorial-band relative overflow-hidden border-t border-white/10 py-28 md:py-40" onPointerDown={createContactPulse} onPointerMove={extendContactConstellation} onPointerLeave={() => setContactConstellationTrail([])} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/images/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      <section id="contact" className="editorial-band relative overflow-hidden py-28 md:py-40" onPointerDown={createContactPulse} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/images/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className={`contact-atmosphere ${contactFocused ? "is-engaged" : ""}`} aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" /><span className="contact-beacon"><i /><i /><i /></span>{contactPulses.map((pulse) => <span key={pulse.id} className="contact-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
-        <div className="contact-constellation" aria-hidden="true">{contactConstellationSegments.map((segment) => <span key={segment.id} className="constellation-line" style={{ left: `${segment.x}%`, top: `${segment.y}%`, width: `${segment.length}%`, transform: `rotate(${segment.angle}deg)` }} />)}{contactConstellationTrail.map((point) => <span key={point.id} className="constellation-point" style={{ left: `${point.x}%`, top: `${point.y}%` }} />)}</div>
-        <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label">07 / Contact</p><h2 className="display mt-5 max-w-[9ch] text-5xl leading-[.9] text-white md:text-7xl">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4"><a href="mailto:manojprabhu0707@gmail.com" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Mail size={16} /></span>manojprabhu0707@gmail.com</a><a href="tel:+919677518268" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Phone size={16} /></span>+91 9677518268</a><a href="https://maps.google.com/?q=Polur,Tamil+Nadu" target="_blank" rel="noreferrer" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><MapPin size={16} /></span>Polur, Tamil Nadu</a></div></div>
-          <form className="panel p-6 md:p-9" onSubmit={handleContact} onFocusCapture={() => setContactFocused(true)} onBlurCapture={handleContactBlur}><div className="grid gap-5"><div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4"><span className="label text-[0.57rem]">Correspondence / 01</span><button type="button" className="motion-toggle" onClick={() => setMotionPaused((paused) => !paused)} aria-pressed={motionPaused || Boolean(reduceMotion)} aria-label={reduceMotion ? "Background motion is paused by your device setting" : motionPaused ? "Resume background motion" : "Pause background motion"} disabled={Boolean(reduceMotion)}>{motionPaused || reduceMotion ? <Play size={13} /> : <Pause size={13} />}{motionPaused || reduceMotion ? "Motion paused" : "Motion live"}</button></div><label className="block"><span className="label mb-2 block">Your name</span><input className="form-field" required name="name" placeholder="What should I call you?" /></label><label className="block"><span className="label mb-2 block">Email</span><input className="form-field" type="email" required name="email" placeholder="name@company.com" /></label><label className="block"><span className="label mb-2 block">Message</span><textarea className="form-field min-h-36 resize-y" required name="message" placeholder="A few lines about the work, goal, or opportunity..." /></label><button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
+        <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">07 / Contact</p><h2 className="display mt-5 max-w-[12ch] text-5xl leading-[.9] text-white md:text-7xl [text-wrap:balance]">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1] [text-wrap:balance]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4">
+  <div className="space-y-2">
+    <div className="group relative flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-2.5 pr-3.5 backdrop-blur-sm transition-all hover:border-violet-500/40 hover:bg-white/[0.06]">
+      <button
+        type="button"
+        onClick={handleCopyEmail}
+        className="flex items-center gap-3.5 text-left text-sm text-[#d3cce0] transition-colors hover:text-white group-hover:text-violet-100 cursor-pointer"
+        title="Click to copy email address"
+        aria-label="Click to copy email address to clipboard"
+      >
+        <span className="icon-button h-10 w-10 shrink-0 group-hover:border-violet-400/50 group-hover:bg-violet-500/20">
+          <Mail size={16} className="text-violet-300 group-hover:text-violet-200" />
+        </span>
+        <div className="flex flex-col">
+          <span className="font-mono text-[0.88rem] tracking-tight text-white font-medium">
+            manojprabhu0707@gmail.com
+          </span>
+          <span className="text-[10px] text-[#9d96ac] font-sans group-hover:text-violet-300 transition-colors">
+            Click to copy email
+          </span>
+        </div>
+      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleCopyEmail}
+          className={`relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold tracking-wide transition-all ${
+            copiedEmail
+              ? "border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_14px_rgba(16,185,129,0.3)]"
+              : "border border-violet-500/30 bg-violet-500/10 text-violet-200 hover:border-violet-400 hover:bg-violet-500/25 hover:text-white active:scale-95"
+          }`}
+          aria-label="Copy email address"
+          title="Copy email to clipboard"
+        >
+          {copiedEmail ? (
+            <>
+              <Check size={13} className="text-emerald-400" />
+              <span>Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} className="text-violet-300" />
+              <span>Copy email</span>
+            </>
+          )}
+        </button>
+        <a
+          href="mailto:manojprabhu0707@gmail.com"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-[#b8adc9] transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+          title="Open in default mail client"
+          aria-label="Open default mail application"
+        >
+          <ArrowUpRight size={13} />
+        </a>
+      </div>
+    </div>
+    <AnimatePresence>
+      {copiedEmail && (
+        <motion.div
+          initial={{ opacity: 0, y: -4, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -4, scale: 0.97 }}
+          transition={{ duration: 0.18 }}
+          className="flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-950/80 px-3 py-1.5 text-xs text-emerald-300 shadow-lg shadow-emerald-950/40 backdrop-blur-md"
+          role="status"
+          aria-live="polite"
+        >
+          <Check size={13} className="shrink-0 text-emerald-400" />
+          <span>Copied to clipboard: <span className="font-mono font-medium text-emerald-200">manojprabhu0707@gmail.com</span></span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+  <a href="tel:+919677518268" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><Phone size={16} /></span>+91 9677518268</a>
+  <a href="https://maps.google.com/?q=Polur,Tamil+Nadu" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-sm text-[#d3cce0] hover:text-white"><span className="icon-button h-10 w-10"><MapPin size={16} /></span>Polur, Tamil Nadu</a>
+
+  {/* One-Tap Save Contact (.vcf) button */}
+  <button
+    type="button"
+    onClick={downloadVCard}
+    className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-xs font-medium text-[#d3cce0] transition-all hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-white"
+    title="Download vCard to save Manoj directly to phone or desktop contacts"
+  >
+    <UserPlus size={14} className="text-violet-300" />
+    <span>Save Manoj to Contacts (.vcf)</span>
+  </button>
+</div></div>
+          <form className="panel p-6 md:p-9" onSubmit={handleContact} onFocusCapture={() => setContactFocused(true)} onBlurCapture={handleContactBlur}><div className="grid gap-5"><div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4"><span className="label text-[0.57rem]">Correspondence / 01</span><button type="button" className="motion-toggle" onClick={() => setMotionPaused((paused) => !paused)} aria-pressed={motionPaused || Boolean(reduceMotion)} aria-label={reduceMotion ? "Background motion is paused by your device setting" : motionPaused ? "Resume background motion" : "Pause background motion"} disabled={Boolean(reduceMotion)}>{motionPaused || reduceMotion ? <Play size={13} /> : <Pause size={13} />}{motionPaused || reduceMotion ? "Motion paused" : "Motion live"}</button></div>
+
+          <label className="block"><span className="label mb-2 block">Your name</span><input className="form-field" required name="name" placeholder="What should I call you?" /></label><label className="block"><span className="label mb-2 block">Email</span><input className="form-field" type="email" required name="email" placeholder="name@company.com" /></label><label className="block"><span className="label mb-2 block">Message</span><textarea className="form-field min-h-36 resize-y" required name="message" value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} placeholder="A few lines about the work, goal, or opportunity..." /></label>
+
+          {/* Transmission Signal Counter */}
+          <div className="flex items-center justify-between text-[11px] text-[#8e859e] -mt-2">
+            <span className="flex items-center gap-1.5">
+              <span className={`h-1.5 w-1.5 rounded-full ${contactMessage.trim().length > 10 ? "bg-emerald-400 animate-pulse" : "bg-white/30"}`} />
+              <span>{contactMessage.trim().length > 10 ? "Signal ready to transmit" : "Drafting message"}</span>
+            </span>
+            <span className="font-mono">{contactMessage.length} / 2000</span>
+          </div>
+
+          <button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
       </section>
 
-      <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>
+
+
+      <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" loading="lazy" decoding="async" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noopener noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>
       <div className="mobile-contact-dock" aria-label="Mobile quick actions"><button className="mobile-resume-action" type="button" onClick={downloadResume}><Download size={15} />Résumé</button><button className="mobile-contact-action" type="button" onClick={() => scrollToSection("contact")}><Mail size={16} />Contact</button></div>
     </main>
   );

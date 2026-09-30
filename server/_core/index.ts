@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import fs from "fs";
+import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -34,6 +36,40 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // Custom pet image upload endpoint
+  app.post("/api/upload-kitsune", async (req, res) => {
+    try {
+      const { imageBase64, imageUrl } = req.body;
+      let buffer: Buffer;
+
+      if (imageBase64) {
+        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+        buffer = Buffer.from(base64Data, "base64");
+      } else if (imageUrl) {
+        const fetchRes = await fetch(imageUrl);
+        const arrayBuf = await fetchRes.arrayBuffer();
+        buffer = Buffer.from(arrayBuf);
+      } else {
+        return res.status(400).json({ error: "Missing imageBase64 or imageUrl in request body" });
+      }
+
+      const publicDir = path.resolve(process.cwd(), "client/public/images");
+      const distDir = path.resolve(process.cwd(), "dist/public/images");
+
+      if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+      if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+
+      fs.writeFileSync(path.join(publicDir, "kitsune-pet.png"), buffer);
+      fs.writeFileSync(path.join(distDir, "kitsune-pet.png"), buffer);
+
+      return res.json({ success: true, url: "/images/kitsune-pet.png" });
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      return res.status(500).json({ error: err.message || "Failed to save image" });
+    }
+  });
+
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API

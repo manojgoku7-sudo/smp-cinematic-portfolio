@@ -1,0 +1,456 @@
+/* ==========================================================================
+   HOLOGRAPHIC 3D FLOATING BADGE & GYROSCOPE TILT SYSTEM
+   ========================================================================== */
+
+.holo-badge-stage {
+  position: relative;
+  width: 100%;
+  max-width: 29rem;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+@media (min-width: 1024px) {
+  .holo-badge-stage {
+    max-width: 32rem;
+  }
+}
+
+/* 3D Floating Badge Canvas */
+.holo-badge-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--holo-tilt-x, 0deg)) rotateY(var(--holo-tilt-y, 0deg)) translateZ(var(--holo-lift, 0px));
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease-out;
+  will-change: transform;
+}
+
+.holo-badge-stage.is-hovered .holo-badge-canvas {
+  --holo-lift: 20px;
+}
+
+/* Base Holographic Aura Glow */
+.holo-aura-glow {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at var(--holo-light-x, 50%) var(--holo-light-y, 50%),
+    rgba(139, 92, 246, 0.38) 0%,
+    rgba(56, 189, 248, 0.22) 36%,
+    rgba(236, 72, 153, 0.14) 58%,
+    transparent 78%
+  );
+  filter: blur(28px);
+  opacity: 0.85;
+  transform: translateZ(-20px) scale(1.05);
+  pointer-events: none;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  animation: holoAuraPulse 7s ease-in-out infinite alternate;
+}
+
+.holo-badge-stage.is-hovered .holo-aura-glow {
+  opacity: 1;
+  filter: blur(22px);
+  transform: translateZ(-20px) scale(1.12);
+}
+
+@keyframes holoAuraPulse {
+  0% {
+    opacity: 0.65;
+    transform: translateZ(-20px) scale(0.98);
+  }
+  100% {
+    opacity: 0.95;
+    transform: translateZ(-20px) scale(1.08);
+  }
+}
+
+/* Holographic Floating Shield / Backplate */
+.holo-shield-backplate {
+  position: absolute;
+  inset: 4%;
+  border-radius: 28px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(139, 92, 246, 0.04) 40%,
+    rgba(6, 182, 212, 0.03) 70%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(196, 181, 253, 0.22);
+  box-shadow:
+    0 24px 60px -12px rgba(0, 0, 0, 0.65),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 32px 0 rgba(139, 92, 246, 0.08),
+    0 0 24px -4px rgba(139, 92, 246, 0.2);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  transform: translateZ(0px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Iridescent Prismatic Glint Sheen (Dynamic incident light reflection) */
+.holo-prismatic-sheen {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 320px at var(--holo-light-x, 50%) var(--holo-light-y, 50%),
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(167, 139, 250, 0.28) 22%,
+    rgba(56, 189, 248, 0.22) 44%,
+    rgba(244, 114, 182, 0.16) 62%,
+    transparent 80%
+  );
+  mix-blend-mode: color-dodge;
+  opacity: 0.68;
+  transform: translateZ(4px);
+  transition: opacity 0.25s ease;
+}
+
+.holo-badge-stage.is-hovered .holo-prismatic-sheen {
+  opacity: 0.95;
+}
+
+/* Holographic Micro-Grid / Hex Matrix Scanlines */
+.holo-cyber-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(196, 181, 253, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196, 181, 253, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: center center;
+  opacity: 0.65;
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 85%);
+  transform: translateZ(2px);
+}
+
+/* Concentric Gyro / Holographic Orbit Rings */
+.holo-gyro-orbit-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(8px);
+  pointer-events: none;
+  border: 1px dashed rgba(196, 181, 253, 0.28);
+}
+
+.holo-gyro-orbit-ring.ring-outer {
+  width: 82%;
+  height: 82%;
+  border-style: solid;
+  border-color: rgba(139, 92, 246, 0.22);
+  animation: holoRingSpin 42s linear infinite;
+}
+
+.holo-gyro-orbit-ring.ring-inner {
+  width: 68%;
+  height: 68%;
+  border-color: rgba(56, 189, 248, 0.2);
+  animation: holoRingSpinRev 30s linear infinite;
+}
+
+@keyframes holoRingSpin {
+  from {
+    transform: translate(-50%, -50%) translateZ(8px) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) translateZ(8px) rotate(360deg);
+  }
+}
+
+@keyframes holoRingSpinRev {
+  from {
+    transform: translate(-50%, -50%) translateZ(8px) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) translateZ(8px) rotate(0deg);
+  }
+}
+
+/* Cyberpunk HUD Corner Brackets (Elevated in 3D Space) */
+.holo-hud-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  border: 2px solid rgba(56, 189, 248, 0.65);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+  transform: translateZ(24px);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.holo-hud-corner.tl {
+  top: 14px;
+  left: 14px;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 8px;
+}
+
+.holo-hud-corner.tr {
+  top: 14px;
+  right: 14px;
+  border-left: none;
+  border-bottom: none;
+  border-top-right-radius: 8px;
+}
+
+.holo-hud-corner.bl {
+  bottom: 14px;
+  left: 14px;
+  border-right: none;
+  border-top: none;
+  border-bottom-left-radius: 8px;
+}
+
+.holo-hud-corner.br {
+  bottom: 14px;
+  right: 14px;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 8px;
+}
+
+.holo-badge-stage.is-hovered .holo-hud-corner {
+  border-color: rgba(167, 139, 250, 0.95);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.7);
+  transform: translateZ(30px);
+}
+
+/* Holographic Telemetry Badges (Floating on Top) */
+.holo-telemetry-badge {
+  position: absolute;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(10, 8, 20, 0.82);
+  border: 1px solid rgba(196, 181, 253, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e2d8ff;
+  pointer-events: none;
+  transform: translateZ(28px);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background 0.2s ease;
+}
+
+.holo-telemetry-badge.badge-top-left {
+  top: 18px;
+  left: 18px;
+}
+
+.holo-telemetry-badge.badge-top-right {
+  top: 18px;
+  right: 18px;
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.holo-badge-stage.is-hovered .holo-telemetry-badge {
+  transform: translateZ(36px);
+}
+
+/* Pulsing Status Dot */
+.holo-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8, 0 0 14px rgba(56, 189, 248, 0.6);
+  animation: holoStatusPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.holo-status-dot.dot-violet {
+  background: #a855f7;
+  box-shadow: 0 0 8px #a855f7, 0 0 14px rgba(168, 85, 247, 0.6);
+}
+
+@keyframes holoStatusPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
+/* Memoji Artwork Container in 3D Layer */
+.holo-memoji-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform: translateZ(16px);
+  transform-origin: 50% 85%;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo-badge-stage.is-hovered .holo-memoji-layer {
+  transform: translateZ(24px) scale(1.02);
+}
+
+.holo-memoji-img {
+  width: 88%;
+  max-width: 25rem;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 12px rgba(139, 92, 246, 0.25));
+  transition: filter 0.25s ease, transform 0.25s ease;
+}
+
+.holo-badge-stage.is-hovered .holo-memoji-img {
+  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 18px rgba(167, 139, 250, 0.4));
+}
+
+/* Holographic Prismatic Scanning Line (Sweeps across the portrait) */
+.holo-scan-sweep {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  right: -20%;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.2) 20%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(168, 85, 247, 0.3) 80%,
+    transparent 100%
+  );
+  filter: blur(1px);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.8), 0 0 24px rgba(168, 85, 247, 0.5);
+  transform: translateZ(32px) rotate(-14deg);
+  opacity: 0.75;
+  pointer-events: none;
+  animation: holoScanSweep 6.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes holoScanSweep {
+  0% {
+    top: -25%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    top: 125%;
+    opacity: 0;
+  }
+}
+
+/* Mobile Gyro Mode Toggle Indicator / Trigger */
+.holo-gyro-mode-indicator {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(34px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(14, 11, 26, 0.88);
+  border: 1px solid rgba(196, 181, 253, 0.3);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(139, 92, 246, 0.2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #c4b5fd;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  z-index: 15;
+}
+
+.holo-gyro-mode-indicator:hover,
+.holo-gyro-mode-indicator:focus-visible {
+  border-color: rgba(56, 189, 248, 0.7);
+  background: rgba(18, 14, 34, 0.96);
+  color: #38bdf8;
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.65), 0 0 16px rgba(56, 189, 248, 0.4);
+  transform: translateX(-50%) translateZ(38px) scale(1.04);
+}
+
+.holo-gyro-mode-indicator.is-gyro-live {
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #34d399;
+}
+
+.holo-gyro-mode-indicator.is-gyro-live .holo-status-dot {
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399, 0 0 14px rgba(52, 211, 153, 0.6);
+}
+
+/* Motion Reduced & Low Data Overrides */
+@media (prefers-reduced-motion: reduce) {
+  .holo-badge-canvas {
+    transform: none !important;
+    transition: none !important;
+  }
+  .holo-aura-glow,
+  .holo-gyro-orbit-ring,
+  .holo-scan-sweep,
+  .holo-status-dot {
+    animation: none !important;
+  }
+}
+
+.motion-paused .holo-badge-canvas,
+.low-data .holo-badge-canvas {
+  transform: none !important;
+  transition: none !important;
+}
+
+.motion-paused .holo-aura-glow,
+.motion-paused .holo-gyro-orbit-ring,
+.motion-paused .holo-scan-sweep,
+.motion-paused .holo-status-dot,
+.low-data .holo-aura-glow,
+.low-data .holo-gyro-orbit-ring,
+.low-data .holo-scan-sweep,
+.low-data .holo-status-dot {
+  animation: none !important;
+}
+
+.low-data .holo-aura-glow,
+.low-data .holo-scan-sweep,
+.low-data .holo-prismatic-sheen {
+  display: none !important;
+}

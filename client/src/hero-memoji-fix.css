@@ -1,15 +1,217 @@
-/* Keep the hero Memoji's original eyes, glasses, eyebrows, and face as one perfectly aligned image.
- * The previous implementation duplicated the entire portrait into clipped pupil layers.
- * Those duplicate layers drifted against the glasses/eyes during gaze and blink motion.
- */
+/* Obsidian Studio Hero Memoji - authentic portrait display */
 .hero-memoji-pupil-window,
 .hero-memoji-lid {
   display: none !important;
 }
 
-/* Disable only the eye-overlay motion. The surrounding hero motion remains unchanged. */
-.hero-memoji-portrait.is-gazing .hero-memoji-pupil-window,
-.hero-memoji-portrait.is-blinking .hero-memoji-lid,
-.hero-memoji-portrait.is-mobile-blinking .hero-memoji-lid {
-  display: none !important;
+/* Memoji & Hero Delight: Ambient Laptop Screen Glow & Developer Micro-interactions */
+.hero-memoji-laptop-glow {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 4%;
+  height: 24%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 42%, rgba(0, 0, 0, 0) 75%);
+  filter: blur(16px);
+  pointer-events: none;
+  opacity: 0.65;
+  transition: opacity 0.4s ease, filter 0.4s ease, background 0.5s ease;
+  z-index: 2;
+  animation: heroLaptopCodeGlow 5.5s infinite ease-in-out;
+}
+
+.hero-memoji-portrait:hover .hero-memoji-laptop-glow {
+  opacity: 0.9;
+  filter: blur(14px);
+  background: radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(0, 0, 0, 0) 75%);
+}
+
+@keyframes heroLaptopCodeGlow {
+  0%, 100% {
+    opacity: 0.58;
+    transform: scaleY(1);
+  }
+  28% {
+    opacity: 0.72;
+    transform: scaleY(1.05);
+  }
+  32% {
+    opacity: 0.55;
+  }
+  65% {
+    opacity: 0.78;
+    transform: scaleY(1.03);
+  }
+  70% {
+    opacity: 0.62;
+  }
+}
+
+/* ==========================================================================
+   Hero Memoji: Laptop Backside Precision Monochrome Illuminated Line
+   A sleek, minimalist hardware-etched lightbar on the laptop backside.
+   - Pure minimalist luminous platinum-white line.
+   - Smooth ambient glow and subtle pulse.
+   ========================================================================== */
+.hero-laptop-terminal-line-container {
+  position: absolute;
+  z-index: 25;
+  left: 50%;
+  bottom: clamp(1.4rem, 12.5%, 2.7rem);
+  transform: translateX(-50%);
+  width: clamp(76px, 24%, 110px);
+  height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+  outline: none;
+  border-radius: 9999px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero-laptop-terminal-line-container:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.hero-laptop-terminal-line-container:active {
+  transform: translateX(-50%) scale(0.94);
+  filter: brightness(1.3);
+}
+
+.hero-laptop-terminal-line-container:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+}
+
+.hero-laptop-laser-bar {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ambient diffuse glow behind the laptop lid */
+.hero-laptop-laser-glow {
+  position: absolute;
+  width: 92%;
+  height: 12px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.18) 42%,
+    transparent 80%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+  opacity: 0.8;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Precision clipped track strictly holding the line */
+.hero-laptop-laser-track {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: 
+    0 0 6px rgba(255, 255, 255, 0.8),
+    0 0 14px rgba(255, 255, 255, 0.4);
+  transition: box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base static illuminated groove */
+.hero-laptop-laser-base {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.32) 20%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.32) 80%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  opacity: 0.85;
+}
+
+/* Silky-smooth running light beam - continuous GPU translation */
+.hero-laptop-laser-runner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 48%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 14%,
+    rgba(255, 255, 255, 0.5) 32%,
+    rgba(255, 255, 255, 0.95) 50%,
+    #ffffff 58%,
+    rgba(255, 255, 255, 0.95) 66%,
+    rgba(255, 255, 255, 0.5) 78%,
+    rgba(255, 255, 255, 0.1) 90%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 4px #ffffff);
+  pointer-events: none;
+  will-change: transform;
+  animation: heroLaptopLaserSmoothRun 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Hover micro-interactions */
+.hero-memoji-portrait:hover .hero-laptop-laser-track,
+.hero-laptop-terminal-line-container:hover .hero-laptop-laser-track {
+  box-shadow: 
+    0 0 8px rgba(255, 255, 255, 1),
+    0 0 20px rgba(255, 255, 255, 0.9),
+    0 0 32px rgba(255, 255, 255, 0.55);
+  transform: scaleY(1.3) scaleX(1.02);
+}
+
+.hero-memoji-portrait:hover .hero-laptop-laser-glow,
+.hero-laptop-terminal-line-container:hover .hero-laptop-laser-glow {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.hero-memoji-portrait:hover .hero-laptop-laser-runner,
+.hero-laptop-terminal-line-container:hover .hero-laptop-laser-runner {
+  animation-duration: 1.4s;
+  filter: drop-shadow(0 0 6px #ffffff);
+}
+
+/* Ultra-smooth GPU translation with zero pop or hard edges */
+@keyframes heroLaptopLaserSmoothRun {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(210%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-laptop-laser-runner {
+    display: none !important;
+  }
+}
+
+/* Compact scale for small screens */
+@media (max-width: 640px) {
+  .hero-laptop-terminal-line-container {
+    bottom: clamp(1rem, 11%, 2.1rem);
+    width: clamp(64px, 22%, 92px);
+    height: 22px;
+  }
 }
