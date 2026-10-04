@@ -79,6 +79,12 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Lenis updates the scroll position on each animation frame. Disable the
+   browser's second smooth-scroll animation to prevent stutter while scrolling. */
+html.lenis {
+  scroll-behavior: auto !important;
+}
+
 /* Luxury Obsidian Scrollbar */
 ::-webkit-scrollbar {
   width: 9px;

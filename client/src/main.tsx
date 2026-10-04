@@ -8,6 +8,7 @@ import App from "./App";
 import SmoothScroll from "./components/SmoothScroll";
 import { startLogin } from "./const";
 import "./index.css";
+import "lenis/dist/lenis.css";
 import "./interaction-fluidity.css";
 import "./interaction-signals.css";
 import "./interaction-travel.css";

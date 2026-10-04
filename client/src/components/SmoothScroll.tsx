@@ -16,11 +16,12 @@ export default function SmoothScroll() {
     if (reducedMotion.matches) return;
 
     const lenis = new Lenis({
-      duration: 1.05,
+      // Lerp mode reacts immediately to each wheel event and avoids the long
+      // ease-out that can feel delayed on a long, animation-heavy page.
+      lerp: 0.18,
       smoothWheel: true,
       syncTouch: false,
-      wheelMultiplier: 0.9,
-      easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+      wheelMultiplier: 1,
     });
     window.__portfolioLenis = lenis;
 
