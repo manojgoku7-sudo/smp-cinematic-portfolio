@@ -1,3 +1,11 @@
+import type Lenis from "lenis";
+
+declare global {
+  interface Window {
+    __portfolioLenis?: Lenis;
+  }
+}
+
 export interface UseSmoothScrollOptions {
   enabled?: boolean;
   paused?: boolean;
@@ -5,12 +13,11 @@ export interface UseSmoothScrollOptions {
 
 /**
  * Obsidian Studio Smooth Scroll Utility
- * Uses native GPU-composited smooth scrolling for natural 60fps/120fps physics
- * without JavaScript wheel hijacking or main-thread scroll lockups.
+ * Lenis is mounted once at the application root. This hook remains available
+ * for existing call sites that need the shared scrolling instance.
  */
 export function useSmoothScroll(_options: UseSmoothScrollOptions = {}) {
-  // Native compositor scrolling is preserved for zero-latency, stutter-free movement
-  return null;
+  return typeof window === "undefined" ? null : window.__portfolioLenis ?? null;
 }
 
 /**
@@ -27,21 +34,23 @@ export function scrollToElement(
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
+  const scrollTo = (top: number) => {
+    if (!isReduced && window.__portfolioLenis) {
+      window.__portfolioLenis.scrollTo(top);
+      return;
+    }
+    window.scrollTo({ top, behavior: isReduced ? "auto" : "smooth" });
+  };
+
   if (typeof target === "number") {
-    window.scrollTo({
-      top: target,
-      behavior: isReduced ? "auto" : "smooth",
-    });
+    scrollTo(target);
     return;
   }
 
   if (typeof target === "string") {
     const cleanId = target.replace(/^#/, "");
     if (cleanId === "top") {
-      window.scrollTo({
-        top: 0,
-        behavior: isReduced ? "auto" : "smooth",
-      });
+      scrollTo(0);
       return;
     }
 
@@ -51,10 +60,7 @@ export function scrollToElement(
         el.getBoundingClientRect().top +
         (window.scrollY ?? window.pageYOffset ?? 0) +
         offset;
-      window.scrollTo({
-        top: Math.max(0, top),
-        behavior: isReduced ? "auto" : "smooth",
-      });
+      scrollTo(Math.max(0, top));
     }
     return;
   }
@@ -64,10 +70,6 @@ export function scrollToElement(
       target.getBoundingClientRect().top +
       (window.scrollY ?? window.pageYOffset ?? 0) +
       offset;
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: isReduced ? "auto" : "smooth",
-    });
+    scrollTo(Math.max(0, top));
   }
 }
-
