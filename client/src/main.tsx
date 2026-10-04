@@ -11,6 +11,7 @@ import "./interaction-fluidity.css";
 import "./interaction-signals.css";
 import "./interaction-travel.css";
 import "./hero-memoji-fix.css";
+import "./hero-seamless.css";
 
 const queryClient = new QueryClient();
 

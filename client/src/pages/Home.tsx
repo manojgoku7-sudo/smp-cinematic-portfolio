@@ -1,6 +1,6 @@
 /**
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
- * Hero portrait rule: the freestanding glasses-wearing Memoji remains compact, transparent, and cursor-responsive only on fine-pointer desktop devices.
+ * Hero portrait: calibrated video frames follow the cursor on fine-pointer devices, with a static fallback.
  */
 import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
@@ -16,10 +16,8 @@ import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { MagneticNav } from "@/components/MagneticNav";
 import { ProjectOrbitSelector } from "@/components/ProjectOrbitSelector";
-import { DynamicIslandStatus } from "@/components/DynamicIslandStatus";
-import { InteractiveCoffeeMug } from "@/components/InteractiveCoffeeMug";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
-import { DeveloperTerminal } from "@/components/DeveloperTerminal";
+import { CursorPortrait } from "@/components/CursorPortrait";
 import { scrollToElement } from "@/hooks/useSmoothScroll";
 import {
   ArrowDownRight,
@@ -120,10 +118,6 @@ const certifications = [
 const reelItems = ["React interfaces", "Figma systems", "Java services", "REST APIs", "Product thinking", "Applied ML"];
 const professionalRoles = ["Frontend Developer", "UI/UX Designer", "Java Developer"];
 // Obsidian Studio gaze calibration: make the iris visibly responsive while keeping a safety margin inside each white socket.
-const HERO_MEMOJI_PUPIL_MAX_X = 6.2;
-const HERO_MEMOJI_PUPIL_MAX_Y = 2.5;
-const HERO_MEMOJI_BLINK_MIN_MS = 420;
-const HERO_MEMOJI_BLINK_MAX_MS = 500;
 const orbitProjects = [
   { id: "attack-study", index: "01", title: "Attack Prediction Model", discipline: "Machine Learning · Python", signal: "85% Accuracy" },
   { id: "delivery-study", index: "02", title: "Food Delivery App", discipline: "Mobile UI/UX · Figma", signal: "15+ Screens" },
@@ -1192,7 +1186,6 @@ export default function Home() {
   const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
   const [lowDataMode, setLowDataMode] = useState(false);
-  const [terminalOpen, setTerminalOpen] = useState(false);
   const [recruiterOpen, setRecruiterOpen] = useState(false);
   const [recruiterReviewOpen, setRecruiterReviewOpen] = useState(false);
   const [recruiterReviewStep, setRecruiterReviewStep] = useState(0);
@@ -1232,16 +1225,6 @@ export default function Home() {
   }, [isNarrowMobile]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const heroMemojiRef = useRef<HTMLDivElement>(null);
-  const memojiGazeTarget = useRef({ x: 0, y: 0 });
-  const memojiGazeCurrent = useRef({ x: 0, y: 0 });
-  const memojiGazeRafId = useRef<number | null>(null);
-  const memojiGazeActive = useRef(false);
-  const memojiCenterCache = useRef<{ x: number; y: number } | null>(null);
-  const heroMemojiTapReleaseTimer = useRef<number | null>(null);
-  const heroMemojiHoverTimer = useRef<number | null>(null);
-  const heroMemojiSmileTimer = useRef<number | null>(null);
-  const heroMemojiTouchStart = useRef<{ x: number; y: number } | null>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
   const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
@@ -1391,11 +1374,6 @@ export default function Home() {
           }, 30);
           return;
         }
-        if (terminalOpen) {
-          event.preventDefault();
-          setTerminalOpen(false);
-          return;
-        }
         if (selectedCredential) {
           event.preventDefault();
           setSelectedCredential(null);
@@ -1412,18 +1390,10 @@ export default function Home() {
           return;
         }
       }
-      if (event.key === "`" || event.key === "~") {
-        const target = event.target as HTMLElement;
-        if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
-          return;
-        }
-        event.preventDefault();
-        setTerminalOpen((prev) => !prev);
-      }
     };
     window.addEventListener("keydown", handleGlobalEscape);
     return () => window.removeEventListener("keydown", handleGlobalEscape);
-  }, [activeCollectionProject, aiContentStudioOpen, polurCharmOpen, selectedCredential, recruiterOpen, recruiterReviewOpen, terminalOpen]);
+  }, [activeCollectionProject, aiContentStudioOpen, polurCharmOpen, selectedCredential, recruiterOpen, recruiterReviewOpen]);
 
   // Keyboard navigation for Project Collection cards (ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Home, End)
   const handleCollectionCardKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -1544,64 +1514,6 @@ export default function Home() {
   }, [motionPaused, reduceMotion, lowDataMode]);
 
   useEffect(() => {
-    const portrait = heroMemojiRef.current;
-    if (!portrait || motionPaused || reduceMotion || lowDataMode || window.innerWidth < 768) {
-      portrait?.classList.remove("is-blinking");
-      return;
-    }
-    let blinkTimer: number | undefined;
-    let releaseTimer: number | undefined;
-    const scheduleBlink = () => {
-      const naturalDelay = 7600 + Math.round(Math.random() * 3200);
-      const blinkDuration = HERO_MEMOJI_BLINK_MIN_MS + Math.round(Math.random() * (HERO_MEMOJI_BLINK_MAX_MS - HERO_MEMOJI_BLINK_MIN_MS));
-      blinkTimer = window.setTimeout(() => {
-        portrait.style.setProperty("--hero-memoji-blink-duration", `${blinkDuration}ms`);
-        portrait.classList.add("is-blinking");
-        releaseTimer = window.setTimeout(() => {
-          portrait.classList.remove("is-blinking");
-          portrait.style.removeProperty("--hero-memoji-blink-duration");
-          scheduleBlink();
-        }, blinkDuration);
-      }, naturalDelay);
-    };
-    scheduleBlink();
-    return () => {
-      if (blinkTimer !== undefined) window.clearTimeout(blinkTimer);
-      if (releaseTimer !== undefined) window.clearTimeout(releaseTimer);
-      portrait.classList.remove("is-blinking");
-      portrait.style.removeProperty("--hero-memoji-blink-duration");
-    };
-  }, [lowDataMode, motionPaused, reduceMotion]);
-
-  useEffect(() => () => {
-    if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
-    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
-    if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
-    if (memojiGazeRafId.current !== null) cancelAnimationFrame(memojiGazeRafId.current);
-  }, []);
-
-  useEffect(() => {
-    if (motionPaused || reduceMotion || lowDataMode) return;
-
-    const onGlobalPointerMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return;
-      updateMemojiGaze(e.clientX, e.clientY);
-    };
-
-    const onGlobalPointerLeave = () => {
-      resetHeroMemojiGaze();
-    };
-
-    window.addEventListener("pointermove", onGlobalPointerMove, { passive: true });
-    document.addEventListener("mouseleave", onGlobalPointerLeave);
-
-    return () => {
-      window.removeEventListener("pointermove", onGlobalPointerMove);
-      document.removeEventListener("mouseleave", onGlobalPointerLeave);
-    };
-  }, [lowDataMode, motionPaused, reduceMotion]);
-
-  useEffect(() => {
     if (motionPaused || reduceMotion || lowDataMode) return;
     const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
     return () => window.clearInterval(cycle);
@@ -1624,7 +1536,6 @@ export default function Home() {
         document.documentElement.style.setProperty("--seal-scroll-opacity", sealOpacity);
         document.documentElement.style.setProperty("--seal-orbit-rot", `${sealRot}deg`);
         document.documentElement.style.setProperty("--divider-rot", `${dividerRot}deg`);
-        memojiCenterCache.current = null;
         scrollTicking = false;
         scrollFrameId = null;
       });
@@ -1941,132 +1852,6 @@ export default function Home() {
     tile.style.removeProperty("--cell-glow-y");
   }
 
-  const tickMemojiGaze = useCallback(() => {
-    const portrait = heroMemojiRef.current;
-    if (!portrait) {
-      memojiGazeRafId.current = null;
-      return;
-    }
-    const target = memojiGazeTarget.current;
-    const current = memojiGazeCurrent.current;
-    const damping = 0.085;
-    current.x += (target.x - current.x) * damping;
-    current.y += (target.y - current.y) * damping;
-
-    portrait.style.setProperty("--hero-memoji-tilt-y", `${(current.x * 1.5).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-tilt-x", `${(current.y * -1.1).toFixed(2)}deg`);
-    portrait.style.setProperty("--hero-memoji-shadow-x", `${(current.x * -4.2).toFixed(2)}px`);
-    portrait.style.setProperty("--hero-memoji-shadow-y", `${(current.y * 2.6).toFixed(2)}px`);
-
-    const dist = Math.hypot(target.x - current.x, target.y - current.y);
-    if (dist > 0.003 || memojiGazeActive.current) {
-      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
-    } else {
-      memojiGazeRafId.current = null;
-      if (!memojiGazeActive.current) {
-        portrait.classList.remove("is-gazing");
-      }
-    }
-  }, []);
-
-  function updateMemojiGaze(clientX: number, clientY: number) {
-    if (reduceMotion || motionPaused || lowDataMode || window.innerWidth < 768) return;
-    const portrait = heroMemojiRef.current;
-    if (!portrait) return;
-
-    if (!memojiCenterCache.current) {
-      const rect = portrait.getBoundingClientRect();
-      if (rect.bottom < -80 || rect.top > window.innerHeight + 80) return;
-      memojiCenterCache.current = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-      };
-    }
-
-    const { x: centerX, y: centerY } = memojiCenterCache.current;
-    const normX = Math.max(-1, Math.min(1, (clientX - centerX) / (window.innerWidth * 0.5)));
-    const normY = Math.max(-1, Math.min(1, (clientY - centerY) / (window.innerHeight * 0.5)));
-
-    memojiGazeActive.current = true;
-    memojiGazeTarget.current = { x: normX, y: normY };
-    portrait.classList.add("is-gazing");
-
-    if (memojiGazeRafId.current === null) {
-      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
-    }
-  }
-
-  // Hero Memoji gaze: direct pointer move handler forwards coordinates to updateMemojiGaze
-  function followHeroMemojiGaze(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "mouse") return;
-    updateMemojiGaze(event.clientX, event.clientY);
-  }
-
-  function resetHeroMemojiGaze() {
-    const portrait = heroMemojiRef.current;
-    if (!portrait) return;
-    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
-    heroMemojiHoverTimer.current = null;
-    memojiGazeActive.current = false;
-    memojiGazeTarget.current = { x: 0, y: 0 };
-    memojiCenterCache.current = null;
-    if (memojiGazeRafId.current === null) {
-      memojiGazeRafId.current = requestAnimationFrame(tickMemojiGaze);
-    }
-    portrait.classList.remove("is-settled");
-    portrait.style.removeProperty("--hero-memoji-brow-x");
-    portrait.style.removeProperty("--hero-memoji-brow-y");
-    portrait.style.removeProperty("--hero-memoji-ground-shadow-x");
-    portrait.style.removeProperty("--hero-memoji-ground-shadow-y");
-    portrait.style.removeProperty("--hero-memoji-glint-x");
-    portrait.style.removeProperty("--hero-memoji-glint-y");
-    portrait.style.removeProperty("--hero-memoji-backdrop-x");
-    portrait.style.removeProperty("--hero-memoji-backdrop-y");
-  }
-
-  function beginHeroMemojiHover(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "mouse" || window.innerWidth < 768) return;
-    if (heroMemojiHoverTimer.current !== null) window.clearTimeout(heroMemojiHoverTimer.current);
-    heroMemojiHoverTimer.current = null;
-  }
-
-  function noteHeroMemojiTouchStart(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "touch" || window.innerWidth >= 768) return;
-    heroMemojiTouchStart.current = { x: event.clientX, y: event.clientY };
-  }
-
-  function triggerMobileMemojiBlink(event: ReactPointerEvent<HTMLDivElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "touch" || window.innerWidth >= 768) return;
-    const touchStart = heroMemojiTouchStart.current;
-    heroMemojiTouchStart.current = null;
-    if (!touchStart || Math.hypot(event.clientX - touchStart.x, event.clientY - touchStart.y) > 12) return;
-    const portrait = heroMemojiRef.current;
-    if (!portrait || portrait.classList.contains("is-mobile-blinking")) return;
-    portrait.classList.add("is-mobile-blinking");
-    if (heroMemojiTapReleaseTimer.current !== null) window.clearTimeout(heroMemojiTapReleaseTimer.current);
-    heroMemojiTapReleaseTimer.current = window.setTimeout(() => {
-      portrait.classList.remove("is-mobile-blinking");
-      heroMemojiTapReleaseTimer.current = null;
-    }, 460);
-  }
-
-  function triggerHeroMemojiSmile(event: ReactPointerEvent<HTMLDivElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || (event.pointerType !== "mouse" && event.pointerType !== "touch")) return;
-    const portrait = heroMemojiRef.current;
-    if (!portrait) return;
-    portrait.classList.add("is-smiling");
-    if (heroMemojiSmileTimer.current !== null) window.clearTimeout(heroMemojiSmileTimer.current);
-    heroMemojiSmileTimer.current = window.setTimeout(() => {
-      portrait.classList.remove("is-smiling");
-      heroMemojiSmileTimer.current = null;
-    }, 780);
-  }
-
-  function handleHeroMemojiPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    triggerMobileMemojiBlink(event);
-    triggerHeroMemojiSmile(event);
-  }
-
   // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
   function handleCollectionArtworkParallax(event: ReactPointerEvent<HTMLButtonElement>) {
     if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 1024) return;
@@ -2310,7 +2095,7 @@ export default function Home() {
         activeSection={active}
         onSelectSection={scrollToSection}
         onOpenRecruiterReview={startRecruiterReview}
-        onOpenTerminal={() => setTerminalOpen(true)}
+
         onDownloadResume={downloadResume}
         motionPaused={motionPaused}
       />
@@ -2348,7 +2133,6 @@ export default function Home() {
             </motion.div>
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual relative">
-            <div className="hero-grid" aria-hidden="true" />
 
             {/* Responsive Nebula Starfield (16 stars under 480px, 34 stars on desktop/tablet) */}
             <div className="nebula-starfield" aria-hidden="true">
@@ -2368,78 +2152,11 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Apple-Style "Dynamic Island" Live Status Pill - Shifted gracefully to the right side */}
-            <div className="absolute top-2 sm:top-3.5 right-3 sm:right-6 md:right-10 z-30 flex justify-end pointer-events-none">
-              <DynamicIslandStatus
-                onOpenContact={() => scrollToSection("contact")}
-                onOpenRecruiter={() => setRecruiterOpen(true)}
-              />
-            </div>
-
-            <div
-              ref={heroMemojiRef}
-              className="hero-memoji-portrait"
-              onPointerEnter={beginHeroMemojiHover}
-              onPointerMove={followHeroMemojiGaze}
-              onPointerLeave={resetHeroMemojiGaze}
-              onPointerDown={noteHeroMemojiTouchStart}
-              onPointerUp={handleHeroMemojiPointerUp}
-              title="Manoj Prabhu"
-            >
-              <span className="hero-memoji-ground-shadow" aria-hidden="true" />
-              <span className="hero-memoji-backdrop" aria-hidden="true" />
-
-              {/* Ambient Laptop Screen Glow */}
-              <div className="hero-memoji-laptop-glow" aria-hidden="true" />
-              {/* Authentic unedited artwork */}
-              <img className="hero-memoji-reference-scene" src="/images/manoj-hero-transparent-memoji-glasses-a_0af8bf1f.png" alt="Stylized light-skinned developer Memoji with glasses peeking over a light-gray laptop" width={640} height={640} loading="eager" fetchPriority="high" decoding="async" />
-
-              {/* Illuminated Precision Line on Laptop Backside - Click to open terminal */}
-              <div
-                className="hero-laptop-terminal-line-container"
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTerminalOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setTerminalOpen(true);
-                  }
-                }}
-                title="Click to open Developer Terminal"
-                aria-label="Open Developer Terminal"
-              >
-                {/* Horizontal glowing cyber line across laptop backside with silky-smooth running animation */}
-                <div className="hero-laptop-laser-bar">
-                  <span className="hero-laptop-laser-glow" />
-                  <div className="hero-laptop-laser-track">
-                    <span className="hero-laptop-laser-base" />
-                    <span className="hero-laptop-laser-runner" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <span className="hero-memoji-greeting" aria-hidden="true">Hi, I’m Manoj</span>
-
-            {/* Interactive Steam Ceramic Coffee Mug Desk Prop (Right) */}
-            <div className="absolute -bottom-1.5 right-3 sm:bottom-2 sm:right-8 md:bottom-4 md:right-10 z-20">
-              <InteractiveCoffeeMug />
-            </div>
+            <CursorPortrait paused={motionPaused || Boolean(reduceMotion)} lowData={lowDataMode} />
           </motion.div>
         </div>
       </section>
 
-      {/* Interactive Developer Terminal Shell */}
-      <DeveloperTerminal
-        isOpen={terminalOpen}
-        onClose={() => setTerminalOpen(false)}
-        onDownloadResume={downloadResume}
-        onScrollToSection={scrollToSection}
-      />
 
 
 

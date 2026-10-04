@@ -1,0 +1,24 @@
+/* Final hero treatment: share the page background without a framed panel. */
+.page-shell .hero-visual {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.page-shell .hero-visual::before,
+.page-shell .hero-visual::after {
+  content: none !important;
+  display: none !important;
+}
+.hero-grid {
+  display: none !important;
+  background: none !important;
+  border: 0 !important;
+}
+.cursor-portrait,
+.cursor-portrait-image {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+}
