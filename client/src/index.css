@@ -85,6 +85,13 @@ html.lenis {
   scroll-behavior: auto !important;
 }
 
+/* Give scrolling priority over decorative motion on this animation-rich page. */
+html.is-scroll-active *,
+html.is-scroll-active *::before,
+html.is-scroll-active *::after {
+  animation-play-state: paused !important;
+}
+
 /* Luxury Obsidian Scrollbar */
 ::-webkit-scrollbar {
   width: 9px;

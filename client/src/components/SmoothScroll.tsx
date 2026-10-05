@@ -25,6 +25,17 @@ export default function SmoothScroll() {
     });
     window.__portfolioLenis = lenis;
 
+    const root = document.documentElement;
+    let idleTimer = 0;
+    const pauseDecorativeMotion = () => {
+      root.classList.add("is-scroll-active");
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        root.classList.remove("is-scroll-active");
+      }, 180);
+    };
+    const unsubscribeScroll = lenis.on("scroll", pauseDecorativeMotion);
+
     let frameId = 0;
     const raf = (time: number) => {
       lenis.raf(time);
@@ -35,6 +46,9 @@ export default function SmoothScroll() {
     const stopForReducedMotion = (event: MediaQueryListEvent) => {
       if (event.matches) {
         window.cancelAnimationFrame(frameId);
+        unsubscribeScroll();
+        window.clearTimeout(idleTimer);
+        root.classList.remove("is-scroll-active");
         lenis.destroy();
         delete window.__portfolioLenis;
       }
@@ -44,6 +58,9 @@ export default function SmoothScroll() {
     return () => {
       reducedMotion.removeEventListener("change", stopForReducedMotion);
       window.cancelAnimationFrame(frameId);
+      unsubscribeScroll();
+      window.clearTimeout(idleTimer);
+      root.classList.remove("is-scroll-active");
       lenis.destroy();
       if (window.__portfolioLenis === lenis) {
         delete window.__portfolioLenis;
