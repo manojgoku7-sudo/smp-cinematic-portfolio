@@ -285,16 +285,20 @@ const nebulaStars = Array.from({ length: 48 }, (_, index) => ({
   speed: 3.8 + ((index * 11) % 31) / 10,
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
 }));
-const nebulaParticles = Array.from({ length: 12 }, (_, index) => ({
-  id: index,
-  left: 4 + ((index * 31) % 92),
-  top: 8 + ((index * 47) % 82),
-  duration: 1.9 + ((index * 7) % 15) / 10,
-  delay: -((index * 13) % 29) / 10,
-  travelX: -48 - ((index * 19) % 56),
-  travelY: 34 + ((index * 23) % 72),
-  trail: 18 + ((index * 11) % 19),
-}));
+const nebulaParticles = Array.from({ length: 12 }, (_, index) => {
+  const distance = 128 + ((index * 19) % 52);
+  return {
+    id: index,
+    left: 4 + ((index * 31) % 92),
+    top: 8 + ((index * 47) % 82),
+    duration: 0.9 + ((index * 3) % 7) / 10,
+    delay: -((index * 13) % 29) / 10,
+    // Every shooting star travels down-left at the same shallow angle.
+    travelX: -distance,
+    travelY: Math.round(distance * 0.58),
+    trail: 42 + ((index * 11) % 28),
+  };
+});
 type InteractionPoint = { id: number; x: number; y: number };
 const skillProficiency: Record<string, { level: string; stars: number }> = {
   Java: { level: "Applied", stars: 4 }, JavaScript: { level: "Working", stars: 3 }, Python: { level: "Working", stars: 3 }, SQL: { level: "Working", stars: 3 }, HTML5: { level: "Applied", stars: 4 }, CSS3: { level: "Applied", stars: 4 }, "React (basic)": { level: "Foundation", stars: 2 }, Figma: { level: "Applied", stars: 4 }, Wireframing: { level: "Applied", stars: 4 }, Prototyping: { level: "Applied", stars: 4 }, "Spring Boot": { level: "Working", stars: 3 }, "REST API": { level: "Applied", stars: 4 }, MySQL: { level: "Working", stars: 3 }, Git: { level: "Working", stars: 3 }, GitHub: { level: "Working", stars: 3 }, "VS Code": { level: "Applied", stars: 4 }, Firebase: { level: "Working", stars: 3 }, "Oracle APEX": { level: "Foundation", stars: 2 }, XGBoost: { level: "Applied", stars: 4 }, SVM: { level: "Working", stars: 3 }, "Logistic Regression": { level: "Working", stars: 3 }, Agile: { level: "Working", stars: 3 }, Scrum: { level: "Working", stars: 3 },
