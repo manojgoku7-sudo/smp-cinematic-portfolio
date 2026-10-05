@@ -275,7 +275,7 @@ function getConnectionPrefetchProfile(): ConnectionPrefetchProfile {
   return cautious ? { enabled: true, intentDistance: 32, velocityThreshold: .55 } : fallback;
 }
 
-const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
+const nebulaStars = Array.from({ length: 48 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
   top: 7 + ((index * 61) % 81),
@@ -284,6 +284,16 @@ const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   delay: -((index * 17) % 43) / 10,
   speed: 3.8 + ((index * 11) % 31) / 10,
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
+}));
+const nebulaParticles = Array.from({ length: 12 }, (_, index) => ({
+  id: index,
+  left: 4 + ((index * 31) % 92),
+  top: 8 + ((index * 47) % 82),
+  duration: 1.9 + ((index * 7) % 15) / 10,
+  delay: -((index * 13) % 29) / 10,
+  travelX: -48 - ((index * 19) % 56),
+  travelY: 34 + ((index * 23) % 72),
+  trail: 18 + ((index * 11) % 19),
 }));
 type InteractionPoint = { id: number; x: number; y: number };
 const skillProficiency: Record<string, { level: string; stars: number }> = {
@@ -1221,7 +1231,7 @@ export default function Home() {
   }, []);
 
   const visibleNebulaStars = useMemo(() => {
-    return isNarrowMobile ? nebulaStars.slice(0, 16) : nebulaStars;
+    return isNarrowMobile ? nebulaStars.slice(0, 22) : nebulaStars;
   }, [isNarrowMobile]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -2134,7 +2144,7 @@ export default function Home() {
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual relative">
 
-            {/* Responsive Nebula Starfield (16 stars under 480px, 34 stars on desktop/tablet) */}
+            {/* Responsive starfield with a small, fast particle layer behind the portrait. */}
             <div className="nebula-starfield" aria-hidden="true">
               {visibleNebulaStars.map((star) => (
                 <span
@@ -2147,6 +2157,21 @@ export default function Home() {
                     "--star-opacity": star.opacity,
                     "--star-speed": `${star.speed}s`,
                     "--star-delay": `${star.delay}s`,
+                  } as React.CSSProperties}
+                />
+              ))}
+              {nebulaParticles.map((particle) => (
+                <span
+                  key={`particle-${particle.id}`}
+                  className="nebula-particle"
+                  style={{
+                    left: `${particle.left}%`,
+                    top: `${particle.top}%`,
+                    "--particle-duration": `${particle.duration}s`,
+                    "--particle-delay": `${particle.delay}s`,
+                    "--particle-x": `${particle.travelX}px`,
+                    "--particle-y": `${particle.travelY}px`,
+                    "--particle-trail": `${particle.trail}px`,
                   } as React.CSSProperties}
                 />
               ))}

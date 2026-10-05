@@ -755,6 +755,11 @@ button:not(:disabled), a[href], input, textarea { cursor: pointer; }
 .nebula-star { position: absolute; width: var(--star-size); height: var(--star-size); border-radius: 50%; background: #e7ddff; box-shadow: 0 0 calc(var(--star-size) * 4) rgb(192 164 255 / 0.9); opacity: var(--star-opacity); }
 .nebula-star.is-violet { background: #bb9bff; box-shadow: 0 0 calc(var(--star-size) * 5) #8b5cf6; }
 .nebula-star.is-rose { background: #f4c2ed; box-shadow: 0 0 calc(var(--star-size) * 5) #f1a7e1; }
+.nebula-particle { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #f5efff; opacity: 0; box-shadow: 0 0 7px rgb(210 190 255 / 90%); animation: nebula-particle-flight var(--particle-duration) linear var(--particle-delay) infinite; will-change: transform, opacity; }
+.nebula-particle::before { content: ""; position: absolute; right: 1px; top: 50%; width: var(--particle-trail); height: 1px; background: linear-gradient(90deg, transparent, rgb(196 181 253 / 78%)); transform: translateY(-50%) rotate(-32deg); transform-origin: right center; }
+@keyframes nebula-particle-flight { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 8% { opacity: .82; } 66% { opacity: .56; } 100% { transform: translate3d(var(--particle-x), var(--particle-y), 0); opacity: 0; } }
+.motion-paused .nebula-particle { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) { .nebula-particle { display: none; } }
 .nebula-burst { position: absolute; width: 0.5rem; height: 0.5rem; border: 1px solid rgb(231 221 255 / 0.92); border-radius: 50%; box-shadow: 0 0 0 5px rgb(139 92 246 / 0.18), 0 0 20px #8b5cf6; transform: translate(-50%, -50%); }
 .nebula-burst::before, .nebula-burst::after { content: ""; position: absolute; left: 50%; top: 50%; width: 1px; height: 3.6rem; background: linear-gradient(to bottom, transparent, #d7c8ff 45%, transparent); transform: translate(-50%, -50%); }
 .nebula-burst::after { transform: translate(-50%, -50%) rotate(90deg); }
