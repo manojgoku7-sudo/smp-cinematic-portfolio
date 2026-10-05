@@ -275,7 +275,7 @@ function getConnectionPrefetchProfile(): ConnectionPrefetchProfile {
   return cautious ? { enabled: true, intentDistance: 32, velocityThreshold: .55 } : fallback;
 }
 
-const nebulaStars = Array.from({ length: 48 }, (_, index) => ({
+const nebulaStars = Array.from({ length: 12 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
   top: 7 + ((index * 61) % 81),
@@ -285,18 +285,23 @@ const nebulaStars = Array.from({ length: 48 }, (_, index) => ({
   speed: 3.8 + ((index * 11) % 31) / 10,
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
 }));
-const nebulaParticles = Array.from({ length: 12 }, (_, index) => {
-  const distance = 128 + ((index * 19) % 52);
+const nebulaParticles = Array.from({ length: 4 }, (_, index) => {
+  const distance = 150;
+  const starts = [
+    { left: 26, top: 8 },
+    { left: 50, top: 18 },
+    { left: 74, top: 6 },
+    { left: 94, top: 24 },
+  ];
   return {
     id: index,
-    left: 4 + ((index * 31) % 92),
-    top: 8 + ((index * 47) % 82),
-    duration: 0.9 + ((index * 3) % 7) / 10,
-    delay: -((index * 13) % 29) / 10,
+    ...starts[index],
+    duration: 5.2,
+    delay: -(index * 1.3),
     // Every shooting star travels down-left at the same shallow angle.
     travelX: -distance,
     travelY: Math.round(distance * 0.58),
-    trail: 42 + ((index * 11) % 28),
+    trail: 54,
   };
 });
 type InteractionPoint = { id: number; x: number; y: number };
@@ -1235,7 +1240,7 @@ export default function Home() {
   }, []);
 
   const visibleNebulaStars = useMemo(() => {
-    return isNarrowMobile ? nebulaStars.slice(0, 22) : nebulaStars;
+    return isNarrowMobile ? nebulaStars.slice(0, 8) : nebulaStars;
   }, [isNarrowMobile]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
