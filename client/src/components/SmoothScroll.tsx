@@ -18,10 +18,13 @@ export default function SmoothScroll() {
     const lenis = new Lenis({
       // Lerp mode reacts immediately to each wheel event and avoids the long
       // ease-out that can feel delayed on a long, animation-heavy page.
-      lerp: 0.18,
+      // A slightly higher lerp keeps wheel motion fluid on long pages without
+      // creating the low-frame, delayed feeling of an overly soft ease.
+      lerp: 0.28,
       smoothWheel: true,
       syncTouch: false,
-      wheelMultiplier: 1,
+      wheelMultiplier: 0.92,
+      overscroll: false,
     });
     window.__portfolioLenis = lenis;
 

@@ -70,9 +70,10 @@ const skills = [
   { title: "Frontend", code: "02", items: ["HTML5", "CSS3", "React (basic)"] },
   { title: "UI / UX", code: "03", items: ["Figma", "Wireframing", "Prototyping"] },
   { title: "Backend", code: "04", items: ["Spring Boot", "REST API", "MySQL"] },
-  { title: "Tools & Delivery", code: "05", items: ["Git", "GitHub", "VS Code", "Firebase", "Oracle APEX", "Agile", "Scrum"] },
+  { title: "Version control", code: "05", items: ["Git"] },
   { title: "Applied ML", code: "06", items: ["XGBoost", "SVM", "Logistic Regression"] },
 ];
+const skillCategoryIcons = [Code2, Layout, Palette, Layers3, Github, Cpu];
 
 const experience = [
   {
@@ -642,7 +643,7 @@ function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyI
   return (
     <div className="case-signal-control">
       <button className={`case-signal-button ${open ? "is-open" : ""}`} type="button" onClick={onToggle} aria-expanded={open} aria-controls={`${id}-signal-detail`}>
-        <span>Case signal</span><span>{open ? "Close" : "Open"} <ArrowUpRight size={13} /></span>
+        <span>Project details</span><span>{open ? "Close" : "Open"} <ArrowUpRight size={13} /></span>
       </button>
       <AnimatePresence initial={false}>
         {open ? <motion.div id={`${id}-signal-detail`} className="case-signal-detail" initial={staticMotion ? false : { opacity: 0, y: 8, scale: 0.985 }} animate={staticMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={staticMotion ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}>
@@ -1188,6 +1189,7 @@ function ProjectCollectionDialog({ project, loading, onOpenChange, onCloseAutoFo
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
   const [active, setActive] = useState("about");
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
@@ -1541,12 +1543,17 @@ export default function Home() {
   useEffect(() => {
     let scrollTicking = false;
     let scrollFrameId: number | null = null;
+    let previousScrollY = window.scrollY;
     const onScroll = () => {
       if (scrollTicking) return;
       scrollTicking = true;
       scrollFrameId = requestAnimationFrame(() => {
         const nextScrolled = window.scrollY > 24;
         setScrolled((current) => current === nextScrolled ? current : nextScrolled);
+        const delta = window.scrollY - previousScrollY;
+        if (window.scrollY < 24) setNavHidden(false);
+        else if (Math.abs(delta) > 6) setNavHidden(delta > 0);
+        previousScrollY = window.scrollY;
         const maximum = document.documentElement.scrollHeight - window.innerHeight;
         const progress = maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0;
         const sealOpacity = (Math.max(0.74, 1 - progress * 0.0026)).toFixed(3);
@@ -2074,7 +2081,7 @@ export default function Home() {
       {!reduceMotion && <div ref={cursorRef} className="cursor" aria-hidden="true" />}
       <AmbientBackground motionPaused={motionPaused} reduceMotion={Boolean(reduceMotion)} lowDataMode={lowDataMode} />
       <div className="grain" aria-hidden="true" />
-      <header className={`nav-shell ${scrolled ? "is-scrolled" : ""}`}>
+      <header className={`nav-shell ${scrolled ? "is-scrolled" : ""} ${navHidden ? "is-hidden" : ""}`}>
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram" aria-describedby="mj-brand-tooltip">
@@ -2204,32 +2211,30 @@ export default function Home() {
 
       <AnimatePresence>{recruiterReviewOpen ? <motion.aside ref={recruiterReviewRef} className="recruiter-review-panel" role="region" aria-label="Recruiter review path" data-lenis-prevent initial={reduceMotion ? false : { opacity: 0, y: 16, scale: .98 }} animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: .98 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-review-head"><div><p className="label">Recruiter review path</p><p>Four signals. One concise review.</p></div><div className="flex items-center gap-2"><span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span><button type="button" className="recruiter-close" onClick={() => setRecruiterReviewOpen(false)} aria-label="Close recruiter review path (Esc)"><X size={17} /></button></div></div><div className="recruiter-review-progress" aria-label={`Checkpoint ${recruiterReviewStep + 1} of ${recruiterReviewSteps.length}`}>{recruiterReviewSteps.map((step, index) => <button key={step.id} type="button" className={index === recruiterReviewStep ? "is-active" : index < recruiterReviewStep ? "is-complete" : ""} onClick={() => goToRecruiterReviewStep(index)} aria-current={index === recruiterReviewStep ? "step" : undefined}><span>{step.index}</span><em>{step.label}</em></button>)}</div><div className="recruiter-review-copy" aria-live="polite"><span className="label">{recruiterReviewSteps[recruiterReviewStep].index} / {recruiterReviewSteps[recruiterReviewStep].label}</span><p>{recruiterReviewSteps[recruiterReviewStep].note}</p></div><div className="recruiter-review-actions"><button type="button" onClick={() => goToRecruiterReviewStep(recruiterReviewStep - 1)} disabled={recruiterReviewStep === 0}>Previous</button><button type="button" className="signal-button primary" onClick={() => recruiterReviewStep === recruiterReviewSteps.length - 1 ? setRecruiterReviewOpen(false) : goToRecruiterReviewStep(recruiterReviewStep + 1)}>{recruiterReviewStep === recruiterReviewSteps.length - 1 ? "Complete review" : "Next signal"} <ArrowDownRight size={14} /></button></div></motion.aside> : null}</AnimatePresence>
 
-      <section id="about" className="editorial-band container py-28 md:py-40">
+      <section id="about" className="editorial-band snapshot-about container py-16 md:py-20">
         {/* Obsidian Studio About visual: restore the original black-hole reel as a quiet right-side signal, with the copy kept in the foreground. */}
         <div className="about-blackhole-video" aria-hidden="true"><video ref={heroVideoRef} className="about-blackhole-video-media" autoPlay={!reduceMotion && !motionPaused && !lowDataMode} loop muted playsInline preload="metadata" poster="/images/smp-hero-orbit_86f3fd46.jpg"><source src="/videos/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" /></video><span className="about-blackhole-video-vignette" /></div><span className="signal-thread about-thread" aria-hidden="true" />
-        <Reveal><SectionIntro index="02" eyebrow="Working at the intersection" title="Systems made visible." detail="A frontend developer and UI/UX designer with experience in Java, Spring Boot, and applied machine learning." motionPaused={motionPaused} /></Reveal>
-        <div className="about-proof mt-14 grid gap-5 lg:grid-cols-[1.28fr_.72fr]">
-          <Reveal delay={0.06} className="panel relative overflow-hidden p-7 md:p-10">
-            <div className="absolute right-0 top-0 h-32 w-32 bg-violet-500/15 blur-3xl" />
-            <p className="display max-w-[20ch] text-2xl leading-tight text-[#eeeaff] md:text-[2rem]">I create <span className="text-violet-300">clear, responsive interfaces</span> and practical user flows—from Figma design to implementation.</p>
-            <div className="mt-12 grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-3">
-              <RevealMetric value={20} suffix="+" label="Reusable React components" motionPaused={motionPaused} lowDataMode={lowDataMode} />
-              <RevealMetric value={10} suffix="+" label="High-fidelity Figma screens" motionPaused={motionPaused} lowDataMode={lowDataMode} />
-              <RevealMetric value={85} suffix="%" label="Best ML classification accuracy" motionPaused={motionPaused} lowDataMode={lowDataMode} />
-            </div>
-          </Reveal>
-          <Reveal delay={0.14} className="panel p-7 md:p-8">
-            <p className="label">Operating principles</p>
-            <div className="mt-7 space-y-6">
-              {["Make the hierarchy do the explaining.", "Build the component system before the screen count grows.", "Test interactions where they matter: in the flow."].map((line, index) => <div key={line} className="flex gap-4"><span className="display text-lg text-violet-300">0{index + 1}</span><p className="max-w-[19ch] text-sm leading-6 text-[#c5bfce]">{line}</p></div>)}
-            </div>
-          </Reveal>
-        </div>
+        <Reveal><SectionIntro index="02" eyebrow="Capabilities" title="Skills and tools." detail="The languages, design methods, frameworks, and tools I use across projects." motionPaused={motionPaused} /></Reveal>
+        <motion.article className="skills-overview" aria-label="Skills and tools" initial={reduceMotion ? false : { opacity: 0, y: 24 }} whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}>
+          <div className="skills-overview-grid">
+            {skills.map((group, index) => {
+              const Icon = skillCategoryIcons[index];
+              return <div className={`skills-overview-group skill-panel-${group.code}`} key={group.code}>
+                <div className="skill-panel-meta"><span>{group.code}</span>{["01", "04", "05"].includes(group.code) && <em><i />active</em>}</div>
+                <span className="skill-panel-icon" aria-hidden="true"><Icon size={18} strokeWidth={1.8} /></span>
+                <h3>{group.title}</h3>
+                <ul className="skill-chip-list">{group.items.map((item) => <li key={item} className={`skill-chip skill-chip-${skillProficiency[item].level.toLowerCase()}`} aria-label={`${item}: ${skillProficiency[item].level}, ${skillProficiency[item].stars} of 4`} title={`${item} · ${skillProficiency[item].level}`}>
+                  {item}<span className="skill-chip-dots" aria-hidden="true">{Array.from({ length: 4 }, (_, dot) => <i key={dot} className={dot < skillProficiency[item].stars ? "is-filled" : ""} />)}</span>
+                </li>)}</ul>
+              </div>;
+            })}
+          </div>
+        </motion.article>
       </section>
 
       <section id="work" className="editorial-band top-rule bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
         <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" loading="lazy" decoding="async" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
-        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused project studies across applied machine learning, mobile product design, autonomous content operations, and civic discovery." motionPaused={motionPaused} /></Reveal>
+        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused projects across machine learning, product design, automation, and civic technology—with the decisions and outcomes made clear." motionPaused={motionPaused} /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button><button onClick={() => scrollToSection("ai-content-studio")}>03 AI studio</button><button onClick={() => scrollToSection("polur-charm")}>04 Polur Charm</button></nav>
           <ProjectOrbitSelector
             projects={orbitProjects}
@@ -2240,7 +2245,7 @@ export default function Home() {
             lowDataMode={lowDataMode}
             reduceMotion={reduceMotion}
           />
-          <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare signals</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
+          <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare projects</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal delay={0.06}><article id="attack-study" className={`project-card panel ${gravityProject === "attack-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "attack-study", 0)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("attack-study")} onFocus={() => setGravityProject("attack-study")} onClick={() => setGravityProject("attack-study")} onMouseLeave={resetProjectTilt}>
               <img className="project-art" src="/images/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" />
@@ -2473,131 +2478,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="editorial-band top-rule bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40 relative">
-        <span className="signal-thread skill-thread" aria-hidden="true" />
-        <div className="container"><Reveal><SectionIntro index="05" eyebrow="Capabilities" title="A stack with range." detail="Design craft, frontend detail, backend thinking, and applied experimentation — organised around the goal of making a useful product feel inevitable." motionPaused={motionPaused} /></Reveal>
-          <Reveal delay={0.08}><div className="skill-legend" aria-label="Four-point star-map proficiency scale"><span className="skill-legend-title">Star map / four-point scale</span>{[[1, "Exploring"], [2, "Foundation"], [3, "Working"], [4, "Applied"]].map(([stars, label]) => <span className="skill-legend-item" key={label as string}><span className="skill-legend-stars" aria-hidden="true">{Array.from({ length: 4 }, (_, star) => <b key={star} className={star < Number(stars) ? "is-lit" : ""} />)}</span>{label}</span>)}</div></Reveal>
-          {/* Enhanced Cosmic Glassmorphic Project Gravity Bar */}
-          <div className={`skill-gravity-status ${gravityProject ? "is-active" : ""}`} aria-live="polite">
-            <span className="skill-gravity-core" aria-hidden="true">
-              <i />
-            </span>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="label text-[10px] tracking-widest text-violet-300 font-mono">PROJECT GRAVITY FIELD</span>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-[#b3a8cb]">
-                  <span className={`w-1.5 h-1.5 rounded-full ${gravityProject ? "bg-emerald-400 animate-pulse" : "bg-white/30"}`} />
-                  <span className={gravityProject ? "text-emerald-300 font-semibold" : "text-[#8e879f]"}>
-                    {gravityProject ? "ALIGNED" : "IDLE"}
-                  </span>
-                </span>
-              </div>
-              <p>{gravityProject ? <><b>{projectSkillGravity[gravityProject].label}</b> draws in {projectSkillGravity[gravityProject].note}.</> : "Hover or focus a featured project to align its relevant skills in real-time."}</p>
-            </div>
-            <div className="skill-gravity-controls" aria-label="Choose a project skill alignment">
-              {orbitProjects.map((project) => (
-                <button
-                  type="button"
-                  key={project.id}
-                  className={`${gravityProject === project.id ? "is-active" : ""}`}
-                  onClick={() => setGravityProject(project.id)}
-                  aria-pressed={gravityProject === project.id}
-                  title={`Align skills for ${project.title}`}
-                >
-                  {project.index}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="skill-gravity-reset flex items-center gap-1.5"
-                onClick={() => setGravityProject(null)}
-                disabled={!gravityProject}
-                title="Reset skill gravity alignment"
-              >
-                <RotateCcw size={11} className={gravityProject ? "text-rose-400" : "opacity-40"} />
-                <span>Reset</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-80 w-[85%] -translate-x-1/2 rounded-full bg-gradient-to-b from-violet-600/12 via-purple-500/5 to-transparent blur-3xl" aria-hidden="true" />
-            <div className="capability-grid relative mt-10 grid gap-px overflow-hidden rounded-xl border border-white/15 bg-white/[0.06] shadow-[0_24px_80px_rgba(0,0,0,0.55),inset_0_1px_1px_rgba(255,255,255,0.18)] backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-3">
-              {skills.map((skill, index) => {
-                // Category-specific visual icon & theme
-                const categoryVisuals = {
-                  "01": { Icon: Code2, color: "text-emerald-300", border: "border-emerald-400/25", bg: "bg-emerald-500/10", glow: "group-hover:border-emerald-300/40 group-hover:bg-emerald-500/20 group-hover:shadow-[0_0_18px_rgba(16,185,129,0.35)]", label: "Core" },
-                  "02": { Icon: Layout, color: "text-cyan-300", border: "border-cyan-400/25", bg: "bg-cyan-500/10", glow: "group-hover:border-cyan-300/40 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_18px_rgba(6,182,212,0.35)]", label: "Web UI" },
-                  "03": { Icon: Palette, color: "text-fuchsia-300", border: "border-fuchsia-400/25", bg: "bg-fuchsia-500/10", glow: "group-hover:border-fuchsia-300/40 group-hover:bg-fuchsia-500/20 group-hover:shadow-[0_0_18px_rgba(217,70,239,0.35)]", label: "Visual" },
-                  "04": { Icon: Server, color: "text-indigo-300", border: "border-indigo-400/25", bg: "bg-indigo-500/10", glow: "group-hover:border-indigo-300/40 group-hover:bg-indigo-500/20 group-hover:shadow-[0_0_18px_rgba(99,102,241,0.35)]", label: "Services" },
-                  "05": { Icon: Cloud, color: "text-sky-300", border: "border-sky-400/25", bg: "bg-sky-500/10", glow: "group-hover:border-sky-300/40 group-hover:bg-sky-500/20 group-hover:shadow-[0_0_18px_rgba(14,165,233,0.35)]", label: "Infra" },
-                  "06": { Icon: Cpu, color: "text-amber-300", border: "border-amber-400/25", bg: "bg-amber-500/10", glow: "group-hover:border-amber-300/40 group-hover:bg-amber-500/20 group-hover:shadow-[0_0_18px_rgba(245,158,11,0.35)]", label: "ML & Flow" },
-                }[skill.code] ?? { Icon: Layers3, color: "text-violet-300", border: "border-violet-400/20", bg: "bg-violet-500/10", glow: "group-hover:border-violet-300/40 group-hover:bg-violet-500/20 group-hover:shadow-[0_0_14px_rgba(139,92,246,0.35)]", label: "Stack" };
-                const { Icon, color, border, bg, glow } = categoryVisuals;
-
-                const isCardGravityGroup = Boolean(gravityProject && skill.items.some((item) => projectSkillGravity[gravityProject].skills.includes(item as never)));
-
-                return (
-                  <Reveal key={skill.code} delay={index * 0.04}>
-                    <div
-                      className={`capability-cell group relative min-h-[200px] p-6 transition-all duration-300 ${isCardGravityGroup ? "is-gravity-group" : ""}`}
-                      onPointerMove={handleCapabilityGlow}
-                      onPointerLeave={clearCapabilityGlow}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <p className="label font-mono text-[11px] text-violet-300">{skill.code}</p>
-                          {isCardGravityGroup && (
-                            <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-300">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                              active
-                            </span>
-                          )}
-                        </div>
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${border} ${bg} backdrop-blur-sm transition-all duration-300 group-hover:scale-110 ${glow}`}>
-                          <Icon size={16} className={`${color} transition-colors group-hover:brightness-125`} />
-                        </div>
-                      </div>
-                      <h3 className="display mt-5 text-2xl tracking-tight text-white group-hover:text-violet-100 transition-colors">{skill.title}</h3>
-                      <div className="mt-5 flex flex-wrap gap-2">
-                        {skill.items.map((item) => {
-                          const proficiency = skillProficiency[item] ?? { level: "Working", stars: 3 };
-                          const isGravityActive = Boolean(gravityProject && projectSkillGravity[gravityProject].skills.includes(item as never));
-                          const vector = skillGravityVectors[item] ?? { x: "0px", y: "0px" };
-                          return (
-                            <span
-                              className={`skill-chip ${isGravityActive ? "is-gravity-active" : ""}`}
-                              key={item}
-                              tabIndex={0}
-                              aria-label={`${item}: ${proficiency.level} proficiency${isGravityActive ? ". Related to the active project." : ""}`}
-                              style={{ "--gravity-x": vector.x, "--gravity-y": vector.y } as React.CSSProperties}
-                            >
-                              {isGravityActive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
-                              <span>{item}</span>
-                              <span className="skill-tooltip" role="tooltip">
-                                <span className="skill-star-map" aria-hidden="true">
-                                  {Array.from({ length: 4 }, (_, star) => (
-                                    <i key={star} className={star < proficiency.stars ? "is-lit" : ""} />
-                                  ))}
-                                </span>
-                                <span className="skill-tooltip-copy">{proficiency.level} proficiency</span>
-                              </span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="editorial-band container py-28 md:py-40">
         <span className="signal-thread credential-thread" aria-hidden="true" />
-        <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl [text-wrap:balance]">Signals of momentum.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
+        <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl [text-wrap:balance]">Credentials & learning.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
         <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
           <CredentialSignalScan motionPaused={motionPaused} />
           {certifications.map((credential, index) => (
@@ -2749,3 +2632,5 @@ export default function Home() {
     </main>
   );
 }
+
+
