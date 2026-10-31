@@ -272,8 +272,8 @@ export function CursorPortrait({
         render(match.img);
       }
 
-      // Continue animation if angle is still moving or desired frame is still loading
-      if (Math.abs(delta) > 0.001 || (match && match.index !== desiredIndex)) {
+      // Image load callbacks request another frame; do not spin while waiting on a missing image.
+      if (Math.abs(delta) > 0.001) {
         rafId = requestAnimationFrame(draw);
       }
     }
@@ -330,7 +330,7 @@ export function CursorPortrait({
 
     observer.observe(root);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    if (!("PointerEvent" in window)) window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("blur", reset);
     document.documentElement.addEventListener("mouseleave", reset);
