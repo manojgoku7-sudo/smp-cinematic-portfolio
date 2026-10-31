@@ -148,21 +148,6 @@ export function CursorPortrait({ paused = false, lowData = false }: {
       reduced.removeEventListener("change", onPreference);
     };
   }, [paused, lowData]);
-  return () => {
-      stop();
-      resize.disconnect();
-      observer.disconnect();
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("scroll", invalidateBounds, true);
-      window.removeEventListener("resize", invalidateBounds);
-      window.removeEventListener("blur", settle);
-      document.documentElement.removeEventListener("pointerleave", settle);
-      document.removeEventListener("visibilitychange", onVisibility);
-      reduced.removeEventListener("change", onPreference);
-      fine.removeEventListener("change", onPreference);
-    };
-  }, [paused, lowData]);
-
   return (
     <div className="cursor-portrait" ref={rootRef}>
       <button type="button" className="cursor-portrait-trigger" aria-label="Say hello to Manoj"
@@ -179,5 +164,6 @@ export function CursorPortrait({ paused = false, lowData = false }: {
     </div>
   );
 }
+
 
 
