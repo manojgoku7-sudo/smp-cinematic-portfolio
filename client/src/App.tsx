@@ -8,7 +8,6 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { usePerformanceMonitor } from "./hooks/usePerformanceMonitor";
-import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import Home from "./pages/Home";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -27,7 +26,6 @@ function Router() {
 
 export default function App() {
   usePerformanceMonitor();
-  useSmoothScroll();
 
   return (
     <ErrorBoundary>
