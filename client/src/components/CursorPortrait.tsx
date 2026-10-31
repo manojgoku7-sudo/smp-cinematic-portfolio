@@ -1,353 +1,169 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import "./CursorPortrait.css";
 
-const BASE = "/frames/";
-const CENTER = `${BASE}center.webp`;
-// Calibrated pose timestamps in seconds from charachter.mp4
-// Directions clockwise: [up, upperRight, right, lowerRight, down, lowerLeft, left, upperLeft, up]
-const POSES = [1.25, 2.0, 2.5, 3.0, 4.25, 4.75, 5.75, 6.75, 7.5];
-const TWO_PI = Math.PI * 2;
-const file = (index: number) => `${BASE}frame-${String(index).padStart(3, "0")}.webp`;
-
-export function CursorPortrait({
-  paused = false,
-  lowData = false,
-}: {
+export function CursorPortrait({ paused = false, lowData = false }: {
   paused?: boolean;
   lowData?: boolean;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   const [greeting, setGreeting] = useState(false);
   const greetingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const greet = useCallback(() => {
     if (greetingTimer.current) clearTimeout(greetingTimer.current);
     setGreeting(true);
     greetingTimer.current = setTimeout(() => setGreeting(false), 3500);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (greetingTimer.current) clearTimeout(greetingTimer.current);
-    };
+  useEffect(() => () => {
+    if (greetingTimer.current) clearTimeout(greetingTimer.current);
   }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
     const root = rootRef.current;
-    if (!canvas || !root) return;
-
+    const image = imageRef.current;
+    if (!root || !image) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = 768;
+    canvas.height = 432;
+    canvas.className = image.className;
+    canvas.setAttribute("aria-label", "Manoj's portrait following your pointer");
+    canvas.setAttribute("role", "img");
+    canvas.style.willChange = "auto";
+    canvas.style.display = "none";
+    image.insertAdjacentElement("afterend", canvas);
     const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
-
-    const coarseOnly = matchMedia("(hover: none) and (pointer: coarse)");
+    if (!ctx) { canvas.remove(); return; }
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-
-    const nav = navigator as Navigator & {
-      deviceMemory?: number;
-      connection?: { saveData?: boolean };
-    };
-    const cores = nav.hardwareConcurrency ?? 8;
-    const memory = nav.deviceMemory ?? 8;
-    const saveData = Boolean(nav.connection?.saveData);
-    const isConstrainedDevice =
-      (coarseOnly.matches && window.innerWidth < 768) ||
-      cores <= 2 ||
-      memory <= 2 ||
-      saveData;
-
-    // On constrained mobile phones, preload a 16-frame subset (stride = 4); on desktop/laptops load all 64 frames
-    const frameStride = isConstrainedDevice ? 4 : 1;
-    const workerCount = isConstrainedDevice ? 2 : 6;
-
-    let disposed = false;
-    let visible = true;
-    let rafId = 0;
-    let previousTime = 0;
-    let currentAngle = 0;
-    let targetAngle = 0;
-    let active = false;
-    let isNearCenter = true;
-    let currentRenderedIndex = -1;
-
-    let mouseX = -10000;
-    let mouseY = -10000;
-    let hasMouse = false;
-
-    // Cache preloaded frame image objects
     const frames: (HTMLImageElement | undefined)[] = new Array(64);
-    const centerImg = new Image();
-    centerImg.decoding = "async";
-    centerImg.src = CENTER;
+    let disposed = false;
+    let ready = false;
+    let visible = false;
+    let raf = 0;
+    let previous = 0;
+    let position = 56;
+    let target = 56;
+    let rendered = -1;
+    let bounds = root.getBoundingClientRect();
+    let dirty = true;
+    const enabled = () => !paused && !lowData && !reduced.matches;
+    const poses = [8, 13, 16, 19, 27, 30, 36, 43, 47];
 
-    const render = (img: HTMLImageElement) => {
-      if (disposed || !ctx) return;
-      ctx.clearRect(0, 0, 1280, 720);
-      ctx.drawImage(img, 0, 0, 1280, 720);
-    };
-
-    // Draw initial center frame as soon as it loads
-    if (centerImg.complete && centerImg.naturalWidth > 0) {
-      render(centerImg);
-    } else {
-      centerImg.onload = () => {
-        if (!disposed && currentRenderedIndex === -1) {
-          render(centerImg);
-        }
-      };
+    function draw(index: number) {
+      const frame = frames[index];
+      if (!frame || index === rendered || disposed) return;
+      ctx!.clearRect(0, 0, canvas.width, canvas.height);
+      ctx!.drawImage(frame, 0, 0, canvas.width, canvas.height);
+      image!.style.display = "none";
+      canvas.style.display = "block";
+      rendered = index;
     }
-
-    const canTrackMouse = () => !paused && !lowData && !reduced.matches;
-
-    // Find the requested frame or the closest already-loaded frame so gaze responds immediately
-    const getBestLoadedFrame = (targetIdx: number): { index: number; img: HTMLImageElement } | null => {
-      const direct = frames[targetIdx];
-      if (direct && direct.complete && direct.naturalWidth > 0) {
-        return { index: targetIdx, img: direct };
-      }
-      for (let offset = 1; offset < 32; offset++) {
-        const prev = (targetIdx - offset + 64) % 64;
-        const prevImg = frames[prev];
-        if (prevImg && prevImg.complete && prevImg.naturalWidth > 0) {
-          return { index: prev, img: prevImg };
-        }
-        const next = (targetIdx + offset) % 64;
-        const nextImg = frames[next];
-        if (nextImg && nextImg.complete && nextImg.naturalWidth > 0) {
-          return { index: next, img: nextImg };
-        }
-      }
-      return null;
-    };
-
-    // Build frame index list: load key cardinal/intercardinal frames first so tracking works immediately, then fill in between
-    const frameIndices: number[] = [];
-    if (!lowData && !reduced.matches) {
-      const seen = new Set<number>();
-      for (const stridePass of [8, 4, frameStride]) {
-        if (stridePass < frameStride) continue;
-        for (let idx = 0; idx < 64; idx += stridePass) {
-          if (!seen.has(idx)) {
-            seen.add(idx);
-            frameIndices.push(idx);
-          }
-        }
-      }
+    function tick(now: number) {
+      raf = 0;
+      if (disposed || !ready || !visible || document.hidden || !enabled()) return;
+      const dt = previous ? Math.min(32, now - previous) : 16.67;
+      previous = now;
+      const delta = target - position;
+      // Ease in sequence space, not angle space: cross every intermediate pose.
+      // Cap travel to one source frame per display refresh to prevent large jumps.
+      const step = delta * (1 - Math.exp(-dt / 70));
+      position += Math.max(-1, Math.min(1, step));
+      if (Math.abs(target - position) < 0.02) position = target;
+      draw(Math.round(position));
+      if (position !== target) raf = requestAnimationFrame(tick);
+      else previous = 0;
     }
-
-    let queueCursor = 0;
-    const loadSingleFrame = (i: number): Promise<void> =>
-      new Promise((resolve) => {
-        if (disposed) {
-          resolve();
-          return;
-        }
-        const img = new Image();
-        img.decoding = "async";
-        frames[i] = img;
-        const finish = () => {
-          // If cursor is already active and waiting on frames, schedule a draw tick
-          if (!disposed && hasMouse && !isNearCenter && !rafId) {
-            previousTime = performance.now();
-            rafId = requestAnimationFrame(draw);
-          }
-          resolve();
-        };
-        img.onload = finish;
-        img.onerror = () => resolve();
-        img.src = file(i);
-      });
-
-    const loadWorker = async () => {
-      while (queueCursor < frameIndices.length && !disposed) {
-        const i = frameIndices[queueCursor++];
-        await loadSingleFrame(i);
-      }
-    };
-
-    for (let w = 0; w < workerCount; w++) {
-      void loadWorker();
+    function schedule() {
+      if (!raf && ready && visible && !document.hidden && enabled()) raf = requestAnimationFrame(tick);
     }
-
-    function draw(now: number) {
-      rafId = 0;
-      if (disposed || !visible || !canTrackMouse() || !root) return;
-
-      const dt = previousTime ? Math.min(48, now - previousTime) : 16;
-      previousTime = now;
-
-      if (hasMouse) {
-        const bounds = root.getBoundingClientRect();
-        if (bounds.bottom < -50 || bounds.top > window.innerHeight + 50) {
-          return;
-        }
-
-        const centerX = bounds.left + bounds.width / 2;
-        const centerY = bounds.top + bounds.height * 0.42;
-
-        const dx = mouseX - centerX;
-        const dy = mouseY - centerY;
-        const dist = Math.hypot(dx, dy);
-
-        // Dead-zone near face center
-        if (dist < bounds.width * 0.12) {
-          isNearCenter = true;
-        } else {
-          isNearCenter = false;
-          targetAngle = Math.atan2(dx, -dy);
-          if (!active) {
-            currentAngle = targetAngle;
-            active = true;
-          }
-        }
-      }
-
-      if (isNearCenter) {
-        // When near center, smoothly settle to center frame
-        if (currentRenderedIndex !== -1) {
-          currentRenderedIndex = -1;
-          if (centerImg.complete && centerImg.naturalWidth > 0) {
-            render(centerImg);
-          }
-        }
-        return;
-      }
-
-      // Compute shortest angular difference
-      const delta = Math.atan2(
-        Math.sin(targetAngle - currentAngle),
-        Math.cos(targetAngle - currentAngle)
-      );
-
-      // Critically damped exponential spring: responsive yet silky smooth
-      const factor = 1 - Math.exp(-dt / 42);
-      currentAngle += delta * factor;
-
-      // Map normalized angle to poses and quantize to nearest preloaded stride frame
-      const norm = ((currentAngle % TWO_PI) + TWO_PI) % TWO_PI;
-      const sectorExact = Math.min(7.9999, norm / (Math.PI / 4));
-      const start = Math.floor(sectorExact) % 8;
-      const blend = sectorExact - start;
-      const next = start + 1;
-      const time = POSES[start] + (POSES[next] - POSES[start]) * blend;
-      const rawIndex = Math.max(0, Math.min(63, Math.round((time * 24 * 63) / 239)));
-      const desiredIndex = Math.min(
-        64 - frameStride,
-        Math.max(0, Math.round(rawIndex / frameStride) * frameStride)
-      );
-
-      const match = getBestLoadedFrame(desiredIndex);
-      if (match && currentRenderedIndex !== match.index) {
-        currentRenderedIndex = match.index;
-        render(match.img);
-      }
-
-      // Continue animation if angle is still moving or desired frame is still loading
-      if (Math.abs(delta) > 0.001 || (match && match.index !== desiredIndex)) {
-        rafId = requestAnimationFrame(draw);
+    function onPointerMove(event: PointerEvent) {
+      if (event.pointerType === "touch" || !visible || !enabled()) return;
+      if (dirty) { bounds = root!.getBoundingClientRect(); dirty = false; }
+      const dx = event.clientX - bounds.left - bounds.width / 2;
+      const dy = event.clientY - bounds.top - bounds.height * 0.42;
+      // Hold the current gaze near the face instead of snapping to a separate image.
+      if (Math.hypot(dx, dy) < bounds.width * 0.06) return;
+      const angle = (Math.atan2(dx, -dy) + Math.PI * 2) % (Math.PI * 2);
+      const sector = angle / (Math.PI / 4);
+      const i = Math.min(7, Math.floor(sector));
+      target = poses[i] + (poses[i + 1] - poses[i]) * (sector - i);
+      schedule();
+    }
+    function invalidate() { dirty = true; }
+    function stop() { cancelAnimationFrame(raf); raf = 0; previous = 0; }
+    function onVisibility() { if (document.hidden) stop(); else schedule(); }
+    function onPreference() {
+      if (!enabled()) { stop(); canvas.style.display = "none"; image!.style.display = "block"; }
+      else { startLoading(); if (ready) { rendered = -1; draw(Math.round(position)); } schedule(); }
+    }
+    // Decode the entire small sequence before enabling tracking; partial loading
+    // previously caused fallback poses to jump as more frames arrived.
+    let cursor = 0;
+    async function loadWorker() {
+      while (cursor < 64 && !disposed) {
+        const index = cursor++;
+        const frame = new Image();
+        frame.decoding = "async";
+        frame.src = `/frames/frame-${String(index).padStart(3, "0")}.webp`;
+        try { await frame.decode(); if (!disposed) frames[index] = frame; }
+        catch { /* Keep the static fallback if the sequence cannot be decoded. */ }
       }
     }
-
-    function scheduleDraw() {
-      if (!canTrackMouse() || !visible || rafId) return;
-      previousTime = performance.now();
-      rafId = requestAnimationFrame(draw);
+    let loading = false;
+    function startLoading() {
+      if (loading || !enabled()) return;
+      loading = true;
+      void Promise.all(Array.from({ length: 4 }, loadWorker)).then(() => {
+      if (disposed || frames.filter(Boolean).length !== 64) return;
+      ready = true;
+      if (enabled()) draw(56);
+      schedule();
+    });
     }
-
-    function onPointerMove(e: PointerEvent) {
-      if (e.pointerType === "touch") return;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      hasMouse = true;
-      scheduleDraw();
-    }
-
-    function onMouseMove(e: MouseEvent) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      hasMouse = true;
-      scheduleDraw();
-    }
-
-    function onScroll() {
-      // While scrolling, update gaze relative to current mouse position on next animation frame
-      if (hasMouse) {
-        scheduleDraw();
-      }
-    }
-
-    function reset() {
-      hasMouse = false;
-      isNearCenter = true;
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-      currentRenderedIndex = -1;
-      if (centerImg.complete && centerImg.naturalWidth > 0) {
-        render(centerImg);
-      }
-    }
-
+    startLoading();
+    const resize = new ResizeObserver(invalidate);
+    resize.observe(root);
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (!visible) {
-        reset();
-      } else if (hasMouse) {
-        scheduleDraw();
-      }
+      dirty = true;
+      if (!visible) stop(); else schedule();
     });
-
     observer.observe(root);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("blur", reset);
-    document.documentElement.addEventListener("mouseleave", reset);
-
-    const onVisibilityChange = () => {
-      if (document.hidden) reset();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
+    window.addEventListener("scroll", invalidate, { passive: true, capture: true });
+    window.addEventListener("resize", invalidate, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
+    reduced.addEventListener("change", onPreference);
     return () => {
       disposed = true;
-      reset();
+      stop();
+      canvas.remove();
+      image.style.display = "block";
+      resize.disconnect();
       observer.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("blur", reset);
-      document.documentElement.removeEventListener("mouseleave", reset);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("scroll", invalidate, true);
+      window.removeEventListener("resize", invalidate);
+      document.removeEventListener("visibilitychange", onVisibility);
+      reduced.removeEventListener("change", onPreference);
     };
   }, [paused, lowData]);
-
   return (
     <div className="cursor-portrait" ref={rootRef}>
-      <button
-        type="button"
-        className="cursor-portrait-trigger"
-        aria-label="Say hello to Manoj"
-        onClick={greet}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") setGreeting(false);
-        }}
-      >
+      <button type="button" className="cursor-portrait-trigger" aria-label="Say hello to Manoj"
+        onClick={greet} onKeyDown={event => { if (event.key === "Escape") setGreeting(false); }}>
         <span className="cursor-portrait-blend">
-          <canvas
-            ref={canvasRef}
-            className="cursor-portrait-image"
-            width={1280}
-            height={720}
-            aria-label="Manoj's animated portrait with smooth cursor and scroll gaze tracking"
-          />
+          <img ref={imageRef} className="cursor-portrait-image" src="/frames/center.webp"
+            width={1280} height={720} decoding="async" fetchPriority="high"
+            alt="Manoj Prabhu" style={{ willChange: "auto", transformOrigin: "50% 65%" }} />
         </span>
       </button>
       <div className="cursor-portrait-greeting" role="status" aria-live="polite">
-        {greeting && <span>Hi, I’m Manoj 👋</span>}
+        {greeting && <span>Hi, I'm Manoj 👋</span>}
       </div>
     </div>
   );
 }
+
+
+
