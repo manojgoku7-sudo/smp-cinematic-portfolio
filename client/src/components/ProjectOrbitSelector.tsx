@@ -1,6 +1,31 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDown, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { LazyProjectImage, markImagePredecoded } from "@/hooks/useLazyImage";
+
+const predecodedOrbitImages = new Set<string>();
+
+function predecodeOrbitArtwork(src: string): Promise<void> {
+  if (!src || predecodedOrbitImages.has(src) || typeof Image === "undefined") {
+    return Promise.resolve();
+  }
+  predecodedOrbitImages.add(src);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = src;
+    const done = () => {
+      markImagePredecoded(src);
+      resolve();
+    };
+    if (typeof img.decode === "function") {
+      img.decode().then(done).catch(done);
+    } else {
+      img.onload = done;
+      img.onerror = done;
+    }
+  });
+}
 
 export interface OrbitProject {
   id: "attack-study" | "delivery-study" | "ai-content-studio" | "polur-charm";
@@ -130,10 +155,58 @@ export function ProjectOrbitSelector({
 }: ProjectOrbitSelectorProps) {
   const isAnimated = !motionPaused && !lowDataMode && !reduceMotion;
   const [hoveredId, setHoveredId] = useState<OrbitProject["id"] | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
 
   const currentProject =
     projects.find((p) => p.id === activeProjectId) || projects[0];
   const currentDetails = PROJECT_DETAILS[currentProject.id];
+
+  // Viewport-gated off-thread pre-decoding for all 4 Project Orbit switcher visuals
+  useEffect(() => {
+    if (lowDataMode) return;
+    const shell = shellRef.current;
+    if (!shell) return;
+
+    let cancelled = false;
+    const runPredecodeQueue = async () => {
+      const urls = Object.values(PROJECT_DETAILS).map((item) => item.image);
+      const isConstrained =
+        typeof window !== "undefined" &&
+        (window.innerWidth < 768 ||
+          document.documentElement.classList.contains("is-midrange-device"));
+
+      if (isConstrained) {
+        // Stagger sequentially on mobile / mid-range devices to avoid GPU texture upload spikes
+        for (const url of urls) {
+          if (cancelled) break;
+          await predecodeOrbitArtwork(url);
+        }
+      } else {
+        await Promise.all(urls.map((url) => predecodeOrbitArtwork(url)));
+      }
+    };
+
+    if (typeof IntersectionObserver === "undefined") {
+      void runPredecodeQueue();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          void runPredecodeQueue();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "320px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(shell);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [lowDataMode]);
 
   const scrollToStudy = (id: OrbitProject["id"]) => {
     const el = document.getElementById(id);
@@ -144,7 +217,8 @@ export function ProjectOrbitSelector({
 
   return (
     <div
-      className="project-spotlight-shell relative my-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0e0a1b]/80 p-5 sm:p-7 md:p-9 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.06)] backdrop-blur-2xl"
+      ref={shellRef}
+      className="project-spotlight-shell relative my-10 w-full max-w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0e0a1b]/80 p-3.5 sm:p-7 md:p-9 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.06)] backdrop-blur-2xl"
       aria-label="Featured Project Spotlight"
     >
       {/* Subtle ambient illumination */}
@@ -179,12 +253,16 @@ export function ProjectOrbitSelector({
                 onMouseEnter={() => {
                   setHoveredId(proj.id);
                   onHoverProject?.(proj.id);
+                  if (!lowDataMode) void predecodeOrbitArtwork(details.image);
+                }}
+                onFocus={() => {
+                  if (!lowDataMode) void predecodeOrbitArtwork(details.image);
                 }}
                 onMouseLeave={() => {
                   setHoveredId(null);
                   onHoverProject?.(null);
                 }}
-                className={`relative flex items-center justify-between gap-2 rounded-lg px-3.5 py-2.5 text-left transition-colors duration-200 ${
+                className={`relative flex items-center justify-between gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3.5 py-2 sm:py-2.5 min-w-0 text-left transition-colors duration-200 ${
                   isActive ? "text-white" : "text-white/50 hover:text-white/80"
                 }`}
               >
@@ -316,12 +394,14 @@ export function ProjectOrbitSelector({
                 title={`Open ${currentDetails.shortTitle} case study`}
               >
                 {/* Artwork */}
-                <img
+                <LazyProjectImage
                   src={currentDetails.image}
                   alt={currentDetails.imageAlt}
+                  width={1200}
+                  height={750}
+                  rootMargin="320px 0px"
+                  referrerPolicy="no-referrer"
                   className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-                  loading="lazy"
-                  decoding="async"
                 />
 
                 {/* Subtle dark vignette gradient */}

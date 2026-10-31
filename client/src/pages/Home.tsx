@@ -2,12 +2,11 @@
  * Obsidian Studio page — an asymmetric editorial reel with ultraviolet signals and purposeful micro-motion.
  * Hero portrait: calibrated video frames follow the cursor on fine-pointer devices, with a static fallback.
  */
-import { FocusEvent, FormEvent, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import { FocusEvent, FormEvent, memo, MouseEvent, PointerEvent as ReactPointerEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
 import { Dialog, Dialog as DialogRoot, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { RevealMetric } from "@/components/RevealMetric";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { CyberTypingDescription } from "@/components/CyberTypingDescription";
@@ -18,6 +17,7 @@ import { MagneticNav } from "@/components/MagneticNav";
 import { ProjectOrbitSelector } from "@/components/ProjectOrbitSelector";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { CursorPortrait } from "@/components/CursorPortrait";
+import { LazyProjectImage, markImagePredecoded } from "@/hooks/useLazyImage";
 import { scrollToElement } from "@/hooks/useSmoothScroll";
 import {
   ArrowDownRight,
@@ -25,7 +25,6 @@ import {
   BriefcaseBusiness,
   Check,
   CircleCheckBig,
-  Clock,
   ChevronLeft,
   ChevronRight,
   Cloud,
@@ -35,27 +34,21 @@ import {
   Download,
   Github,
   GraduationCap,
-  Laptop,
   Layers3,
   Layout,
   Linkedin,
   Mail,
   MapPin,
   Menu,
-  Orbit,
   Palette,
   Pause,
   Phone,
   Play,
-  RotateCcw,
   Send,
   Server,
   Sparkles,
-  Stars,
-  Terminal,
   UserPlus,
   X,
-  Zap,
 } from "lucide-react";
 
 const navItems = [
@@ -66,14 +59,13 @@ const navItems = [
 ] as const;
 
 const skills = [
-  { title: "Languages", code: "01", items: ["Java", "JavaScript", "Python", "SQL"] },
-  { title: "Frontend", code: "02", items: ["HTML5", "CSS3", "React (basic)"] },
-  { title: "UI / UX", code: "03", items: ["Figma", "Wireframing", "Prototyping"] },
-  { title: "Backend", code: "04", items: ["Spring Boot", "REST API", "MySQL"] },
-  { title: "Version control", code: "05", items: ["Git"] },
-  { title: "Applied ML", code: "06", items: ["XGBoost", "SVM", "Logistic Regression"] },
+  { title: "Languages", code: "01", items: ["Java", "JavaScript", "TypeScript", "Python", "SQL", "PL/SQL"] },
+  { title: "Frontend", code: "02", items: ["HTML5", "CSS3", "React fundamentals", "Responsive Design"] },
+  { title: "UI / UX", code: "03", items: ["Figma", "Wireframing", "Prototyping", "Material Design", "Usability Testing"] },
+  { title: "Backend", code: "04", items: ["Java", "Spring Boot", "REST API", "MySQL", "Firebase Realtime DB"] },
+  { title: "Cloud, Tools & Process", code: "05", items: ["Git", "GitHub", "VS Code", "Oracle APEX", "Agile", "Scrum"] },
+  { title: "Applied ML", code: "06", items: ["Scikit-learn", "XGBoost", "SVM", "Logistic Regression", "Gradient Boosting"] },
 ];
-const skillCategoryIcons = [Code2, Layout, Palette, Layers3, Github, Cpu];
 
 const experience = [
   {
@@ -85,6 +77,7 @@ const experience = [
       "Built a full-stack Dynamic Ride Sharing and Carpooling Platform using Java, Spring Boot, and MySQL.",
       "Implemented 8+ RESTful APIs for user registration, trip matching, booking, and route tracking.",
     ],
+    tags: ["Java", "Spring Boot", "REST APIs", "MySQL"],
   },
   {
     period: "01/2024 — 03/2024",
@@ -95,6 +88,7 @@ const experience = [
       "Designed and delivered 10+ mobile and web UI screens in Figma within a two-month sprint.",
       "Conducted usability testing across 3 iterative design cycles, reducing handoff time by approximately 25%.",
     ],
+    tags: ["Figma", "Mobile UI", "Design Systems", "Usability Testing"],
   },
   {
     period: "06/2023 — 08/2023",
@@ -105,9 +99,25 @@ const experience = [
       "Developed a Figma component library of 20+ UI elements, reducing screen design time by 30%.",
       "Designed mobile application screens applying Material Design principles and 8-point grid systems.",
     ],
+    tags: ["Material Design", "Component Library", "8-pt Grid", "Prototyping"],
+  },
+  {
+    period: "09/2021 — 05/2025",
+    role: "B.Tech in Information Technology",
+    company: "Saveetha School of Engineering",
+    place: "Chennai, Tamil Nadu",
+    details: [
+      "Graduated with 8.0 / 10.0 CGPA; delivered capstone ML research achieving 85% accuracy on network intrusion attack detection.",
+      "Built rigorous foundations across Data Structures & Algorithms, Java OOP, Relational Databases (MySQL), and Software Engineering.",
+    ],
+    tags: ["Data Structures", "Java OOP", "MySQL", "ML Capstone (85%)"],
+    highlights: [
+      { label: "Status", value: "Graduated" },
+      { label: "CGPA", value: "8.0 / 10.0" },
+      { label: "ML Capstone", value: "85% Accuracy" },
+    ],
   },
 ];
-const experienceSignals = ["8+ APIs shipped", "3 review cycles", "20+ components"] as const;
 
 const certifications = [
   { issuer: "Oracle", title: "APEX Cloud Developer Professional", meta: "1Z0-771", theme: "Application development", focus: "Cloud delivery" },
@@ -126,16 +136,6 @@ const orbitProjects = [
   { id: "polur-charm", index: "04", title: "Polur Charm Civic Hub", discipline: "Civic Web · React 19", signal: "24/7 Transit" },
 ] as const;
 type OrbitProjectId = (typeof orbitProjects)[number]["id"];
-const projectSkillGravity = {
-  "attack-study": { label: "Attack model", note: "Python, XGBoost, SVM, Logistic Regression", skills: ["Python", "XGBoost", "SVM", "Logistic Regression"] },
-  "delivery-study": { label: "Delivery flow", note: "Figma, Wireframing, Prototyping, Material-led UI", skills: ["Figma", "Wireframing", "Prototyping", "HTML5"] },
-  "ai-content-studio": { label: "AI content studio", note: "Python automation, JavaScript, REST APIs, and Git", skills: ["Python", "JavaScript", "REST API", "Git"] },
-  "polur-charm": { label: "Polur Charm", note: "React, TypeScript, Tailwind CSS, localization, and civic discovery", skills: ["JavaScript", "HTML5", "CSS3", "REST API"] },
-} as const;
-const skillGravityVectors: Record<string, { x: string; y: string }> = {
-  Python: { x: "7px", y: "-4px" }, XGBoost: { x: "-7px", y: "4px" }, SVM: { x: "5px", y: "5px" }, "Logistic Regression": { x: "-5px", y: "-5px" },
-  Figma: { x: "7px", y: "-4px" }, Wireframing: { x: "-7px", y: "4px" }, Prototyping: { x: "5px", y: "5px" }, HTML5: { x: "-5px", y: "-5px" },
-};
 const recruiterReviewSteps = [
   { id: "top", index: "01", label: "Availability", note: "Open to internships and collaborative product work." },
   { id: "about", index: "02", label: "Core proof", note: "React components, Figma screens, and 85% ML accuracy." },
@@ -276,7 +276,7 @@ function getConnectionPrefetchProfile(): ConnectionPrefetchProfile {
   return cautious ? { enabled: true, intentDistance: 32, velocityThreshold: .55 } : fallback;
 }
 
-const nebulaStars = Array.from({ length: 12 }, (_, index) => ({
+const nebulaStars = Array.from({ length: 34 }, (_, index) => ({
   id: index,
   left: 6 + ((index * 37) % 88),
   top: 7 + ((index * 61) % 81),
@@ -286,79 +286,291 @@ const nebulaStars = Array.from({ length: 12 }, (_, index) => ({
   speed: 3.8 + ((index * 11) % 31) / 10,
   tone: index % 9 === 0 ? "is-rose" : index % 4 === 0 ? "is-violet" : "",
 }));
-const nebulaParticles = Array.from({ length: 4 }, (_, index) => {
-  const distance = 150;
-  const starts = [
-    { left: 26, top: 8 },
-    { left: 50, top: 18 },
-    { left: 74, top: 6 },
-    { left: 94, top: 24 },
-  ];
-  return {
-    id: index,
-    ...starts[index],
-    duration: 5.2,
-    delay: -(index * 1.3),
-    // Every shooting star travels down-left at the same shallow angle.
-    travelX: -distance,
-    travelY: Math.round(distance * 0.58),
-    trail: 54,
-  };
-});
 type InteractionPoint = { id: number; x: number; y: number };
-const skillProficiency: Record<string, { level: string; stars: number }> = {
-  Java: { level: "Applied", stars: 4 }, JavaScript: { level: "Working", stars: 3 }, Python: { level: "Working", stars: 3 }, SQL: { level: "Working", stars: 3 }, HTML5: { level: "Applied", stars: 4 }, CSS3: { level: "Applied", stars: 4 }, "React (basic)": { level: "Foundation", stars: 2 }, Figma: { level: "Applied", stars: 4 }, Wireframing: { level: "Applied", stars: 4 }, Prototyping: { level: "Applied", stars: 4 }, "Spring Boot": { level: "Working", stars: 3 }, "REST API": { level: "Applied", stars: 4 }, MySQL: { level: "Working", stars: 3 }, Git: { level: "Working", stars: 3 }, GitHub: { level: "Working", stars: 3 }, "VS Code": { level: "Applied", stars: 4 }, Firebase: { level: "Working", stars: 3 }, "Oracle APEX": { level: "Foundation", stars: 2 }, XGBoost: { level: "Applied", stars: 4 }, SVM: { level: "Working", stars: 3 }, "Logistic Regression": { level: "Working", stars: 3 }, Agile: { level: "Working", stars: 3 }, Scrum: { level: "Working", stars: 3 },
+const skillProficiency: Record<string, { level: "Learning" | "Working" | "Proficient" | "Advanced"; dots: number; stars: number }> = {
+  // 01 Languages
+  Java: { level: "Advanced", dots: 4, stars: 4 },
+  JavaScript: { level: "Proficient", dots: 3, stars: 3 },
+  TypeScript: { level: "Proficient", dots: 3, stars: 3 },
+  Python: { level: "Working", dots: 2, stars: 2 },
+  SQL: { level: "Proficient", dots: 3, stars: 3 },
+  "PL/SQL": { level: "Working", dots: 2, stars: 2 },
+
+  // 02 Frontend
+  HTML5: { level: "Advanced", dots: 4, stars: 4 },
+  CSS3: { level: "Advanced", dots: 4, stars: 4 },
+  "React fundamentals": { level: "Proficient", dots: 3, stars: 3 },
+  "Responsive Design": { level: "Advanced", dots: 4, stars: 4 },
+  "React (basic)": { level: "Learning", dots: 1, stars: 1 },
+
+  // 03 UI / UX
+  Figma: { level: "Advanced", dots: 4, stars: 4 },
+  Wireframing: { level: "Proficient", dots: 3, stars: 3 },
+  Prototyping: { level: "Proficient", dots: 3, stars: 3 },
+  "Material Design": { level: "Proficient", dots: 3, stars: 3 },
+  "Usability Testing": { level: "Working", dots: 2, stars: 2 },
+  "Component Library": { level: "Proficient", dots: 3, stars: 3 },
+
+  // 04 Backend
+  "Spring Boot": { level: "Proficient", dots: 3, stars: 3 },
+  "REST API": { level: "Advanced", dots: 4, stars: 4 },
+  MySQL: { level: "Proficient", dots: 3, stars: 3 },
+  "Firebase Realtime DB": { level: "Working", dots: 2, stars: 2 },
+  Firebase: { level: "Working", dots: 2, stars: 2 },
+
+  // 05 Cloud, Tools & Process
+  Git: { level: "Proficient", dots: 3, stars: 3 },
+  GitHub: { level: "Proficient", dots: 3, stars: 3 },
+  "VS Code": { level: "Advanced", dots: 4, stars: 4 },
+  "Oracle APEX": { level: "Learning", dots: 1, stars: 1 },
+  Agile: { level: "Working", dots: 2, stars: 2 },
+  Scrum: { level: "Working", dots: 2, stars: 2 },
+
+  // 06 Applied ML
+  "Scikit-learn": { level: "Proficient", dots: 3, stars: 3 },
+  XGBoost: { level: "Proficient", dots: 3, stars: 3 },
+  SVM: { level: "Working", dots: 2, stars: 2 },
+  "Logistic Regression": { level: "Working", dots: 2, stars: 2 },
+  "Gradient Boosting": { level: "Proficient", dots: 3, stars: 3 },
 };
 
-const contactTopics = [
-  {
-    id: "hiring",
-    icon: "💼",
-    label: "Internship / Role",
-    template: "Hi Manoj, I reviewed your portfolio and would like to discuss an opportunity for a Frontend Developer / UI-UX role at...",
+interface SkillProof {
+  project: string;
+  metric: string;
+  detail: string;
+  linkId: string;
+  label: string;
+}
+
+const skillProofMap: Record<string, SkillProof> = {
+  // 01 Languages
+  Java: {
+    project: "Infosys Springboard",
+    metric: "Ride Sharing Backend",
+    detail: "Object-oriented services & booking workflows",
+    linkId: "experience",
+    label: "Internship",
   },
-  {
-    id: "frontend",
-    icon: "🎨",
-    label: "UI/UX & Frontend",
-    template: "Hi Manoj, I love your design and frontend work and want to collaborate on building a high-fidelity interface for...",
+  JavaScript: {
+    project: "Polur Charm",
+    metric: "Civic Web Platform",
+    detail: "Dynamic client routing, search & interactive filters",
+    linkId: "polur-charm",
+    label: "Live Site",
   },
-  {
-    id: "stack",
-    icon: "⚡",
-    label: "Java & ML Systems",
-    template: "Hi Manoj, I am interested in your technical background with Java, Spring Boot, and machine learning models for...",
+  TypeScript: {
+    project: "Polur Charm",
+    metric: "Type-Safe Architecture",
+    detail: "Strict models for transit lines, safety & places",
+    linkId: "polur-charm",
+    label: "Production",
   },
-  {
-    id: "chat",
-    icon: "☕",
-    label: "15-Min Intro Chat",
-    template: "Hi Manoj, I enjoyed reviewing your projects and would love to connect for a quick 15-minute informal coffee chat...",
+  Python: {
+    project: "Attack Model Study",
+    metric: "85% Classification Accuracy",
+    detail: "Data pipeline & 4 cybersecurity evaluation models",
+    linkId: "attack-study",
+    label: "ML Study",
   },
-];
+  SQL: {
+    project: "Infosys Springboard",
+    metric: "Relational Data Modeling",
+    detail: "Normalized MySQL schema & transactional queries",
+    linkId: "experience",
+    label: "Database",
+  },
+  "PL/SQL": {
+    project: "Oracle APEX Cloud",
+    metric: "Certified 1Z0-771",
+    detail: "Stored procedures & cloud database routines",
+    linkId: "credentials",
+    label: "Certification",
+  },
+
+  // 02 Frontend
+  HTML5: {
+    project: "Polur Charm",
+    metric: "Semantic DOM & SEO",
+    detail: "Accessible landmarks, rich cards & structured metadata",
+    linkId: "polur-charm",
+    label: "Live Project",
+  },
+  CSS3: {
+    project: "Polur Charm & Portfolio",
+    metric: "Dark Glassmorphism",
+    detail: "Modern backdrop blur, responsive layouts & keyframe effects",
+    linkId: "polur-charm",
+    label: "Design System",
+  },
+  "React fundamentals": {
+    project: "Polur Charm",
+    metric: "React 19 Architecture",
+    detail: "Component hierarchy, custom hooks & reactive state",
+    linkId: "polur-charm",
+    label: "Frontend",
+  },
+  "Responsive Design": {
+    project: "Food Delivery & Polur",
+    metric: "Multi-Breakpoint Layouts",
+    detail: "Fluid layouts tested from 360px phones to 4K displays",
+    linkId: "delivery-study",
+    label: "Mobile-First",
+  },
+
+  // 03 UI / UX
+  Figma: {
+    project: "Food Delivery Mobile App",
+    metric: "15+ Production Screens",
+    detail: "High-fidelity mobile UI & reusable component tokens",
+    linkId: "delivery-study",
+    label: "Case Study",
+  },
+  Wireframing: {
+    project: "Fluezen Technology",
+    metric: "10+ Screens Mapped",
+    detail: "Low-to-high fidelity user journeys mapped in sprints",
+    linkId: "experience",
+    label: "Internship",
+  },
+  Prototyping: {
+    project: "Food Delivery Mobile App",
+    metric: "Interactive Task Flows",
+    detail: "Order discovery, cart checkout & simulated live tracking",
+    linkId: "delivery-study",
+    label: "Case Study",
+  },
+  "Material Design": {
+    project: "Kaashiv Infotech",
+    metric: "20+ Element UI Kit",
+    detail: "8-point grid rhythm, standardized states & elevation",
+    linkId: "experience",
+    label: "Design System",
+  },
+  "Usability Testing": {
+    project: "Fluezen Technology",
+    metric: "3 Review Cycles",
+    detail: "User feedback iterations reduced handoff time by 25%",
+    linkId: "experience",
+    label: "UX Research",
+  },
+
+  // 04 Backend
+  "Spring Boot": {
+    project: "Infosys Springboard",
+    metric: "8+ REST Web Services",
+    detail: "Dependency injection, route security & business logic",
+    linkId: "experience",
+    label: "Spring Framework",
+  },
+  "REST API": {
+    project: "Infosys Springboard",
+    metric: "8+ Endpoints Shipped",
+    detail: "RESTful endpoints for auth, booking & route match",
+    linkId: "experience",
+    label: "API Design",
+  },
+  MySQL: {
+    project: "Infosys Springboard",
+    metric: "Relational Persistence",
+    detail: "Indexed tables & normalized ride data schema",
+    linkId: "experience",
+    label: "Database",
+  },
+  "Firebase Realtime DB": {
+    project: "Realtime Data Sync",
+    metric: "Event Synchronization",
+    detail: "Document streaming & reactive client subscriptions",
+    linkId: "work",
+    label: "Cloud DB",
+  },
+
+  // 05 Cloud, Tools & Process
+  Git: {
+    project: "Production Codebases",
+    metric: "Branch & Merge Hygiene",
+    detail: "Semantic commit history & trunk-based development",
+    linkId: "work",
+    label: "Tooling",
+  },
+  GitHub: {
+    project: "Public Repositories",
+    metric: "Open-Source Codebases",
+    detail: "Releases, documentation & collaboration pipelines",
+    linkId: "work",
+    label: "DevOps",
+  },
+  "VS Code": {
+    project: "Primary Development IDE",
+    metric: "Full-Stack Tooling",
+    detail: "Configured extensions, linting & debugger setups",
+    linkId: "about",
+    label: "Workflow",
+  },
+  "Oracle APEX": {
+    project: "Oracle Cloud Developer",
+    metric: "1Z0-771 Professional",
+    detail: "Certified low-code cloud delivery & SQL integration",
+    linkId: "credentials",
+    label: "Certification",
+  },
+  Agile: {
+    project: "Fluezen & Kaashiv Sprints",
+    metric: "2-Month Agile Sprints",
+    detail: "Cross-functional design-to-engineering delivery cycles",
+    linkId: "experience",
+    label: "Process",
+  },
+  Scrum: {
+    project: "Product Delivery Cycles",
+    metric: "Standups & Handoffs",
+    detail: "Sprint planning, backlog grooming & retrospectives",
+    linkId: "experience",
+    label: "Process",
+  },
+
+  // 06 Applied ML
+  "Scikit-learn": {
+    project: "Attack Prediction Study",
+    metric: "4-Model Evaluation Pipeline",
+    detail: "Standardized cross-validation & confusion matrix scoring",
+    linkId: "attack-study",
+    label: "ML Pipeline",
+  },
+  XGBoost: {
+    project: "Attack Prediction Study",
+    metric: "85% Peak Accuracy",
+    detail: "Top performing model selected after comparative evaluation",
+    linkId: "attack-study",
+    label: "Top Performer",
+  },
+  SVM: {
+    project: "Attack Prediction Study",
+    metric: "Support Vector Classifier",
+    detail: "Optimal margin boundary separation on cybersecurity dataset",
+    linkId: "attack-study",
+    label: "Evaluation",
+  },
+  "Logistic Regression": {
+    project: "Attack Prediction Study",
+    metric: "Probabilistic Baseline",
+    detail: "Standard baseline for binary attack pattern classification",
+    linkId: "attack-study",
+    label: "Baseline",
+  },
+  "Gradient Boosting": {
+    project: "Attack Prediction Study",
+    metric: "Ensemble Classifier",
+    detail: "Sequential error minimization across attack vectors",
+    linkId: "attack-study",
+    label: "Ensemble",
+  },
+};
 
 function scrollToSection(id: string) {
   scrollToElement(id, -84);
 }
 
 async function downloadResume() {
-  const primaryPdf = "/S_Manoj_Prabhu_Resume.pdf";
-  try {
-    const res = await fetch(primaryPdf, { method: "HEAD" });
-    const contentType = res.headers.get("content-type") || "";
-    if (res.ok && !contentType.includes("text/html")) {
-      const anchor = document.createElement("a");
-      anchor.href = primaryPdf;
-      anchor.download = "S_Manoj_Prabhu_Resume.pdf";
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      return;
-    }
-  } catch {
-    // Continue to other checks
-  }
-
   const possiblePdfs = [
     "/S_Manoj_Prabhu_Resume.pdf",
     "/S-Manoj-Prabhu-Resume.pdf",
@@ -394,11 +606,11 @@ GitHub: https://github.com/manojprabhu07
 LinkedIn: https://www.linkedin.com/in/manojprabhu07
 
 PROFILE
-Frontend Developer and UI/UX Designer specialising in React, Figma, Java/Spring Boot, and applied Machine Learning. Engineering undergraduate with hands-on experience building production interfaces, RESTful microservices, and predictive ML models.
+Frontend Developer and UI/UX Designer specialising in React, Figma, Java/Spring Boot, and applied Machine Learning. Engineering graduate with hands-on experience building production interfaces, RESTful microservices, and predictive ML models.
 
 EDUCATION
 B.Tech in Information Technology
-Saveetha School of Engineering, Chennai (09/2021 — Present)
+Saveetha School of Engineering, Chennai (09/2021 — 05/2025 · Graduated)
 • Cumulative GPA: 8.0 / 10.0
 • Higher Secondary Certificate (HSC): 80%
 • Secondary School Leaving Certificate (SSLC): 79%
@@ -457,6 +669,12 @@ CERTIFICATIONS
   URL.revokeObjectURL(url);
 }
 
+/* ============================================================================
+   SECTION 00: SHARED MOTION PRIMITIVES & SECTION HEADING ENGINE
+   - Single IntersectionObserver per GravityHeading (eliminates 25+ per-letter observers)
+   - Cached character center coordinates on pointerEnter (zero getBoundingClientRect in rAF)
+   ============================================================================ */
+
 function releaseSignalButtonMagnet(button: HTMLElement | null) {
   if (!button) return;
   button.classList.remove("is-magnetized");
@@ -464,7 +682,7 @@ function releaseSignalButtonMagnet(button: HTMLElement | null) {
   button.style.removeProperty("--magnet-y");
 }
 
-function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+const Reveal = memo(function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
@@ -477,7 +695,287 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
       {children}
     </motion.div>
   );
-}
+});
+
+const gravityLetterVariants: Variants = {
+  hidden: (index: number) => ({
+    x: ((index % 5) - 2) * 3,
+    y: 9 + (index % 3) * 3,
+    rotate: ((index % 3) - 1) * 1.2,
+    opacity: 0.6,
+  }),
+  visible: (index: number) => ({
+    x: 0,
+    y: 0,
+    rotate: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.54,
+      delay: 0.08 + (index % 8) * 0.035,
+      ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
+    },
+  }),
+};
+
+const GravityHeading = memo(function GravityHeading({
+  title,
+  motionPaused,
+  className = "display section-heading gravity-heading",
+}: {
+  title: string;
+  motionPaused: boolean;
+  className?: string;
+}) {
+  const reduceMotion = useReducedMotion();
+  const staticType = Boolean(reduceMotion || motionPaused);
+  const [isTouchHeading, setIsTouchHeading] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hasFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+    return (!hasFinePointer && window.matchMedia("(hover: none) and (pointer: coarse)").matches) || window.innerWidth < 768;
+  });
+  const containerRef = useRef<HTMLHeadingElement | null>(null);
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const cachedCentersRef = useRef<{ x: number; y: number }[] | null>(null);
+  const rafId = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const updateMode = () => {
+      const hasFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+      setIsTouchHeading(
+        (!hasFinePointer && window.matchMedia("(hover: none) and (pointer: coarse)").matches) ||
+          window.innerWidth < 768,
+      );
+    };
+    window.addEventListener("resize", updateMode, { passive: true });
+    return () => window.removeEventListener("resize", updateMode);
+  }, []);
+
+  const cacheLetterCenters = useCallback(() => {
+    if (staticType || isTouchHeading) return;
+    cachedCentersRef.current = letterRefs.current.map((letter) => {
+      if (!letter) return { x: -9999, y: -9999 };
+      const rect = letter.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+    });
+  }, [isTouchHeading, staticType]);
+
+  const resetLensing = useCallback(() => {
+    if (rafId.current) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
+    cachedCentersRef.current = null;
+    letterRefs.current.forEach((letter) => {
+      if (letter) {
+        letter.style.transform = "";
+        letter.style.textShadow = "";
+        letter.style.color = "";
+      }
+    });
+  }, []);
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLHeadingElement>) => {
+      if (staticType || isTouchHeading || e.pointerType === "touch") return;
+
+      if (!cachedCentersRef.current) {
+        cacheLetterCenters();
+      }
+
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+
+      rafId.current = requestAnimationFrame(() => {
+        const pullRadius = 220;
+        const centers = cachedCentersRef.current;
+        if (!centers) return;
+
+        letterRefs.current.forEach((letter, idx) => {
+          if (!letter) return;
+          const center = centers[idx];
+          if (!center) return;
+          const dx = clientX - center.x;
+          const dy = clientY - center.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < pullRadius) {
+            const norm = 1 - dist / pullRadius;
+            const force = Math.pow(norm, 1.5);
+            const dirX = dx / (dist || 1);
+            const dirY = dy / (dist || 1);
+
+            const tx = dirX * force * 16;
+            const ty = dirY * force * 12;
+            const rot = dirX * dirY * force * 18;
+            const scale = 1 + force * 0.12;
+            const chroma = (force * 3.6).toFixed(1);
+            const glow = (force * 0.65).toFixed(2);
+
+            letter.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+            letter.style.textShadow =
+              force > 0.06
+                ? `-${chroma}px 0 4px rgba(244, 184, 232, 0.8), ${chroma}px 0 4px rgba(139, 92, 246, 0.85), 0 0 16px rgba(196, 181, 253, ${glow})`
+                : "";
+            letter.style.color = force > 0.1 ? "#ffffff" : "";
+          } else if (letter.style.transform) {
+            letter.style.transform = "";
+            letter.style.textShadow = "";
+            letter.style.color = "";
+          }
+        });
+      });
+    },
+    [cacheLetterCenters, isTouchHeading, staticType],
+  );
+
+  useEffect(() => {
+    if (isTouchHeading) return;
+    const invalidateCache = () => {
+      cachedCentersRef.current = null;
+    };
+    window.addEventListener("scroll", invalidateCache, { passive: true });
+    window.addEventListener("resize", invalidateCache, { passive: true });
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      window.removeEventListener("scroll", invalidateCache);
+      window.removeEventListener("resize", invalidateCache);
+    };
+  }, [isTouchHeading]);
+
+  const words = useMemo(() => title.split(" "), [title]);
+
+  // On touch/mobile screens, render a single GPU-composited heading reveal
+  // instead of 35+ individual spring-animated character spans per section.
+  if (isTouchHeading) {
+    return (
+      <motion.h2
+        ref={containerRef}
+        className={className}
+        initial={staticType ? false : { opacity: 0, y: 12 }}
+        whileInView={staticType ? undefined : { opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: "some", margin: "0px 0px 48px 0px" }}
+        transition={{ duration: 0.34, ease: [0.23, 1, 0.32, 1] }}
+      >
+        {title}
+      </motion.h2>
+    );
+  }
+
+  let letterCount = 0;
+
+  return (
+    <motion.h2
+      ref={containerRef}
+      className={className}
+      aria-label={title}
+      initial={staticType ? false : "hidden"}
+      whileInView={staticType ? undefined : "visible"}
+      viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }}
+      onPointerEnter={cacheLetterCenters}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetLensing}
+    >
+      {words.map((word, wordIndex) => (
+        <span className="gravity-word-shell" key={`${word}-${wordIndex}`}>
+          <span className="gravity-word">
+            {word.split("").map((character, characterIndex) => {
+              const currentRefIdx = letterCount++;
+              const index = wordIndex * 8 + characterIndex;
+              return (
+                <motion.span
+                  key={`${character}-${characterIndex}`}
+                  ref={(el) => {
+                    letterRefs.current[currentRefIdx] = el;
+                  }}
+                  custom={index}
+                  variants={staticType ? undefined : gravityLetterVariants}
+                  className="gravity-letter"
+                  aria-hidden="true"
+                >
+                  {character}
+                </motion.span>
+              );
+            })}
+          </span>
+          {wordIndex < words.length - 1 ? <span className="gravity-space" aria-hidden="true" /> : null}
+        </span>
+      ))}
+    </motion.h2>
+  );
+});
+
+const SectionIntro = memo(function SectionIntro({
+  index,
+  eyebrow,
+  title,
+  detail,
+  motionPaused = false,
+}: {
+  index: string;
+  eyebrow: string;
+  title: string;
+  detail?: string;
+  motionPaused?: boolean;
+}) {
+  return (
+    <div className="grid gap-6 md:grid-cols-[9rem_1fr] md:gap-10">
+      <div className="flex items-center gap-3 md:block">
+        <span className="label font-mono text-[11px] text-violet-300 tracking-widest">{index}</span>
+        <span className="hidden h-px flex-1 bg-white/15 md:mt-3 md:block" />
+      </div>
+      <div>
+        <p className="label mb-3 text-violet-200/90 tracking-widest">{eyebrow}</p>
+        <GravityHeading title={title} motionPaused={motionPaused} />
+        {detail ? <p className="mt-5 max-w-2xl text-[0.96rem] leading-7 text-[#c2bbce] [text-wrap:balance]">{detail}</p> : null}
+      </div>
+    </div>
+  );
+});
+
+/* ============================================================================
+   SECTION 01: HERO — SMP FIELD REEL & ROLE CYCLE (#top)
+   ============================================================================ */
+
+const HeroRoleCycle = memo(function HeroRoleCycle({ paused }: { paused: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const [roleIndex, setRoleIndex] = useState(0);
+
+  useEffect(() => {
+    if (paused || reduceMotion) return;
+    const cycle = window.setInterval(() => {
+      setRoleIndex((current) => (current + 1) % professionalRoles.length);
+    }, 3100);
+    return () => window.clearInterval(cycle);
+  }, [paused, reduceMotion]);
+
+  return (
+    <p className="hero-role-cycle" aria-live="polite">
+      <span className="hero-role-label">Now operating as</span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={professionalRoles[roleIndex]}
+          className="hero-role-value"
+          initial={reduceMotion ? false : { opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={reduceMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={reduceMotion ? {} : { opacity: 0, y: -7, filter: "blur(3px)" }}
+          transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+        >
+          {professionalRoles[roleIndex]}
+        </motion.span>
+      </AnimatePresence>
+    </p>
+  );
+});
+
+/* ============================================================================
+   SECTION 03.5: PROJECT COLLECTION — PHYSICAL CARD HAND (#project-collection)
+   ============================================================================ */
 
 const collectionFanVariants: Variants = {
   hidden: (index: number) => {
@@ -508,142 +1006,231 @@ const collectionFanVariants: Variants = {
   }),
 };
 
-function GravityHeading({ title, motionPaused }: { title: string; motionPaused: boolean }) {
-  const reduceMotion = useReducedMotion();
-  const staticType = reduceMotion || motionPaused;
-  const containerRef = useRef<HTMLHeadingElement | null>(null);
-  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const rafId = useRef<number | null>(null);
+interface CollectionTiltCardProps {
+  project: CollectionProject;
+  index: number;
+  isFocused: boolean;
+  isOpening: boolean;
+  shouldLoadImage: boolean;
+  onImageLoad?: () => void;
+  motionDisabled: boolean;
+  cardRef: (el: HTMLButtonElement | null) => void;
+  onSelect: () => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  onFocusCard: () => void;
+  onLeaveCard: () => void;
+  onBlurCard: (event: FocusEvent<HTMLButtonElement>) => void;
+}
 
-  const resetLensing = useCallback(() => {
-    if (rafId.current) cancelAnimationFrame(rafId.current);
-    letterRefs.current.forEach((letter) => {
-      if (letter) {
-        letter.style.transform = "";
-        letter.style.textShadow = "";
-        letter.style.color = "";
-      }
-    });
-  }, []);
+const CollectionTiltCard = memo(function CollectionTiltCard({
+  project,
+  index,
+  isFocused,
+  isOpening,
+  shouldLoadImage,
+  onImageLoad,
+  motionDisabled,
+  cardRef,
+  onSelect,
+  onKeyDown,
+  onFocusCard,
+  onLeaveCard,
+  onBlurCard,
+}: CollectionTiltCardProps) {
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const glareTarget = useMotionValue(0);
+  const cachedBoundsRef = useRef<DOMRect | null>(null);
 
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLHeadingElement>) => {
-    if (staticType) return;
+  const springConfig = { stiffness: 260, damping: 24, mass: 0.55 };
+  const smoothX = useSpring(pointerX, springConfig);
+  const smoothY = useSpring(pointerY, springConfig);
+  const glareOpacity = useSpring(glareTarget, { stiffness: 240, damping: 28 });
 
-    if (rafId.current) cancelAnimationFrame(rafId.current);
+  // Subtle physical card-hand 3D tilt (pitch, yaw, and wrist-pivot micro-twist)
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [7.5, -7.5]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-8.5, 8.5]);
+  const rotateZ = useTransform(smoothX, [-0.5, 0.5], [-1.35, 1.35]);
+  const shiftX = useTransform(smoothX, [-0.5, 0.5], [-4.5, 4.5]);
+  const shiftY = useTransform(smoothY, [-0.5, 0.5], [-3.5, 3.5]);
 
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+  // Specular foil sheen that follows the tilted card face without React state re-renders
+  const glareX = useTransform(smoothX, [-0.5, 0.5], [12, 88]);
+  const glareY = useTransform(smoothY, [-0.5, 0.5], [12, 88]);
+  const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(238, 230, 255, 0.22) 0%, rgba(167, 139, 250, 0.1) 34%, transparent 68%)`;
 
-    rafId.current = requestAnimationFrame(() => {
-      const pullRadius = 220;
+  useEffect(() => {
+    if (motionDisabled) {
+      pointerX.set(0);
+      pointerY.set(0);
+      glareTarget.set(0);
+    }
+  }, [glareTarget, motionDisabled, pointerX, pointerY]);
 
-      letterRefs.current.forEach((letter) => {
-        if (!letter) return;
-        const rect = letter.getBoundingClientRect();
-        const lx = rect.left + rect.width / 2;
-        const ly = rect.top + rect.height / 2;
-        const dx = clientX - lx;
-        const dy = clientY - ly;
-        const dist = Math.hypot(dx, dy);
+  const clearCardParallaxVars = (card: HTMLButtonElement) => {
+    card.classList.remove("is-artwork-parallax");
+    card.style.transition = "transform 0.52s cubic-bezier(0.23, 1, 0.32, 1)";
+    card.style.removeProperty("--collection-art-parallax-x");
+    card.style.removeProperty("--collection-art-parallax-y");
+    card.style.removeProperty("--collection-art-parallax-rotate-x");
+    card.style.removeProperty("--collection-art-parallax-rotate-y");
+    card.style.removeProperty("--collection-art-parallax-scale");
+    card.style.removeProperty("--collection-edge-refraction-x");
+    card.style.removeProperty("--collection-edge-refraction-y");
+  };
 
-        if (dist < pullRadius) {
-          const norm = 1 - dist / pullRadius;
-          const force = Math.pow(norm, 1.5);
-          const dirX = dx / (dist || 1);
-          const dirY = dy / (dist || 1);
-
-          const tx = dirX * force * 16;
-          const ty = dirY * force * 12;
-          const rot = dirX * dirY * force * 18;
-          const scale = 1 + force * 0.12;
-          const chroma = (force * 3.6).toFixed(1);
-          const glow = (force * 0.65).toFixed(2);
-
-          letter.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-          letter.style.textShadow = force > 0.06
-            ? `-${chroma}px 0 4px rgba(244, 184, 232, 0.8), ${chroma}px 0 4px rgba(139, 92, 246, 0.85), 0 0 16px rgba(196, 181, 253, ${glow})`
-            : "";
-          letter.style.color = force > 0.1 ? "#ffffff" : "";
-        } else {
-          letter.style.transform = "";
-          letter.style.textShadow = "";
-          letter.style.color = "";
-        }
-      });
-    });
-  }, [staticType]);
+  const parallaxRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      if (rafId.current) cancelAnimationFrame(rafId.current);
+      if (parallaxRafRef.current !== null) {
+        cancelAnimationFrame(parallaxRafRef.current);
+      }
     };
   }, []);
 
-  let letterCount = 0;
+  const handlePointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (motionDisabled || event.pointerType === "touch") return;
+    const card = event.currentTarget;
+    const rect = cachedBoundsRef.current ?? card.getBoundingClientRect();
+    cachedBoundsRef.current = rect;
+    if (!rect.width || !rect.height) return;
+
+    const nx = Math.max(-0.5, Math.min(0.5, (event.clientX - rect.left) / rect.width - 0.5));
+    const ny = Math.max(-0.5, Math.min(0.5, (event.clientY - rect.top) / rect.height - 0.5));
+    pointerX.set(nx);
+    pointerY.set(ny);
+
+    if (window.innerWidth >= 1024) {
+      if (parallaxRafRef.current !== null) {
+        cancelAnimationFrame(parallaxRafRef.current);
+      }
+      parallaxRafRef.current = requestAnimationFrame(() => {
+        parallaxRafRef.current = null;
+        const x = nx * 2;
+        const y = ny * 2;
+        const depth = Math.min(1, Math.hypot(x, y) / Math.SQRT2);
+        card.classList.add("is-artwork-parallax");
+        card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
+        card.style.setProperty("--collection-art-parallax-x", `${(x * 6.25).toFixed(2)}px`);
+        card.style.setProperty("--collection-art-parallax-y", `${(y * 4.25).toFixed(2)}px`);
+        card.style.setProperty("--collection-art-parallax-rotate-x", `${(y * -1.35).toFixed(2)}deg`);
+        card.style.setProperty("--collection-art-parallax-rotate-y", `${(x * 1.6).toFixed(2)}deg`);
+        card.style.setProperty("--collection-art-parallax-scale", `${(1.078 + depth * 0.022).toFixed(3)}`);
+        card.style.setProperty("--collection-edge-refraction-x", `${((x + 1) * 50).toFixed(1)}%`);
+        card.style.setProperty("--collection-edge-refraction-y", `${((y + 1) * 50).toFixed(1)}%`);
+      });
+    }
+  };
+
+  const resetTilt = (card?: HTMLButtonElement) => {
+    if (parallaxRafRef.current !== null) {
+      cancelAnimationFrame(parallaxRafRef.current);
+      parallaxRafRef.current = null;
+    }
+    cachedBoundsRef.current = null;
+    pointerX.set(0);
+    pointerY.set(0);
+    glareTarget.set(0);
+    if (card) clearCardParallaxVars(card);
+  };
 
   return (
-    <h2
-      ref={containerRef}
-      className="display section-heading gravity-heading"
-      aria-label={title}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={resetLensing}
+    <motion.div
+      className="collection-tilt-plane"
+      style={
+        motionDisabled
+          ? undefined
+          : {
+              rotateX,
+              rotateY,
+              rotateZ,
+              x: shiftX,
+              y: shiftY,
+              transformPerspective: 1150,
+              transformStyle: "preserve-3d",
+            }
+      }
     >
-      {title.split(" ").map((word, wordIndex, wordsArr) => (
-        <span className="gravity-word-shell" key={`${word}-${wordIndex}`}>
-          <span className="gravity-word">
-            {word.split("").map((character, characterIndex) => {
-              const currentRefIdx = letterCount++;
-              const index = wordIndex * 8 + characterIndex;
-              return (
-                <motion.span
-                  key={`${character}-${characterIndex}`}
-                  ref={(el) => {
-                    letterRefs.current[currentRefIdx] = el;
-                  }}
-                  className="gravity-letter"
-                  aria-hidden="true"
-                  initial={staticType ? false : { x: (index % 5 - 2) * 3, y: 9 + (index % 3) * 3, rotate: (index % 3 - 1) * 1.2, opacity: 0.6 }}
-                  whileInView={staticType ? {} : { x: 0, y: 0, rotate: 0, opacity: 1 }}
-                  viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }}
-                  transition={{ duration: 0.54, delay: 0.08 + (index % 8) * 0.035, ease: [0.23, 1, 0.32, 1] }}
-                >
-                  {character}
-                </motion.span>
-              );
-            })}
-          </span>
-          {wordIndex < wordsArr.length - 1 ? <span className="gravity-space" aria-hidden="true" /> : null}
+      <button
+        type="button"
+        ref={cardRef}
+        className={`collection-card collection-card-${index + 1} ${isFocused ? "is-focused is-active" : ""} ${isOpening ? "is-opening" : ""}`}
+        onClick={onSelect}
+        onKeyDown={onKeyDown}
+        onMouseEnter={(event) => {
+          cachedBoundsRef.current = event.currentTarget.getBoundingClientRect();
+          if (!motionDisabled) glareTarget.set(1);
+          onFocusCard();
+        }}
+        onMouseLeave={(event) => {
+          resetTilt(event.currentTarget);
+          onLeaveCard();
+        }}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={(event) => {
+          resetTilt(event.currentTarget);
+        }}
+        onFocus={onFocusCard}
+        onBlur={(event) => {
+          resetTilt(event.currentTarget);
+          onBlurCard(event);
+        }}
+        aria-label={`Open details for ${project.title}. Keyboard shortcut: Left or Right arrow to change card, Enter to view brief.`}
+        aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter"
+      >
+        <ProgressiveImage
+          src={project.image}
+          placeholderSrc={project.placeholder}
+          alt={project.alt}
+          shouldLoad={shouldLoadImage}
+          onLoad={onImageLoad}
+          width={1000}
+          height={1500}
+          fetchPriority="low"
+          motionPaused={motionDisabled}
+        />
+        <span className="collection-card-scrim" aria-hidden="true" />
+        <motion.span
+          className="collection-card-tilt-glare"
+          aria-hidden="true"
+          style={
+            motionDisabled
+              ? undefined
+              : {
+                  background: glareBackground,
+                  opacity: glareOpacity,
+                }
+          }
+        />
+        <span className="collection-card-light-sweep" aria-hidden="true" />
+        <span className="collection-card-refraction" aria-hidden="true" />
+        {index === 3 && <span className="smart-aroma-sensor-pulse" aria-hidden="true" />}
+        <span className="collection-card-index">0{index + 1} / 04</span>
+        <span className="collection-card-copy">
+          <em>{project.label}</em>
+          <b>{project.title}</b>
         </span>
-      ))}
-    </h2>
+        <span className="collection-card-open">
+          Open <ArrowUpRight size={14} />
+        </span>
+      </button>
+    </motion.div>
   );
-}
+});
 
-function SectionIntro({ index, eyebrow, title, detail, motionPaused = false }: { index: string; eyebrow: string; title: string; detail?: string; motionPaused?: boolean }) {
-  return (
-    <div className="grid gap-6 md:grid-cols-[9rem_1fr] md:gap-10">
-      <div className="flex items-center gap-3 md:block">
-        <span className="label font-mono text-[11px] text-violet-300 tracking-widest">{index}</span>
-        <span className="hidden h-px flex-1 bg-white/15 md:mt-3 md:block" />
-      </div>
-      <div>
-        <p className="label mb-3 text-violet-200/90 tracking-widest">{eyebrow}</p>
-        <GravityHeading title={title} motionPaused={motionPaused} />
-        {detail ? <p className="mt-5 max-w-2xl text-[0.96rem] leading-7 text-[#c2bbce] [text-wrap:balance]">{detail}</p> : null}
-      </div>
-    </div>
-  );
-}
+/* ============================================================================
+   SECTION 03: SELECTED WORK — CASE STUDY WALKTHROUGHS & PROOF MARKERS (#work)
+   ============================================================================ */
 
-function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyId; open: boolean; onToggle: () => void; motionPaused: boolean }) {
+const CaseSignalReveal = memo(function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyId; open: boolean; onToggle: () => void; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const signal = caseSignals[id];
   const staticMotion = reduceMotion || motionPaused;
   return (
     <div className="case-signal-control">
       <button className={`case-signal-button ${open ? "is-open" : ""}`} type="button" onClick={onToggle} aria-expanded={open} aria-controls={`${id}-signal-detail`}>
-        <span>Project details</span><span>{open ? "Close" : "Open"} <ArrowUpRight size={13} /></span>
+        <span>Case signal</span><span>{open ? "Close" : "Open"} <ArrowUpRight size={13} /></span>
       </button>
       <AnimatePresence initial={false}>
         {open ? <motion.div id={`${id}-signal-detail`} className="case-signal-detail" initial={staticMotion ? false : { opacity: 0, y: 8, scale: 0.985 }} animate={staticMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={staticMotion ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}>
@@ -652,14 +1239,39 @@ function CaseSignalReveal({ id, open, onToggle, motionPaused }: { id: CaseStudyI
       </AnimatePresence>
     </div>
   );
+});
+
+function useWalkthroughInView<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) setInView(entry.isIntersecting);
+      },
+      { rootMargin: "80px 0px", threshold: 0.01 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, inView };
 }
 
-function DeliveryWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const DeliveryWalkthrough = memo(function DeliveryWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const [runId, setRunId] = useState(0);
+  const { ref, inView } = useWalkthroughInView<HTMLElement>();
   const staticPlayback = reduceMotion || motionPaused || lowDataMode;
   return (
-    <section className={`delivery-walkthrough ${staticPlayback ? "is-static" : ""}`} aria-label="Food delivery flow walkthrough">
+    <section ref={ref} className={`delivery-walkthrough ${staticPlayback ? "is-static" : ""} ${!inView ? "is-offscreen" : ""}`} aria-label="Food delivery flow walkthrough">
       <div className="delivery-walkthrough-head"><div><span className="label">Flow walkthrough</span><p>Discover → cart → live order</p></div><button type="button" className="delivery-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay food delivery walkthrough"}><Play size={12} />Replay</button></div>
       <div key={runId} className="delivery-device" aria-hidden="true">
         <div className="delivery-screen delivery-discover"><span className="device-status">9:41</span><p>Good evening</p><b>Find your next bite</b><span className="delivery-search">Search dishes</span><div className="delivery-cuisine-row"><i /><i /><i /></div><div className="delivery-restaurant"><span /><b>Local favourites</b><em>28 min · 4.8</em></div></div>
@@ -670,22 +1282,17 @@ function DeliveryWalkthrough({ motionPaused, lowDataMode }: { motionPaused: bool
       <p className="delivery-walkthrough-note">Illustrative flow study based on the project’s onboarding, discovery, cart, and order-tracking screens.</p>
     </section>
   );
-}
+});
 
-function PolurCharmWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const PolurCharmWalkthrough = memo(function PolurCharmWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const [runId, setRunId] = useState(0);
+  const { ref, inView } = useWalkthroughInView<HTMLElement>();
   const staticPlayback = reduceMotion || motionPaused || lowDataMode;
-  return <section className={`polur-walkthrough ${staticPlayback ? "is-static" : ""}`} aria-label="Polur Charm discovery walkthrough"><div className="polur-walkthrough-head"><div><span className="label">Live guide walkthrough</span><p>Discover → plan → explore</p></div><button type="button" className="polur-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay Polur Charm walkthrough"}><Play size={12} />Replay</button></div><div key={runId} className="polur-guide-screen" aria-hidden="true"><div className="polur-guide-panel polur-guide-discover"><span className="polur-guide-time">05:15 · Local guide</span><b>Parvathamalai trail</b><p>Full moon trek alert</p><div className="polur-guide-route"><i /><span><strong>Temple base</strong><em>Trail access · open</em></span><small>42 km</small></div><div className="polur-guide-stats"><span>Bus <b>04:20</b></span><span>Weather <b>Clear</b></span></div></div><div className="polur-guide-panel polur-guide-plan"><span className="polur-guide-time">Trip planner · 01</span><b>Route ready</b><p>Transit and safety checked</p><div className="polur-plan-list"><span><i />Regional bus <b>₹72</b></span><span><i />Ghat advisory <b>Clear</b></span><span><i />Water point <b>Saved</b></span></div></div><div className="polur-guide-panel polur-guide-quest"><span className="polur-guide-time">Heritage quest · 03</span><b>Explore and collect</b><p>Parvathamalai badge unlocked</p><div className="polur-quest-badge"><i>✦</i><span><strong>120 XP</strong><em>Trail marker logged</em></span></div></div><div className="polur-guide-progress"><i /><i /><i /></div></div><p className="polur-walkthrough-note">Illustrative discovery loop based on the platform’s local guide, trip-planning, safety, and heritage-quest tools.</p></section>;
-}
+  return <section ref={ref} className={`polur-walkthrough ${staticPlayback ? "is-static" : ""} ${!inView ? "is-offscreen" : ""}`} aria-label="Polur Charm discovery walkthrough"><div className="polur-walkthrough-head"><div><span className="label">Live guide walkthrough</span><p>Discover → plan → explore</p></div><button type="button" className="polur-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay Polur Charm walkthrough"}><Play size={12} />Replay</button></div><div key={runId} className="polur-guide-screen" aria-hidden="true"><div className="polur-guide-panel polur-guide-discover"><span className="polur-guide-time">05:15 · Local guide</span><b>Parvathamalai trail</b><p>Full moon trek alert</p><div className="polur-guide-route"><i /><span><strong>Temple base</strong><em>Trail access · open</em></span><small>42 km</small></div><div className="polur-guide-stats"><span>Bus <b>04:20</b></span><span>Weather <b>Clear</b></span></div></div><div className="polur-guide-panel polur-guide-plan"><span className="polur-guide-time">Trip planner · 01</span><b>Route ready</b><p>Transit and safety checked</p><div className="polur-plan-list"><span><i />Regional bus <b>₹72</b></span><span><i />Ghat advisory <b>Clear</b></span><span><i />Water point <b>Saved</b></span></div></div><div className="polur-guide-panel polur-guide-quest"><span className="polur-guide-time">Heritage quest · 03</span><b>Explore and collect</b><p>Parvathamalai badge unlocked</p><div className="polur-quest-badge"><i>✦</i><span><strong>120 XP</strong><em>Trail marker logged</em></span></div></div><div className="polur-guide-progress"><i /><i /><i /></div></div><p className="polur-walkthrough-note">Illustrative discovery loop based on the platform’s local guide, trip-planning, safety, and heritage-quest tools.</p></section>;
+});
 
-function PolurTripPlannerMicroFlow({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
-  void motionPaused;
-  void lowDataMode;
-  return null;
-}
-
-function DeliveryDeviceRelay({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const DeliveryDeviceRelay = memo(function DeliveryDeviceRelay({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticRelay = reduceMotion || motionPaused || lowDataMode;
@@ -734,20 +1341,22 @@ function DeliveryDeviceRelay({ motionPaused, lowDataMode }: { motionPaused: bool
       </p>
     </section>
   );
-}
+});
 
-function DeliveryInteractionLoop({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const DeliveryInteractionLoop = memo(function DeliveryInteractionLoop({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
+  const { ref, inView } = useWalkthroughInView<HTMLElement>();
   const staticLoop = reduceMotion || motionPaused || lowDataMode;
-  return <section className={`delivery-interaction-loop ${staticLoop ? "is-static" : ""}`} aria-label="Delivery add-to-cart interaction detail"><div className="delivery-interaction-loop-head"><div><span className="label">Interaction detail</span><p>Quick add → cart confirmation</p></div><span className="delivery-loop-status">Live micro-flow</span></div><div className="delivery-interaction-stage" aria-hidden="true"><div className="delivery-loop-product"><span className="delivery-loop-art" /><div><b>Spiced ramen</b><em>Chef special · 28 min</em></div><strong>₹240</strong><button type="button">Add</button></div><span className="delivery-loop-cursor" /><span className="delivery-loop-pulse" /><div className="delivery-loop-cart"><i>01</i><span>Added to your cart</span><b>View cart</b></div></div><p className="delivery-interaction-loop-note">Illustrative interaction study: a clear action, immediate confirmation, and an unobstructed route to checkout.</p></section>;
-}
+  return <section ref={ref} className={`delivery-interaction-loop ${staticLoop ? "is-static" : ""} ${!inView ? "is-offscreen" : ""}`} aria-label="Delivery add-to-cart interaction detail"><div className="delivery-interaction-loop-head"><div><span className="label">Interaction detail</span><p>Quick add → cart confirmation</p></div><span className="delivery-loop-status">Live micro-flow</span></div><div className="delivery-interaction-stage" aria-hidden="true"><div className="delivery-loop-product"><span className="delivery-loop-art" /><div><b>Spiced ramen</b><em>Chef special · 28 min</em></div><strong>₹240</strong><button type="button">Add</button></div><span className="delivery-loop-cursor" /><span className="delivery-loop-pulse" /><div className="delivery-loop-cart"><i>01</i><span>Added to your cart</span><b>View cart</b></div></div><p className="delivery-interaction-loop-note">Illustrative interaction study: a clear action, immediate confirmation, and an unobstructed route to checkout.</p></section>;
+});
 
-function AttackModelWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const AttackModelWalkthrough = memo(function AttackModelWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const [runId, setRunId] = useState(0);
+  const { ref, inView } = useWalkthroughInView<HTMLElement>();
   const staticPlayback = reduceMotion || motionPaused || lowDataMode;
   return (
-    <section className={`attack-walkthrough ${staticPlayback ? "is-static" : ""}`} aria-label="Attack model evaluation walkthrough">
+    <section ref={ref} className={`attack-walkthrough ${staticPlayback ? "is-static" : ""} ${!inView ? "is-offscreen" : ""}`} aria-label="Attack model evaluation walkthrough">
       <div className="attack-walkthrough-head"><div><span className="label">Evaluation walkthrough</span><p>Feature set → model comparison → best result</p></div><button type="button" className="attack-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Walkthrough motion is currently paused" : "Replay attack model walkthrough"}><Play size={12} />Replay</button></div>
       <div key={runId} className="attack-console" aria-hidden="true">
         <div className="attack-stage attack-input"><span className="attack-terminal-label">01 / INPUT MATRIX</span><b>Cybersecurity dataset</b><div className="attack-feature-stack"><i><span />Signal patterns</i><i><span />Traffic markers</i><i><span />Event fields</i></div><p>Structured for model evaluation</p></div>
@@ -758,20 +1367,21 @@ function AttackModelWalkthrough({ motionPaused, lowDataMode }: { motionPaused: b
       <p className="attack-walkthrough-note">Illustrative evaluation flow based on the reported four-model comparison and final 85% classification accuracy.</p>
     </section>
   );
-}
+});
 
-function AutomationStudioWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const AutomationStudioWalkthrough = memo(function AutomationStudioWalkthrough({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   return <AutomationReliabilityReel motionPaused={motionPaused} lowDataMode={lowDataMode} />;
-}
+});
 
-function AutomationReliabilityReel({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
+const AutomationReliabilityReel = memo(function AutomationReliabilityReel({ motionPaused, lowDataMode }: { motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
   const [runId, setRunId] = useState(0);
+  const { ref, inView } = useWalkthroughInView<HTMLElement>();
   const staticPlayback = reduceMotion || motionPaused || lowDataMode;
-  return <section className={`studio-reliability-reel ${staticPlayback ? "is-static" : ""}`} aria-label="AI Content Studio reliability walkthrough"><div className="studio-reliability-head"><div><span className="label">Reliability reel</span><p>Guard → recover → verify</p></div><button type="button" className="studio-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Reliability reel motion is currently paused" : "Replay AI Content Studio reliability reel"}><Play size={12} />Replay</button></div><div key={runId} className="studio-reliability-screen" aria-hidden="true"><div className="studio-reliability-card studio-guard"><span>01 / QUOTA GUARD</span><b>API watch</b><em>Usage threshold detected</em><div className="studio-guard-meter"><i /><i /><i /><i /><i /></div></div><div className="studio-reliability-card studio-recover"><span>02 / FAILOVER PATH</span><b>Resume asset job</b><em>Fallback route engaged</em><div className="studio-recover-route"><i /><i /><i /></div></div><div className="studio-reliability-card studio-verify"><span>03 / STATE RESTORE</span><b>Cloud state verified</b><em>Credentials and queue restored</em><small><i />Recovered</small></div><span className="studio-reliability-sweep" /><span className="studio-reliability-packet"><i /></span></div><p className="studio-reliability-note">Illustrative reliability preview: quota awareness, fallback routing, and state restoration keep the automation pipeline resilient.</p></section>;
-}
+  return <section ref={ref} className={`studio-reliability-reel ${staticPlayback ? "is-static" : ""} ${!inView ? "is-offscreen" : ""}`} aria-label="AI Content Studio reliability walkthrough"><div className="studio-reliability-head"><div><span className="label">Reliability reel</span><p>Guard → recover → verify</p></div><button type="button" className="studio-replay" onClick={() => setRunId((current) => current + 1)} disabled={staticPlayback} aria-label={staticPlayback ? "Reliability reel motion is currently paused" : "Replay AI Content Studio reliability reel"}><Play size={12} />Replay</button></div><div key={runId} className="studio-reliability-screen" aria-hidden="true"><div className="studio-reliability-card studio-guard"><span>01 / QUOTA GUARD</span><b>API watch</b><em>Usage threshold detected</em><div className="studio-guard-meter"><i /><i /><i /><i /><i /></div></div><div className="studio-reliability-card studio-recover"><span>02 / FAILOVER PATH</span><b>Resume asset job</b><em>Fallback route engaged</em><div className="studio-recover-route"><i /><i /><i /></div></div><div className="studio-reliability-card studio-verify"><span>03 / STATE RESTORE</span><b>Cloud state verified</b><em>Credentials and queue restored</em><small><i />Recovered</small></div><span className="studio-reliability-sweep" /><span className="studio-reliability-packet"><i /></span></div><p className="studio-reliability-note">Illustrative reliability preview: quota awareness, fallback routing, and state restoration keep the automation pipeline resilient.</p></section>;
+});
 
-function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone = "violet", motionPaused }: { value: string; suffix?: string; ringValue: number; label: string; detail: string; tone?: "violet" | "cyan"; motionPaused: boolean }) {
+const ProjectProofMarker = memo(function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone = "violet", motionPaused }: { value: string; suffix?: string; ringValue: number; label: string; detail: string; tone?: "violet" | "cyan"; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [hasEntered, setHasEntered] = useState(false);
   const offset = 251.2 * (1 - ringValue / 100);
@@ -782,49 +1392,45 @@ function ProjectProofMarker({ value, suffix = "", ringValue, label, detail, tone
       <span className="proof-copy"><span className="label">Outcome marker</span><b>{label}</b><em>{detail}</em></span>
     </motion.div>
   );
-}
+});
 
-function ProjectSignalFocus({ tone, motionPaused }: { tone: "violet" | "cyan"; motionPaused: boolean }) {
+const ProjectSignalFocus = memo(function ProjectSignalFocus({ tone, motionPaused }: { tone: "violet" | "cyan"; motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const staticMotion = reduceMotion || motionPaused;
   return <motion.span className={`project-signal-focus is-${tone}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scaleX: 0 }} whileInView={staticMotion ? {} : { opacity: 0.78, scaleX: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: 0.72, delay: 0.18, ease: [0.23, 1, 0.32, 1] }}><i /><i /></motion.span>;
-}
+});
 
-function BlueprintCrosshair({ motionPaused }: { motionPaused: boolean }) {
+const BlueprintCrosshair = memo(function BlueprintCrosshair({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
   return <motion.span className={`blueprint-crosshair ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .28, delay: .22, ease: [0.23, 1, 0.32, 1] }}><i className="blueprint-crosshair-h" /><i className="blueprint-crosshair-v" /><b /><em /></motion.span>;
-}
+});
 
-function LensAperture({ motionPaused }: { motionPaused: boolean }) {
+const LensAperture = memo(function LensAperture({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
   return <motion.span className={`ml-lens-aperture ${entered && !staticMotion ? "is-focused" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0, scale: .72 }} whileInView={staticMotion ? {} : { opacity: 1, scale: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .3, delay: .18, ease: [0.23, 1, 0.32, 1] }}><i className="lens-core" /><i className="lens-orbit one" /><i className="lens-orbit two" /><b /></motion.span>;
-}
+});
 
-function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
+/* ============================================================================
+   SECTION 04 & 05: EXPERIENCE & CREDENTIALS MARKERS (#experience, #credentials)
+   ============================================================================ */
+
+const TimelineCheckpoint = memo(function TimelineCheckpoint({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticPulse = reduceMotion || motionPaused;
   return <motion.span className={`timeline-checkpoint ${entered && !staticPulse ? "is-active" : ""}`} aria-hidden="true" initial={false} whileInView={{}} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} />;
-}
+});
 
-function ExperienceEvidenceSignal({ label, motionPaused }: { label: string; motionPaused: boolean }) {
-  const reduceMotion = useReducedMotion();
-  const staticMotion = reduceMotion || motionPaused;
-  return <motion.span className="experience-evidence-signal" initial={staticMotion ? false : { opacity: 0, x: -8 }} whileInView={staticMotion ? {} : { opacity: 1, x: 0 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: .32, delay: .12, ease: [0.23, 1, 0.32, 1] }}><motion.i aria-hidden="true" initial={staticMotion ? false : { scaleX: 0 }} whileInView={staticMotion ? {} : { scaleX: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} transition={{ duration: .46, delay: .16, ease: [0.23, 1, 0.32, 1] }} /><b>{label}</b><em>evidence signal</em></motion.span>;
-}
-
-
-
-function CredentialSignalScan({ motionPaused }: { motionPaused: boolean }) {
+const CredentialSignalScan = memo(function CredentialSignalScan({ motionPaused }: { motionPaused: boolean }) {
   const reduceMotion = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const staticMotion = reduceMotion || motionPaused;
   return <motion.span className={`credential-signal-scan ${entered && !staticMotion ? "is-active" : ""}`} aria-hidden="true" initial={staticMotion ? false : { opacity: 0 }} whileInView={staticMotion ? {} : { opacity: 1 }} viewport={{ once: true, amount: "some", margin: "0px 0px 60px 0px" }} onViewportEnter={() => setEntered(true)} transition={{ duration: .2 }}><i /><i /><i /></motion.span>;
-}
+});
 
 function CredentialPreviewDialog({ credential, open, onOpenChange, motionPaused, lowDataMode }: { credential: typeof certifications[number] | null; open: boolean; onOpenChange: (open: boolean) => void; motionPaused: boolean; lowDataMode: boolean }) {
   const reduceMotion = useReducedMotion();
@@ -900,7 +1506,7 @@ function AIContentStudioDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       <DialogContent ref={contentRef} className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}>
         <div className="ai-studio-dialog">
           <div className="ai-studio-dialog-visual" aria-hidden="true">
-            <img src="/images/ai-content-studio-showcase_e194be53.jpg" alt="" />
+            <LazyProjectImage src="/images/ai-content-studio-showcase_e194be53.jpg" alt="" enabled={open} rootMargin="160px 0px" />
             <span>Studio / 03</span>
           </div>
           <div className="p-6 sm:p-9">
@@ -948,7 +1554,7 @@ function PolurCharmDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
       <DialogContent ref={contentRef} className="max-h-[min(48rem,calc(100svh-2rem))] overflow-y-auto rounded-none border-white/15 bg-[#0b0912] p-0 text-[#f4f0ff] shadow-[0_28px_100px_rgba(0,0,0,.62)] sm:max-w-4xl" showCloseButton={false}>
         <div className="ai-studio-dialog polur-charm-dialog">
           <div className="ai-studio-dialog-visual" aria-hidden="true">
-            <img src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="" />
+            <LazyProjectImage src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="" enabled={open} rootMargin="160px 0px" />
             <span>Polur / 04</span>
           </div>
           <div className="p-6 sm:p-9">
@@ -1071,6 +1677,7 @@ function ProjectCollectionDialogBase({ project, loading, onOpenChange: onProject
     if (!project) return;
     setDialogImageReady(false);
     const priorityImage = new Image();
+    priorityImage.decoding = "async";
     priorityImage.src = project.image;
     priorityImage.decode?.().then(() => setDialogImageReady(true)).catch(() => setDialogImageReady(true));
     return () => {
@@ -1188,25 +1795,18 @@ function ProjectCollectionDialog({ project, loading, onOpenChange, onCloseAutoFo
 
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [navHidden, setNavHidden] = useState(false);
   const [active, setActive] = useState("about");
   const [sent, setSent] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
-  const [starBursts, setStarBursts] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [projectPulses, setProjectPulses] = useState<InteractionPoint[]>([]);
-  const [constellationTrail, setConstellationTrail] = useState<InteractionPoint[]>([]);
   const [contactPulses, setContactPulses] = useState<InteractionPoint[]>([]);
-  const [contactConstellationTrail, setContactConstellationTrail] = useState<InteractionPoint[]>([]);
   const [footerBurst, setFooterBurst] = useState(0);
   const [monogramRipple, setMonogramRipple] = useState(0);
-  const [monogramSectionGlint, setMonogramSectionGlint] = useState(0);
   const [monogramProjectEcho, setMonogramProjectEcho] = useState(0);
-  const [roleIndex, setRoleIndex] = useState(0);
   const [nameRipples, setNameRipples] = useState<InteractionPoint[]>([]);
   const [nameHaptic, setNameHaptic] = useState(0);
   const [introVisible, setIntroVisible] = useState(true);
-  const [lowDataMode, setLowDataMode] = useState(false);
+  const lowDataMode = false;
   const [recruiterOpen, setRecruiterOpen] = useState(false);
   const [recruiterReviewOpen, setRecruiterReviewOpen] = useState(false);
   const [recruiterReviewStep, setRecruiterReviewStep] = useState(0);
@@ -1216,10 +1816,8 @@ export default function Home() {
   const [contactFocused, setContactFocused] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const copyEmailTimeoutRef = useRef<number | null>(null);
-  const [selectedTopic, setSelectedTopic] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [activeExperience, setActiveExperience] = useState(0);
   const [aiContentStudioOpen, setAiContentStudioOpen] = useState(false);
   const [polurCharmOpen, setPolurCharmOpen] = useState(false);
   const [selectedCredential, setSelectedCredential] = useState<typeof certifications[number] | null>(null);
@@ -1231,37 +1829,72 @@ export default function Home() {
   const reduceMotion = useReducedMotion();
   const [gravityProject, setGravityProject] = useState<OrbitProjectId | null>(null);
   const [isNarrowMobile, setIsNarrowMobile] = useState(false);
+  const [isTouchMobile, setIsTouchMobile] = useState(false);
+  const [isMidRangeDevice, setIsMidRangeDevice] = useState(false);
+
+  const handleSkillProofClick = useCallback((targetId?: string) => {
+    if (!targetId) return;
+    scrollToSection(targetId);
+
+    const targetEl = document.getElementById(targetId);
+    if (targetEl) {
+      targetEl.classList.remove("proof-target-highlight");
+      void targetEl.offsetWidth;
+      targetEl.classList.add("proof-target-highlight");
+      window.setTimeout(() => {
+        targetEl.classList.remove("proof-target-highlight");
+      }, 2400);
+    }
+  }, []);
 
   useEffect(() => {
-    const updateViewport = () => {
-      setIsNarrowMobile(typeof window !== "undefined" && window.innerWidth < 480);
+    if (typeof window === "undefined") return;
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean; effectiveType?: string };
     };
+    const cores = nav.hardwareConcurrency ?? 8;
+    const memory = nav.deviceMemory ?? 8;
+    const saveData = Boolean(nav.connection?.saveData);
+    const hasFinePointerInit = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+    const coarseOnlyInit = !hasFinePointerInit && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    const midRange = (coarseOnlyInit && (cores <= 4 || memory <= 4)) || cores <= 2 || memory <= 2 || saveData;
+    setIsMidRangeDevice(midRange);
+
+    const updateViewport = () => {
+      const width = window.innerWidth;
+      const hasFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+      const coarseOnly = !hasFinePointer && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      const touchMobile = coarseOnly || width < 768;
+      setIsNarrowMobile(width < 480);
+      setIsTouchMobile(touchMobile);
+
+      const root = document.documentElement;
+      root.classList.toggle("is-mobile-optimized", touchMobile);
+      root.classList.toggle("is-midrange-device", midRange || (touchMobile && cores <= 4));
+    };
+
     updateViewport();
     window.addEventListener("resize", updateViewport, { passive: true });
-    return () => window.removeEventListener("resize", updateViewport);
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      document.documentElement.classList.remove("is-mobile-optimized", "is-midrange-device");
+    };
   }, []);
 
   const visibleNebulaStars = useMemo(() => {
-    return isNarrowMobile ? nebulaStars.slice(0, 8) : nebulaStars;
-  }, [isNarrowMobile]);
+    if (isNarrowMobile || isMidRangeDevice) return nebulaStars.slice(0, 10);
+    if (isTouchMobile) return nebulaStars.slice(0, 14);
+    return nebulaStars;
+  }, [isMidRangeDevice, isNarrowMobile, isTouchMobile]);
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const sectionGlintRef = useRef<HTMLElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const projectFinderRef = useRef<HTMLSpanElement>(null);
-  const lastConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
-  const lastContactConstellationPoint = useRef({ x: -100, y: -100, time: 0 });
   const lastActiveSection = useRef(active);
-  const experiencePointerActive = useRef(false);
   const magneticEnabledRef = useRef(true);
-
-  // A hovered or focused role row pins the map; scroll-follow stands down until released.
-  const pinExperienceRow = (index: number) => {
-    experiencePointerActive.current = true;
-    setActiveExperience(index);
-  };
-  const releaseExperienceRow = () => {
-    experiencePointerActive.current = false;
-  };
   const collectionPrefetches = useRef(new Map<string, HTMLImageElement>());
   const collectionDialogTriggerIndex = useRef<number | null>(null);
   const collectionCardRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -1271,18 +1904,6 @@ export default function Home() {
   const activeOrbitPreview = motionPaused || reduceMotion || lowDataMode ? null : orbitSelectorPreview;
 
   const year = useMemo(() => new Date().getFullYear(), []);
-  const constellationSegments = useMemo(() => constellationTrail.slice(1).map((point, index) => {
-    const previous = constellationTrail[index];
-    const dx = point.x - previous.x;
-    const dy = point.y - previous.y;
-    return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
-  }), [constellationTrail]);
-  const contactConstellationSegments = useMemo(() => contactConstellationTrail.slice(1).map((point, index) => {
-    const previous = contactConstellationTrail[index];
-    const dx = point.x - previous.x;
-    const dy = point.y - previous.y;
-    return { id: `${previous.id}-${point.id}`, x: previous.x, y: previous.y, length: Math.hypot(dx, dy), angle: Math.atan2(dy, dx) * (180 / Math.PI) };
-  }), [contactConstellationTrail]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1298,10 +1919,20 @@ export default function Home() {
     if (active === lastActiveSection.current) return;
     lastActiveSection.current = active;
     if (motionPaused || reduceMotion || lowDataMode) return;
-    const glintId = Date.now();
-    setMonogramSectionGlint(glintId);
-    const timer = window.setTimeout(() => setMonogramSectionGlint((current) => current === glintId ? 0 : current), 1040);
-    return () => window.clearTimeout(timer);
+    const glintEl = sectionGlintRef.current;
+    if (!glintEl) return;
+    glintEl.classList.remove("is-active");
+    // Trigger CSS animation on the isolated glint node without re-rendering the entire page
+    const raf = window.requestAnimationFrame(() => {
+      glintEl.classList.add("is-active");
+    });
+    const timer = window.setTimeout(() => {
+      glintEl.classList.remove("is-active");
+    }, 1040);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
+    };
   }, [active, lowDataMode, motionPaused, reduceMotion]);
 
   useEffect(() => {
@@ -1510,7 +2141,65 @@ export default function Home() {
     }
   };
 
+  // Section-level IntersectionObserver for 03.5 / Project Collection:
+  // Keeps all four high-resolution collection images in zero-network base64 placeholder mode
+  // during initial page load, and triggers off-thread decoding when the section approaches view.
+  // On mobile and low-end devices, cards decode sequentially one-by-one to prevent GPU texture upload spikes.
+  const collectionSectionRef = useRef<HTMLElement>(null);
+  const [collectionInView, setCollectionInView] = useState(false);
+  const [collectionDecodeCursor, setCollectionDecodeCursor] = useState(0);
+
   useEffect(() => {
+    if (collectionInView) return;
+    const section = collectionSectionRef.current;
+    if (!section) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setCollectionInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setCollectionInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [collectionInView]);
+
+  // Sequential one-by-one card decoding on mobile and low-end devices:
+  // Desktop high-spec unlocks all 4 immediately; mobile/low-end advances one card at a time.
+  useEffect(() => {
+    if (!collectionInView) return;
+    if (!isTouchMobile && !isMidRangeDevice) {
+      setCollectionDecodeCursor(projectCollection.length - 1);
+      return;
+    }
+    if (collectionDecodeCursor >= projectCollection.length - 1) return;
+    const stepTimer = window.setTimeout(() => {
+      setCollectionDecodeCursor((current) =>
+        Math.min(projectCollection.length - 1, current + 1),
+      );
+    }, 140);
+    return () => window.clearTimeout(stepTimer);
+  }, [collectionDecodeCursor, collectionInView, isMidRangeDevice, isTouchMobile]);
+
+  const advanceCollectionDecodeCursor = useCallback((cardIndex: number) => {
+    setCollectionDecodeCursor((current) =>
+      cardIndex >= current
+        ? Math.min(projectCollection.length - 1, cardIndex + 1)
+        : current,
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!collectionInView) return;
     if (typeof window !== "undefined" && window.innerWidth < 768) return;
     const activeIndex = activeCollectionProject
       ? projectCollection.findIndex((project) => project.id === activeCollectionProject.id)
@@ -1520,92 +2209,284 @@ export default function Home() {
     if (nextIndex < 0 || nextIndex >= projectCollection.length) return;
     const prefetchTimer = window.setTimeout(() => prefetchCollectionArtwork(nextIndex), 90);
     return () => window.clearTimeout(prefetchTimer);
-  }, [activeCollectionProject, collectionFocus, lowDataMode]);
+  }, [activeCollectionProject, collectionFocus, collectionInView, lowDataMode]);
 
+  // Offscreen asset IntersectionObserver:
+  // Explicitly sets `decoding="async"` and `loading="lazy"` on all non-critical/offscreen images
+  // and schedules off-thread bitmap decoding via `img.decode()` as assets approach the viewport
+  // so main-thread scroll frames remain completely unblocked.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const nonCriticalImages = Array.from(
+      document.querySelectorAll<HTMLImageElement>('main.page-shell img:not([data-critical="true"])'),
+    );
+
+    nonCriticalImages.forEach((img) => {
+      if (img.getAttribute("decoding") !== "async") {
+        img.decoding = "async";
+        img.setAttribute("decoding", "async");
+      }
+      const rect = img.getBoundingClientRect();
+      const isOffscreen = rect.top > window.innerHeight || rect.bottom < 0;
+      if (isOffscreen || img.dataset.offscreenAsset === "true") {
+        img.loading = "lazy";
+        img.setAttribute("loading", "lazy");
+      }
+    });
+
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const assetObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const img = entry.target as HTMLImageElement;
+          img.decoding = "async";
+          if (!entry.isIntersecting) {
+            if (!img.complete) {
+              img.loading = "lazy";
+              img.setAttribute("loading", "lazy");
+            }
+            continue;
+          }
+          // When approaching the viewport, trigger asynchronous off-thread decode if image is ready
+          if (img.src && img.complete && img.naturalWidth > 0 && typeof img.decode === "function") {
+            img.decode().catch(() => undefined);
+          }
+          assetObserver.unobserve(img);
+        }
+      },
+      { rootMargin: "240px 0px", threshold: 0.01 },
+    );
+
+    nonCriticalImages.forEach((img) => {
+      assetObserver.observe(img);
+    });
+
+    return () => {
+      assetObserver.disconnect();
+    };
+  }, []);
+
+  // Viewport-gated playback for Section 02 Black Hole video: plays when in viewport, pauses when scrolled offscreen
+  const isVideoInViewRef = useRef(true);
   useEffect(() => {
     const video = heroVideoRef.current;
     if (!video) return;
     video.defaultMuted = true;
     video.muted = true;
-    if (motionPaused || reduceMotion || lowDataMode) {
-      video.pause();
-      return;
-    }
-    video.play().catch(() => undefined);
-  }, [motionPaused, reduceMotion, lowDataMode]);
+    video.playsInline = true;
 
-  useEffect(() => {
-    if (motionPaused || reduceMotion || lowDataMode) return;
-    const cycle = window.setInterval(() => setRoleIndex((current) => (current + 1) % professionalRoles.length), 3100);
-    return () => window.clearInterval(cycle);
-  }, [motionPaused, reduceMotion, lowDataMode]);
+    const syncVideoPlayback = () => {
+      if (motionPaused || reduceMotion || lowDataMode || !isVideoInViewRef.current) {
+        video.pause();
+      } else {
+        video.play().catch(() => undefined);
+      }
+    };
 
+    syncVideoPlayback();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) {
+          isVideoInViewRef.current = entry.isIntersecting;
+          syncVideoPlayback();
+        }
+      },
+      { rootMargin: "200px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [lowDataMode, motionPaused, reduceMotion]);
+
+  // Cached interactive element rects to avoid synchronous getBoundingClientRect() during pointermove/scroll
+  const hoveredProjectRectRef = useRef<{ el: HTMLElement; rect: DOMRect } | null>(null);
+  const hoveredTileRectRef = useRef<{ el: HTMLElement; rect: DOMRect } | null>(null);
+  const workSectionRectRef = useRef<DOMRect | null>(null);
+
+  // Unified Scroll & Resize Observer Controller:
+  // Caches document maxScroll and Section 04 timeline geometry on ResizeObserver/resize
+  // so scroll frames only read window.scrollY with zero layout thrashing.
   useEffect(() => {
     let scrollTicking = false;
     let scrollFrameId: number | null = null;
-    let previousScrollY = window.scrollY;
-    const onScroll = () => {
-      if (scrollTicking) return;
-      scrollTicking = true;
-      scrollFrameId = requestAnimationFrame(() => {
-        const nextScrolled = window.scrollY > 24;
-        setScrolled((current) => current === nextScrolled ? current : nextScrolled);
-        const delta = window.scrollY - previousScrollY;
-        if (window.scrollY < 24) setNavHidden(false);
-        else if (Math.abs(delta) > 6) setNavHidden(delta > 0);
-        previousScrollY = window.scrollY;
-        const maximum = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = maximum > 0 ? Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)) : 0;
-        const sealOpacity = (Math.max(0.74, 1 - progress * 0.0026)).toFixed(3);
-        const sealRot = (Math.min(18, progress * 0.18)).toFixed(2);
+    let lastProgress = -1;
+    let lastTimelineProgress = -1;
+    let timelineElement: HTMLElement | null = document.querySelector<HTMLElement>("#experience .timeline-list");
+
+    const metrics = {
+      maxScroll: 1,
+      viewportHeight: window.innerHeight || 1,
+      timelineTop: 0,
+      timelineHeight: 0,
+    };
+
+    const measureLayoutMetrics = () => {
+      const scrollY = window.scrollY || 0;
+      metrics.viewportHeight = window.innerHeight || 1;
+      metrics.maxScroll = Math.max(1, document.documentElement.scrollHeight - metrics.viewportHeight);
+      if (!timelineElement) {
+        timelineElement = document.querySelector<HTMLElement>("#experience .timeline-list");
+      }
+      if (timelineElement) {
+        const rect = timelineElement.getBoundingClientRect();
+        metrics.timelineTop = rect.top + scrollY;
+        metrics.timelineHeight = rect.height;
+      }
+      // Invalidate pointer hover caches when layout shifts
+      hoveredProjectRectRef.current = null;
+      hoveredTileRectRef.current = null;
+      workSectionRectRef.current = null;
+    };
+
+    let lastScrolledState = false;
+    let resizeDebounceTimer: number | null = null;
+
+    const applyScrollFrame = () => {
+      const scrollY = window.scrollY || 0;
+      const nextScrolled = scrollY > 24;
+      if (nextScrolled !== lastScrolledState) {
+        lastScrolledState = nextScrolled;
+        headerRef.current?.classList.toggle("is-scrolled", nextScrolled);
+      }
+
+      // Invalidate pointer hover caches on scroll so next pointermove re-caches cleanly
+      hoveredProjectRectRef.current = null;
+      hoveredTileRectRef.current = null;
+      workSectionRectRef.current = null;
+
+      // 1. Header Monogram Seal & Divider Progress
+      const progress = metrics.maxScroll > 0 ? Math.min(100, Math.max(0, (scrollY / metrics.maxScroll) * 100)) : 0;
+      if (Math.abs(progress - lastProgress) > 0.3) {
+        lastProgress = progress;
+        const sealOpacity = Math.max(0.74, 1 - progress * 0.0026).toFixed(3);
+        const sealRot = Math.min(18, progress * 0.18).toFixed(2);
         const dividerRot = (Math.min(18, progress * 0.18) * 0.34).toFixed(2);
         document.documentElement.style.setProperty("--seal-scroll-opacity", sealOpacity);
         document.documentElement.style.setProperty("--seal-orbit-rot", `${sealRot}deg`);
         document.documentElement.style.setProperty("--divider-rot", `${dividerRot}deg`);
-        scrollTicking = false;
-        scrollFrameId = null;
-      });
+      }
+
+      // 2. Section 04 Experience Timeline Reading Beam Progress
+      if (timelineElement && metrics.timelineHeight > 0) {
+        const readingLine = scrollY + metrics.viewportHeight * 0.44;
+        const timelineProgress = Math.min(1, Math.max(0, (readingLine - metrics.timelineTop) / metrics.timelineHeight));
+        if (Math.abs(timelineProgress - lastTimelineProgress) > 0.002) {
+          lastTimelineProgress = timelineProgress;
+          timelineElement.style.setProperty("--timeline-progress", timelineProgress.toFixed(4));
+        }
+      }
+
+      scrollTicking = false;
+      scrollFrameId = null;
     };
+
+    const onScroll = () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      scrollFrameId = requestAnimationFrame(applyScrollFrame);
+    };
+
+    const onResize = () => {
+      measureLayoutMetrics();
+      onScroll();
+    };
+
+    measureLayoutMetrics();
+    applyScrollFrame();
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            if (resizeDebounceTimer !== null) {
+              window.clearTimeout(resizeDebounceTimer);
+            }
+            resizeDebounceTimer = window.setTimeout(() => {
+              resizeDebounceTimer = null;
+              measureLayoutMetrics();
+              onScroll();
+            }, 120);
+          })
+        : null;
+    resizeObserver?.observe(document.documentElement);
 
     let cursorTargetX = -100;
     let cursorTargetY = -100;
     let cursorCurrentX = -100;
     let cursorCurrentY = -100;
+    let hasCursorPosition = false;
     let cursorAnimId: number | null = null;
+    let hoverTargetRafId: number | null = null;
+    let pendingHoverTarget: HTMLElement | null = null;
 
     const updateCursor = () => {
       const cursor = cursorRef.current;
       if (cursor) {
-        cursorCurrentX += (cursorTargetX - cursorCurrentX) * 0.35;
-        cursorCurrentY += (cursorTargetY - cursorCurrentY) * 0.35;
-        cursor.style.transform = `translate3d(${(cursorCurrentX - 5).toFixed(1)}px, ${(cursorCurrentY - 5).toFixed(1)}px, 0)`;
-        if (Math.hypot(cursorTargetX - cursorCurrentX, cursorTargetY - cursorCurrentY) > 0.1) {
+        cursorCurrentX += (cursorTargetX - cursorCurrentX) * 0.38;
+        cursorCurrentY += (cursorTargetY - cursorCurrentY) * 0.38;
+        cursor.style.transform = `translate3d(${cursorCurrentX.toFixed(1)}px, ${cursorCurrentY.toFixed(1)}px, 0) translate(-50%, -50%)`;
+        if (Math.hypot(cursorTargetX - cursorCurrentX, cursorTargetY - cursorCurrentY) > 0.15) {
           cursorAnimId = requestAnimationFrame(updateCursor);
           return;
         }
+        cursorCurrentX = cursorTargetX;
+        cursorCurrentY = cursorTargetY;
+        cursor.style.transform = `translate3d(${cursorCurrentX.toFixed(1)}px, ${cursorCurrentY.toFixed(1)}px, 0) translate(-50%, -50%)`;
       }
       cursorAnimId = null;
     };
 
-    const onPointer = (event: PointerEvent) => {
-      cursorTargetX = event.clientX;
-      cursorTargetY = event.clientY;
-      if (!cursorAnimId) {
+    const scheduleCursorMove = (clientX: number, clientY: number) => {
+      cursorTargetX = clientX;
+      cursorTargetY = clientY;
+      if (!hasCursorPosition) {
+        hasCursorPosition = true;
+        cursorCurrentX = clientX;
+        cursorCurrentY = clientY;
+        if (cursorRef.current) {
+          cursorRef.current.style.opacity = "1";
+          cursorRef.current.style.transform = `translate3d(${clientX.toFixed(1)}px, ${clientY.toFixed(1)}px, 0) translate(-50%, -50%)`;
+        }
+      }
+      if (cursorAnimId === null) {
         cursorAnimId = requestAnimationFrame(updateCursor);
       }
     };
-    const onPointerOver = (event: globalThis.PointerEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest("a, button, input, textarea, select, [role='button'], [tabindex='0']")) {
-        cursorRef.current?.classList.add("is-active");
-      } else {
-        cursorRef.current?.classList.remove("is-active");
+
+    const onPointer = (event: PointerEvent) => {
+      if (event.pointerType === "touch") {
+        if (cursorRef.current) cursorRef.current.style.opacity = "0";
+        return;
       }
+      scheduleCursorMove(event.clientX, event.clientY);
     };
+
+    const onMouseMove = (event: globalThis.MouseEvent) => {
+      scheduleCursorMove(event.clientX, event.clientY);
+    };
+
+    const onPointerOver = (event: globalThis.PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      pendingHoverTarget = event.target as HTMLElement | null;
+      if (hoverTargetRafId !== null) return;
+      hoverTargetRafId = requestAnimationFrame(() => {
+        hoverTargetRafId = null;
+        const target = pendingHoverTarget;
+        if (target?.closest("a, button, input, textarea, select, [role='button'], [tabindex='0']")) {
+          cursorRef.current?.classList.add("is-active");
+        } else {
+          cursorRef.current?.classList.remove("is-active");
+        }
+      });
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    onScroll();
+    window.addEventListener("resize", onResize, { passive: true });
     window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("pointerover", onPointerOver, { passive: true });
 
     const observer = new IntersectionObserver(
@@ -1620,39 +2501,18 @@ export default function Home() {
       const node = document.getElementById(id);
       if (node) observer.observe(node);
     });
-    // Experience scroll-spy: keep the skills map aligned to the role nearest the reading band,
-    // so the role map also follows on touch devices where hover/focus is unavailable.
-    const experienceRows = Array.from(document.querySelectorAll<HTMLElement>("#experience .timeline-row"));
-    const experienceVisibility = experienceRows.map(() => 0);
-    const experienceObserver = new IntersectionObserver(
-      (entries) => {
-        if (experiencePointerActive.current) return; // Hover/focus owns the highlight.
-        for (const entry of entries) {
-          const index = experienceRows.indexOf(entry.target as HTMLElement);
-          if (index >= 0) experienceVisibility[index] = entry.isIntersecting ? entry.intersectionRatio : 0;
-        }
-        let bestIndex = -1;
-        let bestRatio = 0;
-        experienceVisibility.forEach((ratio, index) => {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestIndex = index;
-          }
-        });
-        if (bestIndex >= 0) setActiveExperience(bestIndex);
-      },
-      { rootMargin: "-34% 0px -46% 0px", threshold: [0.08, 0.18, 0.3, 0.45] },
-    );
-    experienceRows.forEach((row) => experienceObserver.observe(row));
     return () => {
       if (scrollFrameId !== null) cancelAnimationFrame(scrollFrameId);
       if (cursorAnimId !== null) cancelAnimationFrame(cursorAnimId);
+      if (hoverTargetRafId !== null) cancelAnimationFrame(hoverTargetRafId);
+      if (resizeDebounceTimer !== null) window.clearTimeout(resizeDebounceTimer);
+      resizeObserver?.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("pointerover", onPointerOver);
       observer.disconnect();
-      experienceObserver.disconnect();
     };
   }, []);
 
@@ -1668,33 +2528,55 @@ export default function Home() {
 
   // Magnetic pull on signal buttons: a soft follow-light that nudges the button
   // toward the cursor while it is inside, then springs back on release.
+  // Uses requestAnimationFrame coalescing so high-frequency pointer events never stutter.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const finePointer = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!finePointer()) return;
     let current: HTMLElement | null = null;
+    let cachedButtonRect: DOMRect | null = null;
+    let magnetRafId: number | null = null;
+    let pendingClientX = 0;
+    let pendingClientY = 0;
 
     const releaseCurrent = () => {
+      if (magnetRafId !== null) {
+        cancelAnimationFrame(magnetRafId);
+        magnetRafId = null;
+      }
       if (current) {
         releaseSignalButtonMagnet(current);
         current = null;
+        cachedButtonRect = null;
       }
     };
+
+    const applyMagnetFrame = () => {
+      magnetRafId = null;
+      if (!current || !cachedButtonRect) return;
+      const rect = cachedButtonRect;
+      const dx = pendingClientX - (rect.left + rect.width / 2);
+      const dy = pendingClientY - (rect.top + rect.height / 2);
+      const pullX = Math.sign(dx) * Math.min(Math.abs(dx) * 0.28, rect.width * 0.09 + 6);
+      const pullY = Math.sign(dy) * Math.min(Math.abs(dy) * 0.28, rect.height * 0.16 + 5);
+      current.classList.add("is-magnetized");
+      current.style.setProperty("--magnet-x", `${pullX.toFixed(2)}px`);
+      current.style.setProperty("--magnet-y", `${pullY.toFixed(2)}px`);
+    };
+
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" || !magneticEnabledRef.current) return;
+      if (event.pointerType === "touch" || !magneticEnabledRef.current) return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const button = (event.target as Element | null)?.closest?.<HTMLElement>(".signal-button") ?? null;
       if (button) {
-        const rect = button.getBoundingClientRect();
-        const dx = event.clientX - (rect.left + rect.width / 2);
-        const dy = event.clientY - (rect.top + rect.height / 2);
-        const pullX = Math.sign(dx) * Math.min(Math.abs(dx) * 0.28, rect.width * 0.09 + 6);
-        const pullY = Math.sign(dy) * Math.min(Math.abs(dy) * 0.28, rect.height * 0.16 + 5);
-        if (current && current !== button) releaseSignalButtonMagnet(current);
-        current = button;
-        button.classList.add("is-magnetized");
-        button.style.setProperty("--magnet-x", `${pullX.toFixed(2)}px`);
-        button.style.setProperty("--magnet-y", `${pullY.toFixed(2)}px`);
+        if (current !== button || !cachedButtonRect) {
+          if (current && current !== button) releaseSignalButtonMagnet(current);
+          current = button;
+          cachedButtonRect = button.getBoundingClientRect();
+        }
+        pendingClientX = event.clientX;
+        pendingClientY = event.clientY;
+        if (magnetRafId === null) {
+          magnetRafId = requestAnimationFrame(applyMagnetFrame);
+        }
       } else {
         releaseCurrent();
       }
@@ -1719,35 +2601,6 @@ export default function Home() {
       window.removeEventListener("blur", onLeaveWindow);
       window.removeEventListener("pointercancel", onLeaveWindow);
       releaseCurrent();
-    };
-  }, []);
-
-  // Experience reading beam: fills the role timeline as the reading band scrolls down it.
-  useEffect(() => {
-    let ticking = false;
-    let beamFrameId: number | null = null;
-    const updateTimelineBeam = () => {
-      if (ticking) return;
-      ticking = true;
-      beamFrameId = requestAnimationFrame(() => {
-        const list = document.querySelector<HTMLElement>("#experience .timeline-list");
-        if (list) {
-          const rect = list.getBoundingClientRect();
-          const readingLine = window.innerHeight * 0.44;
-          const progress = rect.height > 0 ? Math.min(1, Math.max(0, (readingLine - rect.top) / rect.height)) : 0;
-          list.style.setProperty("--timeline-progress", progress.toFixed(4));
-        }
-        ticking = false;
-        beamFrameId = null;
-      });
-    };
-    updateTimelineBeam();
-    window.addEventListener("scroll", updateTimelineBeam, { passive: true });
-    window.addEventListener("resize", updateTimelineBeam, { passive: true });
-    return () => {
-      if (beamFrameId !== null) cancelAnimationFrame(beamFrameId);
-      window.removeEventListener("scroll", updateTimelineBeam);
-      window.removeEventListener("resize", updateTimelineBeam);
     };
   }, []);
 
@@ -1834,80 +2687,95 @@ export default function Home() {
     const name = String(data.get("name") || "").trim().slice(0, 100);
     const email = String(data.get("email") || "").trim().slice(0, 100);
     const message = (contactMessage || String(data.get("message") || "")).trim().slice(0, 2000);
-    const topicLabel = contactTopics.find((t) => t.id === selectedTopic)?.label;
-    const subjectPrefix = topicLabel ? `[${topicLabel}] ` : "";
-    const subject = encodeURIComponent(`${subjectPrefix}Portfolio enquiry from ${name || "a visitor"}`);
+    const subject = encodeURIComponent(`Portfolio enquiry from ${name || "a visitor"}`);
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
     window.location.href = `mailto:manojprabhu0707@gmail.com?subject=${subject}&body=${body}`;
     setSent(true);
   }
 
+  const tiltRafRef = useRef<number | null>(null);
+  const glowRafRef = useRef<number | null>(null);
+  const finderRafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (tiltRafRef.current !== null) cancelAnimationFrame(tiltRafRef.current);
+      if (glowRafRef.current !== null) cancelAnimationFrame(glowRafRef.current);
+      if (finderRafRef.current !== null) cancelAnimationFrame(finderRafRef.current);
+    };
+  }, []);
+
   function handleProjectTilt(event: MouseEvent<HTMLElement>) {
     if (reduceMotion || motionPaused || lowDataMode) return;
     const card = event.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
-    card.style.transform = `perspective(900px) rotateX(${y * -3.5}deg) rotateY(${x * 3.5}deg) translateY(-5px)`;
-    // Pointer light on the artwork: paint-free CSS variables consumed by the scrim overlay.
-    card.style.setProperty("--card-light-x", `${((x + 0.5) * 100).toFixed(2)}%`);
-    card.style.setProperty("--card-light-y", `${((y + 0.5) * 100).toFixed(2)}%`);
+    if (!hoveredProjectRectRef.current || hoveredProjectRectRef.current.el !== card) {
+      hoveredProjectRectRef.current = { el: card, rect: card.getBoundingClientRect() };
+    }
+    const rect = hoveredProjectRectRef.current.rect;
+    if (!rect.width || !rect.height) return;
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    if (tiltRafRef.current !== null) {
+      cancelAnimationFrame(tiltRafRef.current);
+    }
+    tiltRafRef.current = requestAnimationFrame(() => {
+      tiltRafRef.current = null;
+      const x = (clientX - rect.left) / rect.width - 0.5;
+      const y = (clientY - rect.top) / rect.height - 0.5;
+      card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
+      card.style.transform = `perspective(900px) rotateX(${(y * -3.5).toFixed(2)}deg) rotateY(${(x * 3.5).toFixed(2)}deg) translateY(-5px)`;
+      card.style.setProperty("--card-light-x", `${((x + 0.5) * 100).toFixed(2)}%`);
+      card.style.setProperty("--card-light-y", `${((y + 0.5) * 100).toFixed(2)}%`);
+    });
   }
 
   function resetProjectTilt(event: MouseEvent<HTMLElement>) {
+    if (tiltRafRef.current !== null) {
+      cancelAnimationFrame(tiltRafRef.current);
+      tiltRafRef.current = null;
+    }
     const card = event.currentTarget;
+    if (hoveredProjectRectRef.current?.el === card) {
+      hoveredProjectRectRef.current = null;
+    }
     card.style.transition = "transform 0.52s cubic-bezier(0.23, 1, 0.32, 1)";
     card.style.transform = "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
     card.style.removeProperty("--card-light-x");
     card.style.removeProperty("--card-light-y");
   }
 
-  // Capability tile glow: a soft ultraviolet follow-light beneath the tile content.
+  // Capability tile glow: a soft ultraviolet follow-light beneath the tile content (coalesced with rAF).
   function handleCapabilityGlow(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType === "touch") return;
     const tile = event.currentTarget;
-    const rect = tile.getBoundingClientRect();
-    tile.style.setProperty("--cell-glow-x", `${(((event.clientX - rect.left) / rect.width) * 100).toFixed(2)}%`);
-    tile.style.setProperty("--cell-glow-y", `${(((event.clientY - rect.top) / rect.height) * 100).toFixed(2)}%`);
+    if (!hoveredTileRectRef.current || hoveredTileRectRef.current.el !== tile) {
+      hoveredTileRectRef.current = { el: tile, rect: tile.getBoundingClientRect() };
+    }
+    const rect = hoveredTileRectRef.current.rect;
+    if (!rect.width || !rect.height) return;
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    if (glowRafRef.current !== null) {
+      cancelAnimationFrame(glowRafRef.current);
+    }
+    glowRafRef.current = requestAnimationFrame(() => {
+      glowRafRef.current = null;
+      tile.style.setProperty("--cell-glow-x", `${(((clientX - rect.left) / rect.width) * 100).toFixed(2)}%`);
+      tile.style.setProperty("--cell-glow-y", `${(((clientY - rect.top) / rect.height) * 100).toFixed(2)}%`);
+    });
   }
 
   function clearCapabilityGlow(event: ReactPointerEvent<HTMLElement>) {
+    if (glowRafRef.current !== null) {
+      cancelAnimationFrame(glowRafRef.current);
+      glowRafRef.current = null;
+    }
     const tile = event.currentTarget;
+    if (hoveredTileRectRef.current?.el === tile) {
+      hoveredTileRectRef.current = null;
+    }
     tile.style.removeProperty("--cell-glow-x");
     tile.style.removeProperty("--cell-glow-y");
-  }
-
-  // Obsidian Studio collection parallax: update image-only depth variables without React state so pointer movement cannot disturb dialogs.
-  function handleCollectionArtworkParallax(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 1024) return;
-    const card = event.currentTarget;
-    const bounds = card.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
-    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
-    const depth = Math.min(1, Math.hypot(x, y) / Math.SQRT2);
-    card.classList.add("is-artwork-parallax");
-    card.style.transition = "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1)";
-    card.style.setProperty("--collection-art-parallax-x", `${(x * 6.25).toFixed(2)}px`);
-    card.style.setProperty("--collection-art-parallax-y", `${(y * 4.25).toFixed(2)}px`);
-    card.style.setProperty("--collection-art-parallax-rotate-x", `${(y * -1.35).toFixed(2)}deg`);
-    card.style.setProperty("--collection-art-parallax-rotate-y", `${(x * 1.6).toFixed(2)}deg`);
-    card.style.setProperty("--collection-art-parallax-scale", `${(1.078 + depth * .022).toFixed(3)}`);
-    card.style.setProperty("--collection-edge-refraction-x", `${((x + 1) * 50).toFixed(1)}%`);
-    card.style.setProperty("--collection-edge-refraction-y", `${((y + 1) * 50).toFixed(1)}%`);
-  }
-
-  function resetCollectionArtworkParallax(event: React.SyntheticEvent<HTMLButtonElement>) {
-    const card = event.currentTarget;
-    card.classList.remove("is-artwork-parallax");
-    card.style.transition = "transform 0.52s cubic-bezier(0.23, 1, 0.32, 1)";
-    card.style.removeProperty("--collection-art-parallax-x");
-    card.style.removeProperty("--collection-art-parallax-y");
-    card.style.removeProperty("--collection-art-parallax-rotate-x");
-    card.style.removeProperty("--collection-art-parallax-rotate-y");
-    card.style.removeProperty("--collection-art-parallax-scale");
-    card.style.removeProperty("--collection-edge-refraction-x");
-    card.style.removeProperty("--collection-edge-refraction-y");
   }
 
   function prefetchCollectionArtwork(index: number) {
@@ -1919,7 +2787,7 @@ export default function Home() {
     image.fetchPriority = "low";
     image.src = project.image;
     collectionPrefetches.current.set(project.image, image);
-    image.decode?.().catch(() => undefined);
+    image.decode?.().then(() => markImagePredecoded(project.image)).catch(() => undefined);
   }
 
   function handleMobileCollectionTouchStart(event: React.TouchEvent<HTMLDivElement>) {
@@ -1951,19 +2819,23 @@ export default function Home() {
     mobileCollectionTouchStart.current = null;
   }
 
+  const mobileCollectionScrollRafRef = useRef<number | null>(null);
+
   function handleMobileCollectionScroll(event: React.UIEvent<HTMLDivElement>) {
     if (window.innerWidth >= 768) return;
     const stage = event.currentTarget;
-    const scrollDelta = stage.scrollLeft - mobileCollectionScrollLeft.current;
     mobileCollectionScrollLeft.current = stage.scrollLeft;
-    const stageCenter = stage.getBoundingClientRect().left + stage.clientWidth / 2;
-    const nextSnap = projectCollection.reduce((nearest, _, index) => {
-      const card = stage.querySelector<HTMLElement>(`.collection-card-${index + 1}`);
-      if (!card) return nearest;
-      const distance = Math.abs(card.getBoundingClientRect().left + card.getBoundingClientRect().width / 2 - stageCenter);
-      return distance < nearest.distance ? { index, distance } : nearest;
-    }, { index: mobileCollectionSnap, distance: Number.POSITIVE_INFINITY }).index;
-    setMobileCollectionSnap((current) => current === nextSnap ? current : nextSnap);
+    if (mobileCollectionScrollRafRef.current !== null) return;
+    mobileCollectionScrollRafRef.current = window.requestAnimationFrame(() => {
+      mobileCollectionScrollRafRef.current = null;
+      const maxScrollLeft = Math.max(1, stage.scrollWidth - stage.clientWidth);
+      const ratio = Math.min(1, Math.max(0, stage.scrollLeft / maxScrollLeft));
+      const nextSnap = Math.min(
+        projectCollection.length - 1,
+        Math.max(0, Math.round(ratio * (projectCollection.length - 1))),
+      );
+      setMobileCollectionSnap((current) => (current === nextSnap ? current : nextSnap));
+    });
   }
 
   function selectOrbitProject(id: OrbitProjectId) {
@@ -1988,46 +2860,44 @@ export default function Home() {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setContactFocused(false);
   }
 
-  function createNebulaBurst(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const burst = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
-    setStarBursts((current) => [...current.slice(-2), burst]);
-    window.setTimeout(() => setStarBursts((current) => current.filter((item) => item.id !== burst.id)), 820);
-  }
-
   function createProjectPulse(event: ReactPointerEvent<HTMLElement>) {
     if (reduceMotion || motionPaused) return;
     const bounds = event.currentTarget.getBoundingClientRect();
+    workSectionRectRef.current = bounds;
     const pulse = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
     setProjectPulses((current) => [...current.slice(-2), pulse]);
     window.setTimeout(() => setProjectPulses((current) => current.filter((item) => item.id !== pulse.id)), 920);
   }
 
   function followProjectFinder(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse" || window.innerWidth < 768) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
+    if (reduceMotion || motionPaused || lowDataMode || event.pointerType === "touch" || window.innerWidth < 768) return;
     const finder = projectFinderRef.current;
     if (!finder) return;
-    finder.style.left = `${((event.clientX - bounds.left) / bounds.width) * 100}%`;
-    finder.style.top = `${((event.clientY - bounds.top) / bounds.height) * 100}%`;
-    finder.classList.add("is-active");
+    if (!workSectionRectRef.current) {
+      workSectionRectRef.current = event.currentTarget.getBoundingClientRect();
+    }
+    const bounds = workSectionRectRef.current;
+    if (!bounds.width || !bounds.height) return;
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    if (finderRafRef.current !== null) {
+      cancelAnimationFrame(finderRafRef.current);
+    }
+    finderRafRef.current = requestAnimationFrame(() => {
+      finderRafRef.current = null;
+      finder.style.left = `${(((clientX - bounds.left) / bounds.width) * 100).toFixed(2)}%`;
+      finder.style.top = `${(((clientY - bounds.top) / bounds.height) * 100).toFixed(2)}%`;
+      finder.classList.add("is-active");
+    });
   }
 
   function resetProjectFinder() {
+    if (finderRafRef.current !== null) {
+      cancelAnimationFrame(finderRafRef.current);
+      finderRafRef.current = null;
+    }
+    workSectionRectRef.current = null;
     projectFinderRef.current?.classList.remove("is-active");
-  }
-
-  function extendConstellation(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
-    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-    const now = performance.now();
-    const previous = lastConstellationPoint.current;
-    if (now - previous.time < 52 || Math.hypot(x - previous.x, y - previous.y) < 3.4) return;
-    lastConstellationPoint.current = { x, y, time: now };
-    setConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
   }
 
   function createContactPulse(event: ReactPointerEvent<HTMLElement>) {
@@ -2036,18 +2906,6 @@ export default function Home() {
     const pulse = { id: Date.now(), x: ((event.clientX - bounds.left) / bounds.width) * 100, y: ((event.clientY - bounds.top) / bounds.height) * 100 };
     setContactPulses((current) => [...current.slice(-2), pulse]);
     window.setTimeout(() => setContactPulses((current) => current.filter((item) => item.id !== pulse.id)), 920);
-  }
-
-  function extendContactConstellation(event: ReactPointerEvent<HTMLElement>) {
-    if (reduceMotion || motionPaused || lowDataMode || event.pointerType !== "mouse") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
-    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-    const now = performance.now();
-    const previous = lastContactConstellationPoint.current;
-    if (now - previous.time < 58 || Math.hypot(x - previous.x, y - previous.y) < 3.7) return;
-    lastContactConstellationPoint.current = { x, y, time: now };
-    setContactConstellationTrail((current) => [...current.slice(-7), { id: Date.now() + Math.random(), x, y }]);
   }
 
   function triggerFooterBurst() {
@@ -2077,15 +2935,18 @@ export default function Home() {
 
   return (
     <main className={`page-shell ${motionPaused ? "motion-paused" : ""} ${lowDataMode ? "low-data" : ""} ${recruiterReviewOpen ? "recruiter-review-active" : ""}`}>
-      <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" role="status" aria-label="Loading S Manoj Prabhu portfolio" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
+      {/* ========================================================================
+          SECTION 00: NAVIGATION SHELL, MONOGRAM SEAL & RECRUITER DRAWERS
+          ======================================================================== */}
+      <AnimatePresence>{introVisible && !reduceMotion && !lowDataMode ? <motion.div className="entry-loader" role="status" aria-label="Loading S Manoj Prabhu portfolio" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.03 }} transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}><div className="entry-loader-content"><span className="entry-loader-seal"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" decoding="async" data-critical="true" /></span><span className="entry-loader-signal" /><span className="label text-violet-100">SMP / initializing field reel</span></div></motion.div> : null}</AnimatePresence>
       {!reduceMotion && <div ref={cursorRef} className="cursor" aria-hidden="true" />}
       <AmbientBackground motionPaused={motionPaused} reduceMotion={Boolean(reduceMotion)} lowDataMode={lowDataMode} />
       <div className="grain" aria-hidden="true" />
-      <header className={`nav-shell ${scrolled ? "is-scrolled" : ""} ${navHidden ? "is-hidden" : ""}`}>
+      <header ref={headerRef} className="nav-shell">
         <div className="container flex h-[5rem] items-center justify-between">
           <div className="flex items-center gap-5">
             <button className="monogram-trigger flex items-center gap-3 text-left" onClick={() => { triggerMonogramRipple(); scrollToSection("top"); }} aria-label="Go to the top and reveal the MJ monogram" aria-describedby="mj-brand-tooltip">
-              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: "var(--seal-scroll-opacity, 1)" }}><span className="monogram-halo" aria-hidden="true" style={{ transform: "rotate(var(--seal-orbit-rot, 0deg))" }}><i className="monogram-halo-sweep" /><i key={`section-glint-${monogramSectionGlint || "idle"}`} className={`monogram-section-glint ${monogramSectionGlint ? "is-active" : ""}`} /><i key={`project-echo-${monogramProjectEcho || "idle"}`} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" || openCaseSignal === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`} /><span className={`monogram-selector-preview ${activeOrbitPreview ? `is-active ${activeOrbitPreview === "attack-study" || activeOrbitPreview === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`}><i className="monogram-selector-preview-cyan" /><i className="monogram-selector-preview-violet" /></span><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" decoding="async" /></span>
+              <span className={`seal-wrap ${monogramRipple ? "is-rippling" : ""}`} style={{ opacity: "var(--seal-scroll-opacity, 1)" }}><span className="monogram-halo" aria-hidden="true" style={{ transform: "rotate(var(--seal-orbit-rot, 0deg))" }}><i className="monogram-halo-sweep" /><i ref={sectionGlintRef} className="monogram-section-glint" /><i key={`project-echo-${monogramProjectEcho || "idle"}`} className={`monogram-project-echo ${monogramProjectEcho ? `is-active ${openCaseSignal === "attack-study" || openCaseSignal === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`} /><span className={`monogram-selector-preview ${activeOrbitPreview ? `is-active ${activeOrbitPreview === "attack-study" || activeOrbitPreview === "polur-charm" ? "is-cyan" : "is-violet"}` : ""}`}><i className="monogram-selector-preview-cyan" /><i className="monogram-selector-preview-violet" /></span><b className="monogram-orbit-spark" /></span><span className="monogram-click-ripple" aria-hidden="true" /><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" decoding="async" data-critical="true" /></span>
               <span className="display text-[0.88rem] font-semibold tracking-[-0.04em] text-white">S MANOJ<br />PRABHU</span>
               <span id="mj-brand-tooltip" className="monogram-brand-tooltip" role="tooltip">MJ / Event horizon</span>
             </button>
@@ -2121,20 +2982,22 @@ export default function Home() {
         activeSection={active}
         onSelectSection={scrollToSection}
         onOpenRecruiterReview={startRecruiterReview}
-
         onDownloadResume={downloadResume}
         motionPaused={motionPaused}
       />
 
-      <section id="top" className="hero container">
-        <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:gap-12">
-          <div className="relative z-10 pt-4 lg:pt-0">
+      {/* ========================================================================
+          SECTION 01: HERO — 01 / SMP FIELD REEL (#top)
+          ======================================================================== */}
+      <section id="top" className="hero container w-full max-w-full overflow-x-clip">
+        <div className="grid w-full max-w-full items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)] lg:gap-12">
+          <div className="relative z-10 pt-4 lg:pt-0 max-w-full">
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, ease: [0.23, 1, 0.32, 1] }} className="mb-7 flex flex-wrap items-center gap-3">
               <span className="signal-dot animate-pulse" />
               <span className="label text-[#d3c5ff]">Available for considered digital work</span>
             </motion.div>
             <motion.p initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.08, ease: [0.23, 1, 0.32, 1] }} className="label mb-5">01 / SMP field reel</motion.p>
-            <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 38 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.78, delay: 0.14, ease: [0.23, 1, 0.32, 1] }} className={`hero-name ${nameHaptic ? "is-haptic" : ""} display max-w-[10ch] text-[clamp(4.1rem,9vw,8.2rem)] font-semibold leading-[0.81] text-white`} tabIndex={0} aria-label="S Manoj Prabhu. Click or press Enter to release a signal ripple." onPointerDown={createNameRipple} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const bounds = event.currentTarget.getBoundingClientRect(); createNameRipple({ ...event, clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 } as unknown as ReactPointerEvent<HTMLElement>); } }}>
+            <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 38 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.78, delay: 0.14, ease: [0.23, 1, 0.32, 1] }} className={`hero-name ${nameHaptic ? "is-haptic" : ""} display w-full max-w-full break-words text-[clamp(2.4rem,9.5vw,7.6rem)] font-semibold leading-[0.85] text-white`} tabIndex={0} aria-label="S Manoj Prabhu. Click or press Enter to release a signal ripple." onPointerDown={createNameRipple} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); const bounds = event.currentTarget.getBoundingClientRect(); createNameRipple({ ...event, clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2 } as unknown as ReactPointerEvent<HTMLElement>); } }}>
               <span className="name-line name-manoj" data-text="S MANOJ">S MANOJ</span><span className="name-line name-prabhu" data-text="PRABHU">PRABHU</span><span className="name-ripple-field" aria-hidden="true">{nameRipples.map((ripple) => <i key={ripple.id} className="name-ripple" style={{ left: `${ripple.x}%`, top: `${ripple.y}%` }} />)}</span><span className="name-spark-field" aria-hidden="true">{[
                 { left: "8%", top: "22%", dx: "34px", dy: "-10px", tilt: "-28deg", delay: "-1.1s" },
                 { left: "56%", top: "14%", dx: "22px", dy: "14px", tilt: "36deg", delay: "-3.2s" },
@@ -2143,7 +3006,7 @@ export default function Home() {
               ].map((spark, index) => <i key={index} className="name-spark" style={{ "--spark-left": spark.left, "--spark-top": spark.top, "--spark-dx": spark.dx, "--spark-dy": spark.dy, "--spark-tilt": spark.tilt, "--spark-delay": spark.delay } as React.CSSProperties} />)}</span>
             </motion.h1>
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={reduceMotion ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.64, delay: 0.28, ease: [0.23, 1, 0.32, 1] }} className="mt-8 max-w-lg">
-              <p className="hero-role-cycle" aria-live="polite"><span className="hero-role-label">Now operating as</span><AnimatePresence mode="wait" initial={false}><motion.span key={professionalRoles[roleIndex]} className="hero-role-value" initial={reduceMotion ? false : { opacity: 0, y: 8, filter: "blur(4px)" }} animate={reduceMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }} exit={reduceMotion ? {} : { opacity: 0, y: -7, filter: "blur(3px)" }} transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}>{professionalRoles[roleIndex]}</motion.span></AnimatePresence></p>
+              <HeroRoleCycle paused={motionPaused || Boolean(reduceMotion) || lowDataMode} />
               <p className="mt-4 max-w-md text-[0.93rem] leading-7 text-[#aca6ba]">Crafting intuitive interfaces and full-stack experiences — from Figma to production code.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button className="signal-button primary" onClick={() => scrollToSection("work")}>Open selected work <ArrowDownRight size={16} /></button>
@@ -2160,7 +3023,7 @@ export default function Home() {
           </div>
           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: 24 }} animate={reduceMotion ? {} : { opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.95, delay: 0.18, ease: [0.23, 1, 0.32, 1] }} className="hero-visual relative">
 
-            {/* Responsive starfield with a small, fast particle layer behind the portrait. */}
+            {/* Responsive Nebula Starfield (16 stars under 480px, 34 stars on desktop/tablet) */}
             <div className="nebula-starfield" aria-hidden="true">
               {visibleNebulaStars.map((star) => (
                 <span
@@ -2176,30 +3039,12 @@ export default function Home() {
                   } as React.CSSProperties}
                 />
               ))}
-              {nebulaParticles.map((particle) => (
-                <span
-                  key={`particle-${particle.id}`}
-                  className="nebula-particle"
-                  style={{
-                    left: `${particle.left}%`,
-                    top: `${particle.top}%`,
-                    "--particle-duration": `${particle.duration}s`,
-                    "--particle-delay": `${particle.delay}s`,
-                    "--particle-x": `${particle.travelX}px`,
-                    "--particle-y": `${particle.travelY}px`,
-                    "--particle-trail": `${particle.trail}px`,
-                  } as React.CSSProperties}
-                />
-              ))}
             </div>
 
             <CursorPortrait paused={motionPaused || Boolean(reduceMotion)} lowData={lowDataMode} />
           </motion.div>
         </div>
       </section>
-
-
-
 
       <div className="reel" aria-label="Selected capabilities">
         <div className="reel-track">
@@ -2211,30 +3056,190 @@ export default function Home() {
 
       <AnimatePresence>{recruiterReviewOpen ? <motion.aside ref={recruiterReviewRef} className="recruiter-review-panel" role="region" aria-label="Recruiter review path" data-lenis-prevent initial={reduceMotion ? false : { opacity: 0, y: 16, scale: .98 }} animate={reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? {} : { opacity: 0, y: 12, scale: .98 }} transition={{ duration: .24, ease: [0.23, 1, 0.32, 1] }}><div className="recruiter-review-head"><div><p className="label">Recruiter review path</p><p>Four signals. One concise review.</p></div><div className="flex items-center gap-2"><span className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] text-white/40"><kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60">Esc</kbd></span><button type="button" className="recruiter-close" onClick={() => setRecruiterReviewOpen(false)} aria-label="Close recruiter review path (Esc)"><X size={17} /></button></div></div><div className="recruiter-review-progress" aria-label={`Checkpoint ${recruiterReviewStep + 1} of ${recruiterReviewSteps.length}`}>{recruiterReviewSteps.map((step, index) => <button key={step.id} type="button" className={index === recruiterReviewStep ? "is-active" : index < recruiterReviewStep ? "is-complete" : ""} onClick={() => goToRecruiterReviewStep(index)} aria-current={index === recruiterReviewStep ? "step" : undefined}><span>{step.index}</span><em>{step.label}</em></button>)}</div><div className="recruiter-review-copy" aria-live="polite"><span className="label">{recruiterReviewSteps[recruiterReviewStep].index} / {recruiterReviewSteps[recruiterReviewStep].label}</span><p>{recruiterReviewSteps[recruiterReviewStep].note}</p></div><div className="recruiter-review-actions"><button type="button" onClick={() => goToRecruiterReviewStep(recruiterReviewStep - 1)} disabled={recruiterReviewStep === 0}>Previous</button><button type="button" className="signal-button primary" onClick={() => recruiterReviewStep === recruiterReviewSteps.length - 1 ? setRecruiterReviewOpen(false) : goToRecruiterReviewStep(recruiterReviewStep + 1)}>{recruiterReviewStep === recruiterReviewSteps.length - 1 ? "Complete review" : "Next signal"} <ArrowDownRight size={14} /></button></div></motion.aside> : null}</AnimatePresence>
 
-      <section id="about" className="editorial-band snapshot-about container py-16 md:py-20">
+      {/* ========================================================================
+          SECTION 02: ABOUT & CAPABILITIES — 02 / SKILLS MADE VISIBLE (#about)
+          ======================================================================== */}
+      <section id="about" className="editorial-band container w-full max-w-full overflow-x-clip py-28 md:py-40">
         {/* Obsidian Studio About visual: restore the original black-hole reel as a quiet right-side signal, with the copy kept in the foreground. */}
-        <div className="about-blackhole-video" aria-hidden="true"><video ref={heroVideoRef} className="about-blackhole-video-media" autoPlay={!reduceMotion && !motionPaused && !lowDataMode} loop muted playsInline preload="metadata" poster="/images/smp-hero-orbit_86f3fd46.jpg"><source src="/videos/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" /></video><span className="about-blackhole-video-vignette" /></div><span className="signal-thread about-thread" aria-hidden="true" />
-        <Reveal><SectionIntro index="02" eyebrow="Capabilities" title="Skills and tools." detail="The languages, design methods, frameworks, and tools I use across projects." motionPaused={motionPaused} /></Reveal>
-        <motion.article className="skills-overview" aria-label="Skills and tools" initial={reduceMotion ? false : { opacity: 0, y: 24 }} whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}>
-          <div className="skills-overview-grid">
-            {skills.map((group, index) => {
-              const Icon = skillCategoryIcons[index];
-              return <div className={`skills-overview-group skill-panel-${group.code}`} key={group.code}>
-                <div className="skill-panel-meta"><span>{group.code}</span>{["01", "04", "05"].includes(group.code) && <em><i />active</em>}</div>
-                <span className="skill-panel-icon" aria-hidden="true"><Icon size={18} strokeWidth={1.8} /></span>
-                <h3>{group.title}</h3>
-                <ul className="skill-chip-list">{group.items.map((item) => <li key={item} className={`skill-chip skill-chip-${skillProficiency[item].level.toLowerCase()}`} aria-label={`${item}: ${skillProficiency[item].level}, ${skillProficiency[item].stars} of 4`} title={`${item} · ${skillProficiency[item].level}`}>
-                  {item}<span className="skill-chip-dots" aria-hidden="true">{Array.from({ length: 4 }, (_, dot) => <i key={dot} className={dot < skillProficiency[item].stars ? "is-filled" : ""} />)}</span>
-                </li>)}</ul>
-              </div>;
+        <div className="about-blackhole-video" aria-hidden="true"><video ref={heroVideoRef} className="about-blackhole-video-media" autoPlay={!reduceMotion && !motionPaused && !lowDataMode} loop muted playsInline preload="auto" poster="/images/smp-hero-orbit_86f3fd46.jpg"><source src="/videos/smp-anime-black-hole_fe55ef2a.mp4" type="video/mp4" /></video></div><span className="signal-thread about-thread" aria-hidden="true" />
+        <Reveal>
+          <SectionIntro index="02" eyebrow="Working at the intersection" title="Skills made visible." detail="A frontend developer and UI/UX designer with experience in Java, Spring Boot, and applied machine learning." motionPaused={motionPaused} />
+        </Reveal>
+
+        {/* 6-Card Skills Bento Grid placed right here in Section 02, matching Image 1 */}
+        <Reveal delay={0.08} className="mt-12 md:mt-16 relative w-full max-w-full">
+          <div className="pointer-events-none absolute inset-0 -z-10 rounded-3xl bg-[radial-gradient(ellipse_75%_55%_at_50%_45%,rgba(139,92,246,0.14),rgba(88,28,135,0.05)_55%,transparent_75%)] blur-2xl" aria-hidden="true" />
+          <div className="capability-grid relative mx-auto w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px overflow-hidden rounded-xl sm:rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_24px_70px_-12px_rgba(0,0,0,0.65),0_0_40px_-10px_rgba(124,58,237,0.12)] backdrop-blur-xl">
+            {skills.map((skill, cardIndex) => {
+              const categoryVisuals = {
+                "01": { Icon: Code2, color: "text-cyan-300", border: "border-cyan-400/30", bg: "bg-cyan-500/10", glow: "group-hover:border-cyan-300/50 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_14px_rgba(6,182,212,0.35)]" },
+                "02": { Icon: Layout, color: "text-cyan-300", border: "border-cyan-400/30", bg: "bg-cyan-500/10", glow: "group-hover:border-cyan-300/50 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_14px_rgba(6,182,212,0.35)]" },
+                "03": { Icon: Palette, color: "text-fuchsia-300", border: "border-fuchsia-400/30", bg: "bg-fuchsia-500/10", glow: "group-hover:border-fuchsia-300/50 group-hover:bg-fuchsia-500/20 group-hover:shadow-[0_0_14px_rgba(217,70,239,0.35)]" },
+                "04": { Icon: Server, color: "text-indigo-300", border: "border-indigo-400/30", bg: "bg-indigo-500/10", glow: "group-hover:border-indigo-300/50 group-hover:bg-indigo-500/20 group-hover:shadow-[0_0_14px_rgba(99,102,241,0.35)]" },
+                "05": { Icon: Cloud, color: "text-cyan-300", border: "border-cyan-400/30", bg: "bg-cyan-500/10", glow: "group-hover:border-cyan-300/50 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_14px_rgba(6,182,212,0.35)]" },
+                "06": { Icon: Cpu, color: "text-amber-300", border: "border-amber-400/30", bg: "bg-amber-500/10", glow: "group-hover:border-amber-300/50 group-hover:bg-amber-500/20 group-hover:shadow-[0_0_14px_rgba(245,158,11,0.35)]" },
+              }[skill.code] ?? { Icon: Layers3, color: "text-violet-300", border: "border-violet-400/25", bg: "bg-violet-500/10", glow: "group-hover:border-violet-300/50 group-hover:bg-violet-500/20 group-hover:shadow-[0_0_14px_rgba(139,92,246,0.35)]" };
+              const { Icon, color, border, bg, glow } = categoryVisuals;
+
+              return (
+                <div
+                  key={skill.code}
+                  className={`capability-cell group relative flex flex-col p-5 sm:p-6 transition-all duration-300 ${
+                    cardIndex === 0 ? "first:rounded-t-xl sm:first:rounded-tl-2xl sm:first:rounded-tr-none" : ""
+                  } ${
+                    cardIndex === 1 ? "sm:rounded-tr-2xl lg:rounded-none" : ""
+                  } ${
+                    cardIndex === 2 ? "lg:rounded-tr-2xl" : ""
+                  } ${
+                    cardIndex === 3 ? "lg:rounded-bl-2xl" : ""
+                  } ${
+                    cardIndex === 4 ? "sm:rounded-bl-2xl lg:rounded-none" : ""
+                  } ${
+                    cardIndex === 5 ? "last:rounded-b-xl sm:last:rounded-br-2xl sm:last:rounded-bl-none" : ""
+                  }`}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType === "mouse" && !reduceMotion && !motionPaused && !lowDataMode) {
+                      hoveredTileRectRef.current = { el: event.currentTarget, rect: event.currentTarget.getBoundingClientRect() };
+                    }
+                  }}
+                  onPointerMove={handleCapabilityGlow}
+                  onPointerLeave={clearCapabilityGlow}
+                >
+                  {/* Subtle follow glow layer behind content with lower z-index */}
+                  <div
+                    className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{
+                      background: "radial-gradient(14rem circle at var(--cell-glow-x, 50%) var(--cell-glow-y, 50%), rgba(192, 132, 252, 0.14), rgba(126, 34, 206, 0.04) 50%, transparent 70%)",
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  <div className="capability-cell-content relative z-10 flex flex-col h-full w-full pointer-events-auto">
+                    {/* Top Row: Brighter card number & Icon */}
+                    <div className="relative z-20 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-semibold text-white/95 tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                          {skill.code}
+                        </span>
+                      </div>
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-full border ${border} ${bg} backdrop-blur-sm transition-all duration-300 group-hover:scale-110 ${glow}`}>
+                        <Icon size={13} className={`${color} transition-colors group-hover:brightness-125`} />
+                      </div>
+                    </div>
+
+                    {/* Card heading - stays fully readable and above glow */}
+                    <h3 className="capability-cell-heading display relative z-20 mt-2.5 text-lg sm:text-xl font-semibold tracking-tight text-white group-hover:text-violet-100 transition-colors drop-shadow-sm">
+                      {skill.title}
+                    </h3>
+
+                    {/* Tags placed directly under each heading without empty space, wrapping onto second row */}
+                    <div className="capability-cell-tags relative z-20 mt-2.5 flex flex-wrap gap-1.5">
+                      {skill.items.map((item) => {
+                        const proficiency = skillProficiency[item] ?? { level: "Proficient", dots: 3, stars: 3 };
+                        const proof = skillProofMap[item] ?? {
+                          project: "Selected Work",
+                          metric: "Production Delivery",
+                          detail: "Applied across production engineering and product design",
+                          linkId: "work",
+                          label: "Evidence",
+                        };
+
+                        const activeDots = proficiency.dots ?? proficiency.stars ?? 3;
+
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => handleSkillProofClick(proof.linkId)}
+                            className="skill-chip group/chip relative cursor-pointer !px-2.5 !py-1 !text-xs !bg-white/[0.035] hover:!bg-violet-500/15 !border-white/[0.08] hover:!border-violet-400/40 text-[#d8d0ea] hover:text-white transition-all text-left flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                            key={item}
+                            tabIndex={0}
+                            aria-label={`${item} — Level: ${proficiency.level}, Where: ${proof.project}`}
+                          >
+                            <span>{item}</span>
+                            <span className="skill-tooltip" role="tooltip">
+                              <span className="skill-dots flex items-center gap-1" aria-hidden="true">
+                                {[1, 2, 3, 4].map((dot) => (
+                                  <span
+                                    key={dot}
+                                    className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                      dot <= activeDots
+                                        ? "bg-violet-400 shadow-[0_0_5px_rgba(167,139,250,0.85)]"
+                                        : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </span>
+                              <span className="font-semibold text-violet-300">{proficiency.level}</span>
+                              <span className="text-white/30 font-normal">·</span>
+                              <span className="text-white/80">Where: <span className="text-white font-medium">{proof.project}</span></span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
             })}
           </div>
-        </motion.article>
+
+          {/* Skill Levels Legend with Left & Right Animated Moving White Lines */}
+          <div className="skill-legend-wrapper mt-7 flex items-center justify-center gap-3 sm:gap-5 w-full max-w-full mx-auto px-1 sm:px-2">
+            {/* Left side horizontal line with moving white beam */}
+            <div className="legend-flank-line legend-line-left hidden sm:flex relative flex-1 h-[1px] min-w-[20px] sm:min-w-[44px] overflow-hidden bg-gradient-to-r from-transparent via-white/15 to-white/30">
+              <span className="legend-moving-beam-left" aria-hidden="true" />
+            </div>
+
+            {/* Compact, smaller Skill Levels Legend Pill */}
+            <div className="skill-levels-legend relative overflow-hidden flex flex-wrap items-center justify-center gap-2 sm:gap-4.5 rounded-full border border-white/[0.12] bg-[#110b20]/90 px-3 sm:px-5.5 py-1.5 sm:py-2 shadow-[0_8px_30px_rgba(0,0,0,0.55),inset_0_1px_1px_rgba(255,255,255,0.18)] backdrop-blur-xl max-w-full">
+              {/* Inner moving white glint beam */}
+              <span className="legend-inner-beam" aria-hidden="true" />
+
+              <div className="relative z-10 flex items-center gap-2">
+                <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-violet-300/90 font-semibold whitespace-nowrap">Skill Levels</span>
+                <span className="text-white/20 select-none">|</span>
+              </div>
+
+              <div className="relative z-10 flex flex-wrap items-center justify-center gap-2 sm:gap-4.5 text-[11px] sm:text-xs text-white/80">
+                {[
+                  { level: "Learning", dots: 1 },
+                  { level: "Working", dots: 2 },
+                  { level: "Proficient", dots: 3 },
+                  { level: "Advanced", dots: 4 },
+                ].map(({ level, dots }) => (
+                  <div key={level} className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                    <span className="flex items-center gap-0.5 sm:gap-1" aria-hidden="true">
+                      {[1, 2, 3, 4].map((dot) => (
+                        <span
+                          key={dot}
+                          className={`inline-block w-1.5 h-1.5 rounded-full ${
+                            dot <= dots
+                              ? "bg-violet-400 shadow-[0_0_5px_rgba(167,139,250,0.85)]"
+                              : "bg-white/20"
+                          }`}
+                        />
+                      ))}
+                    </span>
+                    <span className="font-medium text-white/90">{level}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right side horizontal line with moving white beam */}
+            <div className="legend-flank-line legend-line-right hidden sm:flex relative flex-1 h-[1px] min-w-[20px] sm:min-w-[44px] overflow-hidden bg-gradient-to-l from-transparent via-white/15 to-white/30">
+              <span className="legend-moving-beam-right" aria-hidden="true" />
+            </div>
+          </div>
+        </Reveal>
       </section>
 
-      <section id="work" className="editorial-band top-rule bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
-        <div className="project-atmosphere" aria-hidden="true"><img className="project-seal-ghost" src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" loading="lazy" decoding="async" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
-        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused projects across machine learning, product design, automation, and civic technology—with the decisions and outcomes made clear." motionPaused={motionPaused} /></Reveal>
+      {/* ========================================================================
+          SECTION 03: SELECTED WORK — 03 / PROOF OF PRACTICE (#work)
+          ======================================================================== */}
+      <section id="work" className="editorial-band top-rule w-full max-w-full overflow-x-clip bg-[#0d0b15]/90 backdrop-blur-sm py-28 md:py-40" onPointerDown={createProjectPulse} onPointerMove={followProjectFinder} onPointerLeave={resetProjectFinder}>
+        <div className="project-atmosphere" aria-hidden="true"><LazyProjectImage className="project-seal-ghost" src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="" rootMargin="300px 0px" data-offscreen-asset="true" /><span className="project-signal-wave" />{projectPulses.map((pulse) => <span key={pulse.id} className="project-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}<span ref={projectFinderRef} className="project-orbital-finder"><i /><i /></span></div>
+        <div className="container relative z-10"><Reveal><SectionIntro index="03" eyebrow="Selected work" title="Proof of practice." detail="Four focused project studies across applied machine learning, mobile product design, autonomous content operations, and civic discovery." motionPaused={motionPaused} /></Reveal>
           <nav className="mobile-project-nav" aria-label="Project study navigation"><span className="mobile-project-label">Jump to study</span><button onClick={() => scrollToSection("attack-study")}>01 Attack model</button><button onClick={() => scrollToSection("delivery-study")}>02 Delivery app</button><button onClick={() => scrollToSection("ai-content-studio")}>03 AI studio</button><button onClick={() => scrollToSection("polur-charm")}>04 Polur Charm</button></nav>
           <ProjectOrbitSelector
             projects={orbitProjects}
@@ -2245,10 +3250,10 @@ export default function Home() {
             lowDataMode={lowDataMode}
             reduceMotion={reduceMotion}
           />
-          <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare projects</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
+          <div className="project-comparison-shell"><button className={`project-comparison-toggle ${comparisonOpen ? "is-open" : ""}`} type="button" onClick={() => setComparisonOpen((current) => !current)} aria-expanded={comparisonOpen} aria-controls="project-comparison"><span>Compare signals</span><span>{comparisonOpen ? "Close" : "Open"} <ArrowUpRight size={13} /></span></button><AnimatePresence initial={false}>{comparisonOpen ? <motion.div id="project-comparison" className="project-comparison" initial={reduceMotion || motionPaused ? false : { opacity: 0, y: 8, scale: 0.99 }} animate={reduceMotion || motionPaused ? {} : { opacity: 1, y: 0, scale: 1 }} exit={reduceMotion || motionPaused ? {} : { opacity: 0, y: -5, scale: 0.99 }} transition={{ duration: .22, ease: [0.23, 1, 0.32, 1] }}><div className="comparison-head"><span>Signal</span><b>Attack model</b><b>Delivery flow</b></div><div><span>Outcome</span><b>85% accuracy</b><b>15+ screens</b></div><div><span>Method</span><b>4-model evaluation</b><b>2 review cycles</b></div><div><span>Tools</span><b>Python · Scikit-learn</b><b>Figma · Mobile UX</b></div></motion.div> : null}</AnimatePresence></div>
           <div className="project-grid mt-14 grid gap-5 lg:grid-cols-2">
-            <Reveal delay={0.06}><article id="attack-study" className={`project-card panel ${gravityProject === "attack-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "attack-study", 0)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("attack-study")} onFocus={() => setGravityProject("attack-study")} onClick={() => setGravityProject("attack-study")} onMouseLeave={resetProjectTilt}>
-              <img className="project-art" src="/images/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" />
+            <Reveal delay={0.06}><article id="attack-study" className={`project-card panel ${gravityProject === "attack-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Prediction of Perpetration Attack case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "attack-study", 0)} onMouseMove={handleProjectTilt} onMouseEnter={(event) => { hoveredProjectRectRef.current = { el: event.currentTarget, rect: event.currentTarget.getBoundingClientRect() }; setGravityProject("attack-study"); }} onFocus={() => setGravityProject("attack-study")} onClick={() => setGravityProject("attack-study")} onMouseLeave={resetProjectTilt}>
+              <LazyProjectImage className="project-art" src="/images/smp-project-security_4a7c2847.jpg" alt="Abstract diagnostic network visual for cybersecurity machine learning project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} rootMargin="280px 0px" data-offscreen-asset="true" />
               <div className="project-scrim" /><span className="project-signal">classified study</span><span className="project-index">01 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><LensAperture motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">85% accuracy</span></div><p>Four-model classifier for attack-pattern detection.</p></div>
               <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9">
@@ -2264,8 +3269,8 @@ export default function Home() {
                 />
                 <ProjectProofMarker value="85" suffix="%" ringValue={85} label="Best accuracy" detail="XGBoost selected after four-model evaluation" tone="cyan" motionPaused={motionPaused} /><AttackModelWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="attack-study" open={openCaseSignal === "attack-study"} onToggle={() => setOpenCaseSignal((current) => current === "attack-study" ? null : "attack-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Python · Scikit-learn · Model evaluation</span><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white" href="https://github.com/manojprabhu07/Research-Papers-Final-Year-Project" target="_blank" rel="noopener noreferrer">Open repository <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
-            <Reveal delay={0.13}><article id="delivery-study" className={`project-card panel ${gravityProject === "delivery-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "delivery-study", 1)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("delivery-study")} onFocus={() => setGravityProject("delivery-study")} onClick={() => setGravityProject("delivery-study")} onMouseLeave={resetProjectTilt}>
-              <img className="project-art" src="/images/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" />
+            <Reveal delay={0.13}><article id="delivery-study" className={`project-card panel ${gravityProject === "delivery-study" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Food Delivery Mobile App case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to inspect signal." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "delivery-study", 1)} onMouseMove={handleProjectTilt} onMouseEnter={(event) => { hoveredProjectRectRef.current = { el: event.currentTarget, rect: event.currentTarget.getBoundingClientRect() }; setGravityProject("delivery-study"); }} onFocus={() => setGravityProject("delivery-study")} onClick={() => setGravityProject("delivery-study")} onMouseLeave={resetProjectTilt}>
+              <LazyProjectImage className="project-art" src="/images/smp-project-food_c1b44933.jpg" alt="Abstract layered mobile interface visual for food delivery design project" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} rootMargin="280px 0px" data-offscreen-asset="true" />
               <div className="project-scrim" /><span className="project-signal">interaction study</span><span className="project-index">02 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><BlueprintCrosshair motionPaused={motionPaused} />
               <div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">15+ screens</span></div><p>Task-first flow from discovery through delivery.</p></div>
               <div className="relative z-10 flex min-h-[480px] flex-col justify-end p-7 md:p-9">
@@ -2281,7 +3286,7 @@ export default function Home() {
                 />
                 <ProjectProofMarker value="15+" ringValue={100} label="Screens mapped" detail="Two usability review cycles across the mobile flow" motionPaused={motionPaused} /><DeliveryWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryInteractionLoop motionPaused={motionPaused} lowDataMode={lowDataMode} /><DeliveryDeviceRelay motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="delivery-study" open={openCaseSignal === "delivery-study"} onToggle={() => setOpenCaseSignal((current) => current === "delivery-study" ? null : "delivery-study")} motionPaused={motionPaused} /><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">Figma · Mobile UX · Interaction flows</span><a href="mailto:manojprabhu0707@gmail.com?subject=Case%20Study%20Request%20%E2%80%94%20Food%20Delivery%20Mobile%20App" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-violet-200 hover:text-white transition-colors cursor-pointer" aria-label="Request Food Delivery Mobile App case study via email">Case study available on request <ArrowUpRight size={15} /></a></div></div>
             </article></Reveal>
-            <Reveal delay={0.18} className="project-sequence-third"><article id="ai-content-studio" className={`project-card ai-studio-project panel ${gravityProject === "ai-content-studio" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="YouTube Auto-Uploader and Autonomous AI Content Studio showcase. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "ai-content-studio", 2)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("ai-content-studio")} onFocus={() => setGravityProject("ai-content-studio")} onClick={() => setGravityProject("ai-content-studio")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/ai-content-studio-showcase_e194be53.jpg" alt="Abstract autonomous AI media studio with vertical video frames and orbital data streams" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" /><div className="project-scrim" /><span className="project-signal">autonomous studio</span><span className="project-index">03 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">Auto pipeline</span></div><p>From channel monitoring through scheduled publishing.</p></div><div className="relative z-10 flex min-h-[620px] flex-col p-7 md:p-9 ai-studio-card-copy">
+            <Reveal delay={0.18} className="project-sequence-third"><article id="ai-content-studio" className={`project-card ai-studio-project panel ${gravityProject === "ai-content-studio" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="YouTube Auto-Uploader and Autonomous AI Content Studio showcase. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "ai-content-studio", 2)} onMouseMove={handleProjectTilt} onMouseEnter={(event) => { hoveredProjectRectRef.current = { el: event.currentTarget, rect: event.currentTarget.getBoundingClientRect() }; setGravityProject("ai-content-studio"); }} onFocus={() => setGravityProject("ai-content-studio")} onClick={() => setGravityProject("ai-content-studio")} onMouseLeave={resetProjectTilt}><LazyProjectImage className="project-art" src="/images/ai-content-studio-showcase_e194be53.jpg" alt="Abstract autonomous AI media studio with vertical video frames and orbital data streams" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} rootMargin="280px 0px" data-offscreen-asset="true" /><div className="project-scrim" /><span className="project-signal">autonomous studio</span><span className="project-index">03 / 04</span><ProjectSignalFocus tone="violet" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-violet-100">Case signal</span><span className="project-metric">Auto pipeline</span></div><p>From channel monitoring through scheduled publishing.</p></div><div className="relative z-10 flex min-h-[620px] flex-col p-7 md:p-9 ai-studio-card-copy">
               <p className="project-meta label text-violet-200">AI & backend automation · production workflow</p>
               <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[.93] text-white md:text-5xl [text-wrap:balance]">YouTube Auto-Uploader & Autonomous AI Content Studio</h3>
               <CyberTypingDescription
@@ -2293,7 +3298,7 @@ export default function Home() {
                 lowDataMode={lowDataMode}
               />
               <div className="ai-studio-outcome"><span className="ai-studio-outcome-orbit" aria-hidden="true"><i /></span><div><p className="label">Outcome marker</p><b>Autonomous content pipeline</b><em>Ingestion → Shorts → metadata → scheduling</em></div></div><AutomationStudioWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><button type="button" className="ai-studio-detail-trigger ai-studio-brief-action" onClick={() => setAiContentStudioOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button></div></article></Reveal>
-            <Reveal delay={0.23} className="project-sequence-fourth"><article id="polur-charm" className={`project-card polur-charm-project panel ${gravityProject === "polur-charm" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Polur Charm tourism and civic platform case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "polur-charm", 3)} onMouseMove={handleProjectTilt} onMouseEnter={() => setGravityProject("polur-charm")} onFocus={() => setGravityProject("polur-charm")} onClick={() => setGravityProject("polur-charm")} onMouseLeave={resetProjectTilt}><img className="project-art" src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="Cinematic Parvathamalai and Polur travel-civic discovery visual" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} loading="lazy" decoding="async" /><div className="project-scrim" /><span className="project-signal">regional discovery</span><span className="project-index">04 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-cyan-100">Case signal</span><span className="project-metric">24/7 discovery</span></div><p>Travel, civic essentials, and heritage exploration in one guide.</p></div><div className="relative z-10 flex min-h-[560px] flex-col justify-end p-7 md:p-9">
+            <Reveal delay={0.23} className="project-sequence-fourth"><article id="polur-charm" className={`project-card polur-charm-project panel ${gravityProject === "polur-charm" ? "is-gravity-source" : ""}`} tabIndex={0} aria-label="Polur Charm tourism and civic platform case study. Focus or hover to align related capabilities. Use arrow keys to navigate, Enter to open brief." aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter" onKeyDown={(event) => handleWorkProjectKeyDown(event, "polur-charm", 3)} onMouseMove={handleProjectTilt} onMouseEnter={(event) => { hoveredProjectRectRef.current = { el: event.currentTarget, rect: event.currentTarget.getBoundingClientRect() }; setGravityProject("polur-charm"); }} onFocus={() => setGravityProject("polur-charm")} onClick={() => setGravityProject("polur-charm")} onMouseLeave={resetProjectTilt}><LazyProjectImage className="project-art" src="/images/polur-charm-portfolio-art_ee154405.jpg" alt="Cinematic Parvathamalai and Polur travel-civic discovery visual" width={1200} height={750} style={{ aspectRatio: "16 / 10" }} rootMargin="280px 0px" data-offscreen-asset="true" /><div className="project-scrim" /><span className="project-signal">regional discovery</span><span className="project-index">04 / 04</span><ProjectSignalFocus tone="cyan" motionPaused={motionPaused} /><div className="project-caption"><div className="project-caption-head"><span className="label text-[0.5rem] text-cyan-100">Case signal</span><span className="project-metric">24/7 discovery</span></div><p>Travel, civic essentials, and heritage exploration in one guide.</p></div><div className="relative z-10 flex min-h-[560px] flex-col justify-end p-7 md:p-9">
               <p className="project-meta label text-cyan-100">Web development · travel & civic tech</p>
               <h3 className="display mt-3 max-w-[14ch] text-4xl leading-[.93] text-white md:text-5xl [text-wrap:balance]">Polur Charm</h3>
               <CyberTypingDescription
@@ -2304,13 +3309,17 @@ export default function Home() {
                 motionPaused={motionPaused}
                 lowDataMode={lowDataMode}
               />
-              <ProjectProofMarker value="24" suffix="/7" ringValue={100} label="Discovery access" detail="Transit, civic essentials, and heritage trails in one platform" tone="cyan" motionPaused={motionPaused} /><PolurCharmWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><PolurTripPlannerMicroFlow motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="polur-charm" open={openCaseSignal === "polur-charm"} onToggle={() => setOpenCaseSignal((current) => current === "polur-charm" ? null : "polur-charm")} motionPaused={motionPaused} /><button type="button" className="ai-studio-detail-trigger mt-6" onClick={() => setPolurCharmOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">React 19 · TypeScript · TanStack · i18n</span><span className="flex flex-wrap gap-x-4 gap-y-2"><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://polurcharm.com" target="_blank" rel="noopener noreferrer">Visit live site <ArrowUpRight size={15} /></a><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noopener noreferrer">Repository <Github size={15} /></a></span></div></div></article></Reveal>
+              <ProjectProofMarker value="24" suffix="/7" ringValue={100} label="Discovery access" detail="Transit, civic essentials, and heritage trails in one platform" tone="cyan" motionPaused={motionPaused} /><PolurCharmWalkthrough motionPaused={motionPaused} lowDataMode={lowDataMode} /><CaseSignalReveal id="polur-charm" open={openCaseSignal === "polur-charm"} onToggle={() => setOpenCaseSignal((current) => current === "polur-charm" ? null : "polur-charm")} motionPaused={motionPaused} /><button type="button" className="ai-studio-detail-trigger mt-6" onClick={() => setPolurCharmOpen(true)} aria-haspopup="dialog">Open project brief <ArrowUpRight size={15} /></button><div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-5"><span className="label text-[0.57rem] text-white/65">React 19 · TypeScript · TanStack · i18n</span><span className="flex flex-wrap gap-x-4 gap-y-2"><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://polurcharm.com" target="_blank" rel="noopener noreferrer">Visit live site <ArrowUpRight size={15} /></a><a className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-cyan-100 hover:text-white" href="https://github.com/gokuuchihatamil/polur-charm" target="_blank" rel="noopener noreferrer">Repository <Github size={15} /></a></span></div></div></article></Reveal>
           </div>
         </div>
       </section>
       <AIContentStudioDialog open={aiContentStudioOpen} onOpenChange={setAiContentStudioOpen} />
       <PolurCharmDialog open={polurCharmOpen} onOpenChange={setPolurCharmOpen} />
-      <section id="project-collection" className="project-collection-section top-rule bg-[#0a0911]/90 backdrop-blur-sm py-28 md:py-40">
+
+      {/* ========================================================================
+          SECTION 03.5: PROJECT COLLECTION — 03.5 / MORE SIGNALS IN THE FIELD (#project-collection)
+          ======================================================================== */}
+      <section ref={collectionSectionRef} id="project-collection" className="project-collection-section top-rule w-full max-w-full overflow-x-clip bg-[#0a0911]/90 backdrop-blur-sm py-28 md:py-40">
         <div className="container">
           <Reveal>
             <SectionIntro
@@ -2368,49 +3377,33 @@ export default function Home() {
                 viewport={{ once: true, amount: "some", margin: "0px 0px 80px 0px" }}
                 className={`collection-reveal collection-reveal-${index + 1} ${collectionFocus === index ? "is-collection-active" : ""}`}
               >
-                <button
-                  type="button"
-                  ref={(el) => {
+                <CollectionTiltCard
+                  project={project}
+                  index={index}
+                  isFocused={collectionFocus === index}
+                  isOpening={collectionOpeningIndex === index}
+                  shouldLoadImage={
+                    collectionInView &&
+                    (!isTouchMobile && !isMidRangeDevice
+                      ? true
+                      : index <= collectionDecodeCursor)
+                  }
+                  onImageLoad={() => advanceCollectionDecodeCursor(index)}
+                  motionDisabled={Boolean(reduceMotion || motionPaused || lowDataMode || isTouchMobile)}
+                  cardRef={(el) => {
                     collectionCardRefs.current[index] = el;
                   }}
-                  className={`collection-card collection-card-${index + 1} ${collectionFocus === index ? "is-focused is-active" : ""} ${collectionOpeningIndex === index ? "is-opening" : ""}`}
-                  onClick={() => openCollectionProject(project, index)}
+                  onSelect={() => openCollectionProject(project, index)}
                   onKeyDown={(event) => handleCollectionCardKeyDown(event, index)}
-                  onMouseEnter={() => setCollectionFocus(index)}
-                  onMouseLeave={(event) => {
-                    setCollectionFocus(null);
-                    resetCollectionArtworkParallax(event);
-                  }}
-                  onPointerMove={handleCollectionArtworkParallax}
-                  onPointerLeave={resetCollectionArtworkParallax}
-                  onFocus={() => setCollectionFocus(index)}
-                  onBlur={(event) => {
+                  onFocusCard={() => setCollectionFocus(index)}
+                  onLeaveCard={() => setCollectionFocus(null)}
+                  onBlurCard={(event) => {
                     const related = event.relatedTarget as HTMLElement | null;
                     if (!related?.closest(".project-collection-stage")) {
                       setCollectionFocus(null);
                     }
                   }}
-                  aria-label={`Open details for ${project.title}. Keyboard shortcut: Left or Right arrow to change card, Enter to view brief.`}
-                  aria-keyshortcuts="ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter"
-                >
-                  <ProgressiveImage
-                    src={project.image}
-                    placeholderSrc={project.placeholder}
-                    alt={project.alt}
-                    motionPaused={Boolean(motionPaused || reduceMotion)}
-                  />
-                  <span className="collection-card-scrim" aria-hidden="true" />
-                  <span className="collection-card-refraction" aria-hidden="true" />
-                  {index === 3 && <span className="smart-aroma-sensor-pulse" aria-hidden="true" />}
-                  <span className="collection-card-index">0{index + 1} / 04</span>
-                  <span className="collection-card-copy">
-                    <em>{project.label}</em>
-                    <b>{project.title}</b>
-                  </span>
-                  <span className="collection-card-open">
-                    Open <ArrowUpRight size={14} />
-                  </span>
-                </button>
+                />
               </motion.div>
             ))}
           </div>
@@ -2440,30 +3433,76 @@ export default function Home() {
       </section>
       <ProjectCollectionDialog project={activeCollectionProject} loading={collectionDialogLoading} motionPaused={motionPaused} onCloseAutoFocus={() => window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 0)} onOpenChange={(open) => { if (!open) { setCollectionDialogLoading(false); const staticClose = reduceMotion || motionPaused; window.setTimeout(() => { setActiveCollectionProject(null); if (!staticClose) window.setTimeout(() => document.querySelector<HTMLButtonElement>(`.collection-card-${collectionDialogTriggerIndex.current}`)?.focus(), 24); }, staticClose ? 0 : 260); } }} />
 
-      <section id="experience" className="editorial-band container py-28 md:py-40">
+      {/* ========================================================================
+          SECTION 04: EXPERIENCE — 04 / LEARNING IN THE WORK (#experience)
+          ======================================================================== */}
+      <section id="experience" className="editorial-band container w-full max-w-full overflow-x-clip py-28 md:py-40">
         <Reveal><SectionIntro index="04" eyebrow="Experience" title="Learning in the work." detail="A growing practice across product design, full-stack delivery, and the systems that connect a polished surface to dependable behaviour." motionPaused={motionPaused} /></Reveal>
         <div className="experience-layout mt-14 grid gap-12 lg:grid-cols-[1.28fr_.72fr] lg:gap-20">
-          <div className="timeline-list"><Reveal><div className={`timeline-row ${activeExperience === 0 ? "is-map-active" : ""}`} tabIndex={0} aria-label="Project Intern. Focus to highlight related skills." onMouseEnter={() => pinExperienceRow(0)} onFocus={() => pinExperienceRow(0)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{experience[0].period}<br /><span className="text-[#777285]">{experience[0].place}</span></div><div><h3 className="display text-2xl text-white">{experience[0].role}</h3><p className="mt-1 text-sm text-violet-200">{experience[0].company}</p><ExperienceEvidenceSignal label={experienceSignals[0]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{experience[0].details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>
-            {experience.slice(1).map((item, index) => <Reveal delay={(index + 1) * 0.08} key={item.company}><div className={`timeline-row ${activeExperience === index + 1 ? "is-map-active" : ""}`} tabIndex={0} aria-label={`${item.role}. Focus to highlight related skills.`} onMouseEnter={() => pinExperienceRow(index + 1)} onFocus={() => pinExperienceRow(index + 1)} onMouseLeave={releaseExperienceRow} onBlur={releaseExperienceRow}><TimelineCheckpoint motionPaused={motionPaused} /><div className="label leading-6">{item.period}<br /><span className="text-[#777285]">{item.place}</span></div><div><h3 className="display text-2xl text-white">{item.role}</h3><p className="mt-1 text-sm text-violet-200">{item.company}</p><ExperienceEvidenceSignal label={experienceSignals[index + 1]} motionPaused={motionPaused} /><ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">{item.details.map((detail) => <li key={detail} className="flex gap-2"><span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />{detail}</li>)}</ul></div></div></Reveal>)}
+          <div className="timeline-list">
+            {experience.map((item, index) => (
+              <Reveal delay={index * 0.08} key={item.company}>
+                <div className="timeline-row">
+                  <TimelineCheckpoint motionPaused={motionPaused} />
+                  <div className="label leading-6">
+                    {item.period}
+                    <br />
+                    <span className="text-[#777285]">{item.place}</span>
+                  </div>
+                  <div>
+                    <h3 className="display text-2xl text-white">{item.role}</h3>
+                    <p className="mt-1 text-sm text-violet-200">{item.company}</p>
+                    <ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#b7b0c1]">
+                      {item.details.map((detail) => (
+                        <li key={detail} className="flex gap-2">
+                          <span className="mt-2 h-1 w-1 shrink-0 bg-violet-300" />
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                    {item.tags && (
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/[0.04] border border-white/[0.08] text-violet-200/90"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {"highlights" in item && item.highlights && (
+                      <div className="mt-3.5 grid grid-cols-3 gap-2 rounded-lg border border-white/[0.08] bg-white/[0.02] py-2 px-2.5 text-center">
+                        {item.highlights.map((stat) => (
+                          <div key={stat.label} className="flex flex-col">
+                            <span className="text-xs sm:text-sm font-semibold text-white font-mono">{stat.value}</span>
+                            <span className="text-[9px] text-white/50 uppercase tracking-wider mt-0.5">{stat.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
           <Reveal delay={0.1} className="experience-aside-stack self-start">
             <ExperienceConnectionMap
-              activeExperience={activeExperience}
-              onSelectExperience={pinExperienceRow}
               motionPaused={motionPaused}
             />
 
-            <div className="panel p-7 md:p-8 mt-6">
+            <div className="panel p-6 md:p-7 mt-6">
               <div className="flex items-center gap-3">
                 <GraduationCap className="text-violet-300" size={20} />
                 <p className="label">Education</p>
               </div>
-              <div className="mt-7">
-                <p className="display text-3xl leading-tight text-white">B.Tech, Information Technology</p>
-                <p className="mt-3 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p>
-                <p className="mt-5 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021—Present · CGPA 8.0 / 10.0</p>
+              <div className="mt-6">
+                <p className="display text-2xl lg:text-3xl leading-tight text-white">B.Tech, Information Technology</p>
+                <p className="mt-2.5 text-sm leading-6 text-[#c2bbce]">Saveetha School of Engineering, Chennai</p>
+                <p className="mt-4 border-l border-violet-400 pl-3 text-sm text-violet-200">09/2021 — 05/2025 · Graduated · CGPA 8.0 / 10.0</p>
               </div>
-              <div className="mt-8 space-y-3 border-t border-white/10 pt-6">
+              <div className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
                 <div className="flex justify-between text-sm text-[#aaa4b7]">
                   <span>HSC</span>
                   <span className="text-white">80%</span>
@@ -2478,9 +3517,24 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="editorial-band container py-28 md:py-40">
+      {/* ========================================================================
+          SECTION 05: CREDENTIALS — 05 / SIGNALS OF MOMENTUM (#credentials)
+          ======================================================================== */}
+      <section id="credentials" className="editorial-band container w-full max-w-full overflow-x-clip py-28 md:py-40">
         <span className="signal-thread credential-thread" aria-hidden="true" />
-        <Reveal><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">06 / Credentials</p><h2 className="display mt-4 text-4xl text-white md:text-6xl [text-wrap:balance]">Credentials & learning.</h2></div><BriefcaseBusiness className="mb-2 text-violet-300" size={28} /></div></Reveal>
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="label font-mono text-[11px] text-violet-300 tracking-widest">05 / Credentials</p>
+              <GravityHeading
+                title="Signals of momentum."
+                motionPaused={motionPaused}
+                className="display mt-4 text-4xl text-white md:text-6xl [text-wrap:balance] gravity-heading"
+              />
+            </div>
+            <BriefcaseBusiness className="mb-2 text-violet-300" size={28} />
+          </div>
+        </Reveal>
         <div className="credential-grid relative mt-12 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
           <CredentialSignalScan motionPaused={motionPaused} />
           {certifications.map((credential, index) => (
@@ -2520,9 +3574,12 @@ export default function Home() {
         />
       </section>
 
-      <section id="contact" className="editorial-band relative overflow-hidden py-28 md:py-40" onPointerDown={createContactPulse} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/images/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* ========================================================================
+          SECTION 06: CONTACT & FOOTER — 06 / LET'S MAKE THE NEXT INTERACTION COUNT (#contact)
+          ======================================================================== */}
+      <section id="contact" className="editorial-band relative w-full max-w-full overflow-hidden py-28 md:py-40" onPointerDown={createContactPulse} style={{ backgroundImage: "linear-gradient(90deg, rgba(9,9,15,.95), rgba(9,9,15,.8)), url('/images/smp-ambient-texture_4dec6a68.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className={`contact-atmosphere ${contactFocused ? "is-engaged" : ""}`} aria-hidden="true"><span className="contact-orbit one" /><span className="contact-orbit two" /><span className="contact-glint one" /><span className="contact-glint two" /><span className="contact-beacon"><i /><i /><i /></span>{contactPulses.map((pulse) => <span key={pulse.id} className="contact-pulse" style={{ left: `${pulse.x}%`, top: `${pulse.y}%` }} />)}</div>
-        <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">07 / Contact</p><h2 className="display mt-5 max-w-[12ch] text-5xl leading-[.9] text-white md:text-7xl [text-wrap:balance]">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1] [text-wrap:balance]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4">
+        <div className="container relative z-10"><Reveal><div className="grid gap-12 lg:grid-cols-[.86fr_1.14fr] lg:gap-24"><div><p className="label font-mono text-[11px] text-violet-300 tracking-widest">06 / Contact</p><h2 className="display mt-5 max-w-[12ch] text-5xl leading-[.9] text-white md:text-7xl [text-wrap:balance]">Let&apos;s make the next interaction <span className="violet-text">count.</span></h2><p className="mt-7 max-w-md text-[0.94rem] leading-7 text-[#b7b0c1] [text-wrap:balance]">For frontend, UI/UX, Java, or collaborative product work, write a note with a little context. I&apos;ll take it from there.</p><div className="mt-10 space-y-4">
   <div className="space-y-2">
     <div className="group relative flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-2.5 pr-3.5 backdrop-blur-sm transition-all hover:border-violet-500/40 hover:bg-white/[0.06]">
       <button
@@ -2625,12 +3682,8 @@ export default function Home() {
           <button className="signal-button primary w-full" type="submit">{sent ? "Message prepared" : "Send the note"} <Send size={15} /></button>{sent ? <div className="delivery-status" role="status" aria-live="polite"><CircleCheckBig size={19} /><div><p className="label text-[0.56rem] text-violet-100">Message prepared</p><p className="mt-1 text-xs leading-5 text-[#dfd6f5]">Your email app opened with this note addressed to Manoj. Send it there to complete delivery.</p></div></div> : null}<p className="text-center text-xs leading-5 text-[#827b91]">This form prepares a message in your email client; final delivery is confirmed by your email provider.</p></div></form></div></Reveal></div>
       </section>
 
-
-
       <footer className="border-t border-white/10 bg-[#08080e] py-7"><div className="container flex flex-col justify-between gap-5 text-xs text-[#8d869a] sm:flex-row sm:items-center"><div className="flex items-center gap-3"><span className="seal-wrap h-9 w-9"><img src="/images/smp-mj-monogram-clear-j_24fbf37a.png" alt="MJ monogram" loading="lazy" decoding="async" /></span><span>© {year} S Manoj Prabhu. Built with intention.</span></div><div className="flex items-center gap-4"><a className="hover:text-violet-200" href="https://github.com/manojprabhu07" target="_blank" rel="noopener noreferrer">GitHub</a><a className="hover:text-violet-200" href="mailto:manojprabhu0707@gmail.com">Email</a><button className="inline-flex items-center gap-1 hover:text-violet-200" onClick={() => scrollToSection("top")}>Back to top <ArrowUpRight size={13} /></button><button className={`footer-star ${footerBurst ? "is-bursting" : ""}`} onClick={triggerFooterBurst} aria-label={reduceMotion ? "Star motion is disabled by your device setting" : motionPaused ? "Star motion is paused" : "Release a closing spark"} disabled={Boolean(reduceMotion || motionPaused)}><Sparkles size={14} /><span className="spark-tooltip">Release spark</span><span className="corner-spark-field" aria-hidden="true">{footerBurst ? Array.from({ length: 8 }, (_, index) => <span key={`${footerBurst}-${index}`} className="corner-spark" style={{ "--spark-angle": `${index * 45}deg` } as React.CSSProperties} />) : null}</span></button></div></div></footer>
       <div className="mobile-contact-dock" aria-label="Mobile quick actions"><button className="mobile-resume-action" type="button" onClick={downloadResume}><Download size={15} />Résumé</button><button className="mobile-contact-action" type="button" onClick={() => scrollToSection("contact")}><Mail size={16} />Contact</button></div>
     </main>
   );
 }
-
-

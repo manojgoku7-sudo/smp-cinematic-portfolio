@@ -25,6 +25,11 @@ export const MagneticNav: FC<MagneticNavProps> = ({
 
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const moveRafRef = useRef<number | null>(null);
+  const cachedRectsRef = useRef<{
+    navLeft: number;
+    items: Record<string, { left: number; top: number; width: number; height: number }>;
+  }>({ navLeft: 0, items: {} });
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [magneticOffset, setMagneticOffset] = useState({ x: 0, y: 0 });
@@ -34,24 +39,37 @@ export const MagneticNav: FC<MagneticNavProps> = ({
     ready: false,
   });
 
+  const refreshCachedRects = useCallback(() => {
+    const navEl = navRef.current;
+    if (!navEl) return;
+    const navRect = navEl.getBoundingClientRect();
+    const nextItems: Record<string, { left: number; top: number; width: number; height: number }> = {};
+    for (const [id, btn] of Object.entries(itemRefs.current)) {
+      if (btn) {
+        const r = btn.getBoundingClientRect();
+        nextItems[id] = { left: r.left, top: r.top, width: r.width, height: r.height };
+      }
+    }
+    cachedRectsRef.current = { navLeft: navRect.left, items: nextItems };
+  }, []);
+
   // Calculate coordinates of a target item relative to the nav container
   const computePosition = useCallback(
     (targetId: string, extraX = 0) => {
-      const navEl = navRef.current;
-      const targetBtn = itemRefs.current[targetId];
-
-      if (!navEl || !targetBtn) return null;
-
-      const navRect = navEl.getBoundingClientRect();
-      const btnRect = targetBtn.getBoundingClientRect();
+      let cached = cachedRectsRef.current.items[targetId];
+      if (!cached) {
+        refreshCachedRects();
+        cached = cachedRectsRef.current.items[targetId];
+      }
+      if (!cached) return null;
 
       return {
-        left: btnRect.left - navRect.left + extraX,
-        width: btnRect.width,
+        left: cached.left - cachedRectsRef.current.navLeft + extraX,
+        width: cached.width,
         ready: true,
       };
     },
-    []
+    [refreshCachedRects]
   );
 
   // Position underline at activeId or hovered item
@@ -74,48 +92,70 @@ export const MagneticNav: FC<MagneticNavProps> = ({
   // Initial measurement and window resize listener
   useEffect(() => {
     const handleResize = () => {
+      refreshCachedRects();
       const target = hoveredId || activeId;
       updateLine(target, 0);
     };
 
     // Initial measure after mount/fonts loaded
     const timer = setTimeout(handleResize, 50);
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
       clearTimeout(timer);
+      if (moveRafRef.current !== null) {
+        cancelAnimationFrame(moveRafRef.current);
+      }
       window.removeEventListener("resize", handleResize);
     };
-  }, [activeId, hoveredId, updateLine]);
+  }, [activeId, hoveredId, refreshCachedRects, updateLine]);
 
-  // Handle magnetic cursor pull on mouse move
+  // Handle magnetic cursor pull on mouse move coalesced via requestAnimationFrame
   const handleMouseMove = (e: MouseEvent<HTMLButtonElement>, id: string) => {
     if (shouldReduceMotion) return;
 
-    const btn = itemRefs.current[id];
-    if (!btn) return;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
 
-    const rect = btn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    if (moveRafRef.current !== null) {
+      cancelAnimationFrame(moveRafRef.current);
+    }
 
-    // Fluid magnetic displacement towards cursor
-    const deltaX = (e.clientX - centerX) * 0.22;
-    const deltaY = (e.clientY - centerY) * 0.18;
+    moveRafRef.current = requestAnimationFrame(() => {
+      moveRafRef.current = null;
+      let rect = cachedRectsRef.current.items[id];
+      if (!rect) {
+        refreshCachedRects();
+        rect = cachedRectsRef.current.items[id];
+      }
+      if (!rect) return;
 
-    const clampedX = Math.max(-6, Math.min(6, deltaX));
-    const clampedY = Math.max(-3, Math.min(3, deltaY));
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
 
-    setMagneticOffset({ x: clampedX, y: clampedY });
-    updateLine(id, clampedX);
+      // Fluid magnetic displacement towards cursor
+      const deltaX = (clientX - centerX) * 0.22;
+      const deltaY = (clientY - centerY) * 0.18;
+
+      const clampedX = Math.max(-6, Math.min(6, deltaX));
+      const clampedY = Math.max(-3, Math.min(3, deltaY));
+
+      setMagneticOffset({ x: clampedX, y: clampedY });
+      updateLine(id, clampedX);
+    });
   };
 
   const handleMouseEnter = (id: string) => {
+    refreshCachedRects();
     setHoveredId(id);
     updateLine(id, 0);
   };
 
   const handleMouseLeaveNav = () => {
+    if (moveRafRef.current !== null) {
+      cancelAnimationFrame(moveRafRef.current);
+      moveRafRef.current = null;
+    }
     // Snap back to active link
     setHoveredId(null);
     setMagneticOffset({ x: 0, y: 0 });
@@ -123,12 +163,17 @@ export const MagneticNav: FC<MagneticNavProps> = ({
   };
 
   const handleFocus = (id: string) => {
+    refreshCachedRects();
     setHoveredId(id);
     setMagneticOffset({ x: 0, y: 0 });
     updateLine(id, 0);
   };
 
   const handleBlur = () => {
+    if (moveRafRef.current !== null) {
+      cancelAnimationFrame(moveRafRef.current);
+      moveRafRef.current = null;
+    }
     setHoveredId(null);
     setMagneticOffset({ x: 0, y: 0 });
     updateLine(activeId, 0);

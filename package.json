@@ -103,5 +103,15 @@
     "vite": "^7.1.7",
     "vite-plugin-manus-runtime": "0.0.59",
     "vitest": "^2.1.4"
+  },
+  "overrides": {
+    "rollup": "4.64.5",
+    "@builder.io/vite-plugin-jsx-loc": {
+      "vite": "$vite"
+    }
+  },
+  "resolutions": {
+    "rollup": "4.64.5",
+    "vite": "^7.1.7"
   }
 }

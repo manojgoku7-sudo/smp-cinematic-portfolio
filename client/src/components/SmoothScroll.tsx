@@ -13,7 +13,11 @@ export default function SmoothScroll() {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
-    if (reducedMotion.matches) return;
+    const isCoarseTouch =
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      (window.innerWidth < 768 && "ontouchstart" in window);
+
+    if (reducedMotion.matches || isCoarseTouch) return;
 
     const lenis = new Lenis({
       // Lerp mode reacts immediately to each wheel event and avoids the long
@@ -25,6 +29,16 @@ export default function SmoothScroll() {
       syncTouch: false,
       wheelMultiplier: 0.92,
       overscroll: false,
+      prevent: (node) => {
+        return (
+          node.hasAttribute("data-lenis-prevent") ||
+          node.hasAttribute("data-lenis-prevent-wheel") ||
+          Boolean(node.closest("[data-lenis-prevent]")) ||
+          Boolean(node.closest("[data-lenis-prevent-wheel]")) ||
+          Boolean(node.closest("[role='dialog']")) ||
+          Boolean(node.closest(".mobile-drawer-glass"))
+        );
+      },
     });
     window.__portfolioLenis = lenis;
 
@@ -73,3 +87,4 @@ export default function SmoothScroll() {
 
   return null;
 }
+

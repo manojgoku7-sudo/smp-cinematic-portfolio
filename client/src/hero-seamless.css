@@ -22,3 +22,22 @@
   box-shadow: none;
   background: transparent;
 }
+
+.about-blackhole-video,
+.about-blackhole-video-media {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  mix-blend-mode: screen !important;
+}
+
+.about-blackhole-video::before,
+.about-blackhole-video::after,
+.about-blackhole-video-vignette {
+  display: none !important;
+  content: none !important;
+}
+
+
+

@@ -26,10 +26,10 @@ export interface PerformanceMonitorOptions {
  * Automatically cleans up on unmount and ignores background tab pauses.
  */
 export function usePerformanceMonitor({
-  enabled = import.meta.env.DEV,
-  frameDropThresholdMs = 34,
-  logFrameDrops = true,
-  logLongTasks = true,
+  enabled = false, // Set to false to avoid DevTools serialization stalls during scrolling
+  frameDropThresholdMs = 60,
+  logFrameDrops = false,
+  logLongTasks = false,
 }: PerformanceMonitorOptions = {}) {
   useEffect(() => {
     if (!enabled || typeof window === "undefined") {

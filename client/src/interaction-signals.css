@@ -44,11 +44,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0 !important;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.35s var(--ease-out);
-  background: radial-gradient(18rem circle at var(--cell-glow-x, 50%) var(--cell-glow-y, 50%), rgb(224 212 255 / 0.24), rgb(139 92 246 / 0.1) 40%, transparent 70%);
+  background: radial-gradient(14rem circle at var(--cell-glow-x, 50%) var(--cell-glow-y, 50%), rgba(210, 190, 255, 0.16), rgba(139, 92, 246, 0.05) 45%, transparent 70%);
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .page-shell:not(.motion-paused):not(.low-data) .capability-cell:hover::after {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Terminal, RefreshCw, Check, Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -78,6 +78,16 @@ export function CyberTypingDescription({
 
   const colors = TONE_STYLES[tone] || TONE_STYLES.cyan;
 
+  // Pre-compile highlight RegExp and O(1) lowercase lookup Set once per highlights array
+  const highlightMatcher = useMemo(() => {
+    if (!highlights || highlights.length === 0) return null;
+    const escaped = highlights.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    return {
+      regex: new RegExp(`(${escaped.join("|")})`, "gi"),
+      lookup: new Set(highlights.map((h) => h.toLowerCase())),
+    };
+  }, [highlights]);
+
   const startTyping = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     
@@ -149,20 +159,16 @@ export function CyberTypingDescription({
   const renderFormattedText = () => {
     const currentSubstr = text.slice(0, displayedLength);
 
-    if (highlights.length === 0) {
+    if (!highlightMatcher) {
       return <span>{currentSubstr}</span>;
     }
 
-    // Build regex to match any highlight keyword safely
-    const escaped = highlights.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-    const regex = new RegExp(`(${escaped.join("|")})`, "gi");
-    const parts = currentSubstr.split(regex);
+    const parts = currentSubstr.split(highlightMatcher.regex);
 
     return (
       <>
         {parts.map((part, idx) => {
-          const isMatch = highlights.some((h) => h.toLowerCase() === part.toLowerCase());
-          if (isMatch) {
+          if (highlightMatcher.lookup.has(part.toLowerCase())) {
             return (
               <strong key={idx} className={colors.highlight}>
                 {part}
@@ -178,12 +184,12 @@ export function CyberTypingDescription({
   return (
     <div
       ref={containerRef}
-      className={`cyber-typing-block relative my-4 rounded-lg border ${colors.border} ${colors.bg} ${colors.glow} p-3.5 sm:p-4 font-mono text-[12.5px] leading-relaxed backdrop-blur-md transition-all duration-300 group/cyber ${className}`}
+      className={`cyber-typing-block relative my-4 rounded-lg border ${colors.border} ${colors.bg} ${colors.glow} p-3.5 sm:p-4 font-mono text-[12.5px] leading-relaxed transition-colors duration-300 group/cyber ${className}`}
     >
       {/* Cyber terminal header line */}
       <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5 select-none text-[10px] tracking-wider uppercase">
         <div className="flex items-center gap-1.5">
-          <Terminal size={11} className={`${colors.prompt} animate-pulse`} />
+          <Terminal size={11} className={colors.prompt} />
           <span className={`${colors.prompt} font-bold`}>{promptLabel}</span>
           <span className="text-zinc-600">::</span>
           <span className="text-zinc-400 hidden xs:inline">telemetry_stream</span>
@@ -193,7 +199,7 @@ export function CyberTypingDescription({
           <span
             className={`px-1.5 py-0.2 rounded border text-[9px] font-bold ${
               isTyping
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse"
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                 : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
             }`}
           >
@@ -224,18 +230,23 @@ export function CyberTypingDescription({
         </div>
       </div>
 
-      {/* Cyber Monospaced Content */}
-      <div className="relative text-zinc-300 font-mono">
-        <span className={`${colors.prompt} font-bold mr-1.5 select-none`}>&gt;</span>
-        {renderFormattedText()}
-        
-        {/* Blinking Cyber Cursor */}
-        {!isComplete && (
-          <span
-            className={`inline-block w-2 h-3.5 ml-0.5 align-middle ${colors.cursor} animate-pulse shadow-[0_0_8px_currentColor]`}
-            aria-hidden="true"
-          />
-        )}
+      {/* Cyber Monospaced Content — grid sizer locks exact final height to prevent layout shifts during scroll */}
+      <div className="relative grid text-zinc-300 font-mono">
+        <div className="invisible pointer-events-none select-none col-start-1 row-start-1" aria-hidden="true">
+          <span className="font-bold mr-1.5">&gt;</span>
+          <span>{text}</span>
+          <span className="inline-block w-2 h-3.5 ml-0.5 align-middle" />
+        </div>
+        <div className="col-start-1 row-start-1">
+          <span className={`${colors.prompt} font-bold mr-1.5 select-none`}>&gt;</span>
+          {renderFormattedText()}
+          {!isComplete && (
+            <span
+              className={`inline-block w-2 h-3.5 ml-0.5 align-middle ${colors.cursor} shadow-[0_0_8px_currentColor]`}
+              aria-hidden="true"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
