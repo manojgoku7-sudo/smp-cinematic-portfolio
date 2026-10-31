@@ -81,10 +81,39 @@ export function CursorPortrait({
     centerImg.decoding = "async";
     centerImg.src = CENTER;
 
+    // Crossfade from the displayed pose, even when a transition is interrupted.
+    const previousFrame = document.createElement("canvas");
+    previousFrame.width = canvas.width;
+    previousFrame.height = canvas.height;
+    const previousCtx = previousFrame.getContext("2d");
+    let fadeId = 0;
+    let hasRendered = false;
     const render = (img: HTMLImageElement) => {
       if (disposed || !ctx) return;
-      ctx.clearRect(0, 0, 1280, 720);
-      ctx.drawImage(img, 0, 0, 1280, 720);
+      if (fadeId) cancelAnimationFrame(fadeId);
+      fadeId = 0;
+      if (!hasRendered || !previousCtx || paused || lowData || reduced.matches) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        hasRendered = true;
+        return;
+      }
+      previousCtx.clearRect(0, 0, canvas.width, canvas.height);
+      previousCtx.drawImage(canvas, 0, 0);
+      const started = performance.now();
+      const fade = (now: number) => {
+        if (disposed) return;
+        const amount = Math.min(1, (now - started) / 100);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
+        ctx.drawImage(previousFrame, 0, 0);
+        ctx.globalAlpha = amount;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
+        if (amount < 1) fadeId = requestAnimationFrame(fade);
+        else fadeId = 0;
+      };
+      fadeId = requestAnimationFrame(fade);
     };
 
     // Draw initial center frame as soon as it loads
@@ -221,7 +250,7 @@ export function CursorPortrait({
       );
 
       // Critically damped exponential spring: responsive yet silky smooth
-      const factor = 1 - Math.exp(-dt / 42);
+      const factor = 1 - Math.exp(-dt / 85);
       currentAngle += delta * factor;
 
       // Map normalized angle to poses and quantize to nearest preloaded stride frame
@@ -313,6 +342,7 @@ export function CursorPortrait({
 
     return () => {
       disposed = true;
+      if (fadeId) cancelAnimationFrame(fadeId);
       reset();
       observer.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
